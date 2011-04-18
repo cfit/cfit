@@ -1,0 +1,107 @@
+
+PROJECT = cfit
+
+HDIR = include
+CDIR = src
+ODIR = obj
+LDIR = lib
+DDIR = dep
+
+#define MPI_ON
+#1
+#endef
+
+HDRDIRS = $(HDIR)
+LIBDIRS = $(LDIR)
+LIBLIST = minuit
+
+OBJLIST = pdfbase pdfmodel pdf pdfops dataset minimizer nll chi2
+
+
+#-------------------------------------------------------------------
+# There should be no need to change much below this point.
+#-------------------------------------------------------------------
+
+CXX     = g++
+CXXL    = g++
+
+ifdef MPI_ON
+# Directory of the MPI implementation.
+MPIDIR	?= $(HOME)/libs/openmpi
+CXXL    = $(MPIDIR)/bin/mpic++
+HDRDIRS += $(MPIDIR)/include $(MPIDIR)/include/openmpi
+LIBDIRS += $(MPIDIR)/lib
+LIBLIST += mpi
+endif
+
+HDRSTR = $(foreach dir,$(HDRDIRS),-I $(dir))
+LIBSTR = $(foreach dir,$(LIBDIRS),-L $(dir)) $(foreach lib,$(LIBLIST),-l$(lib))
+
+CFLAGS  = -g -O -Wall -fPIC $(HDRSTR)
+LFLAGS  = -g -O -Wall -fPIC $(LIBSTR)
+
+ifdef MPI_ON
+CFLAGS  += -DMPI_ON
+LFLAGS  += -DMPI_ON
+endif
+
+RM      = rm -rf
+LN      = ln -fs
+
+LIB     = $(LDIR)/lib$(subst /,,$(PROJECT)).so
+
+all:    lib
+lib:    $(LIB)
+.PHONY: tidy sweep clean
+
+OFILES = $(foreach obj,$(OBJLIST),$(ODIR)/$(obj).o)
+DFILES = $(foreach dep,$(OBJLIST),$(DDIR)/$(dep).d)
+
+# Rule for the library.
+$(LIB): $(OFILES) $(MAKEFILE_LIST)
+	@ mkdir -p $(dir $@)
+	$(CXXL) -shared -o $@ $(OFILES) $(LFLAGS)
+
+# Rules for dependency files.
+$(DFILES): $(DDIR)/%.d: $(CDIR)/%.cc $(HDIR)/$(firstword $(subst /, ,$(PROJECT)))/%.hh $(MAKEFILE_LIST)
+	@ mkdir -p $(dir $@)
+	@ echo $(CXX) -MM -MF $@ -MT $$(echo $@ | sed "s/^$(DDIR)/$(ODIR)/g;s/\.d$$/\.o/g") $< -I $(HDIR)
+	@ $(CXX) -MM -MF $@ -MT $$(echo $@ | sed "s/^$(DDIR)/$(ODIR)/g;s/\.d$$/\.o/g") $< -I $(HDIR)
+
+# Rules for objects.
+$(OFILES): $(ODIR)/%.o: $(CDIR)/%.cc $(DDIR)/%.d $(MAKEFILE_LIST)
+	@ mkdir -p $(dir $@)
+	$(CXX) -o $@ -c $< $(CFLAGS)
+
+# Include all existent dependency files.
+include $(wildcard $(DFILES))
+
+# This rule removes libraries that have been linked or copied in the
+#    specified $(LDIR). These libraries may be needed to run the
+#    program. Useful to change versions of the libraries used.
+tidy:
+	@ if [ $(LDIR) != "." ] && [ $(LDIR) != ".." ];	\
+	then						\
+		$(RM) $(LDIR);				\
+	else						\
+		$(RM) *.so;				\
+	fi
+
+# This rule cleans up any backups or links to libraries only needed
+#    at compilation time.
+sweep:
+	@ $(RM) $(ELF).out *~ `find -name '*~'` `find -name '\#*'` `find -name '\#*'`
+	@ if [ $(ODIR) != "." ] && [ $(ODIR) != ".." ];	\
+	then						\
+		$(RM) $(ODIR);				\
+	else						\
+		$(RM) *.o;				\
+	fi
+	@ if [ $(DDIR) != "." ] && [ $(DDIR) != ".." ];	\
+	then						\
+		$(RM) $(DDIR);				\
+	else						\
+		$(RM) *.d;				\
+	fi
+
+clean: tidy sweep
