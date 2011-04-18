@@ -13,35 +13,38 @@
 
 void Dataset::push( const std::string& field, const double value, const double error )
 {
-  _data[ field ].push_back( std::make_pair< double >( value, error ) );
+  _data.push_back( std::make_pair( field, std::make_pair( value, error ) ) );
+
+//   _data.push_back( std::make_pair( field, std::make_pair( value, error ) ) );
+
+//   _data[ field ].push_back( std::make_pair< double >( value, error ) );
 }
 
 
 // Getters.
 int Dataset::size() const
 {
-  return _data.begin()->second.size();
+  return _data.size();
 }
 
 
 double Dataset::value( const std::string& field, int entry ) const
 {
-  return _data.find( field )->second[ entry ].first;
+  return _data[ entry ].find( field )->second.first;
 }
 
 
 double Dataset::error( const std::string& field, int entry ) const
 {
-  return _data.find( field )->second[ entry ].second;
+  return _data[ entry ].find( field )->second.second;
 }
 
 
 std::vector< double > Dataset::values( const std::string& field ) const
 {
   std::vector< double > vals;
-  const std::vector< std::pair< double, double > >& entries = _data.find( field )->second;
 
-  std::transform( entries.begin(), entries.end(), std::back_inserter( vals ), Select1st() );
+  std::transform( _data.begin(), _data.end(), std::back_inserter( vals ), SelectValue( field ) );
 
   return vals;
 }
@@ -52,7 +55,7 @@ std::vector< double > Dataset::errors( const std::string& field ) const
   std::vector< double > errs;
   const std::vector< std::pair< double, double > >& entries = _data.find( field )->second;
 
-  std::transform( entries.begin(), entries.end(), std::back_inserter( errs ), Select2nd() );
+  std::transform( entries.begin(), entries.end(), std::back_inserter( errs ), select2nd() );
 
   return errs;
 }
@@ -62,7 +65,7 @@ std::vector< std::string > Dataset::fields() const
 {
   std::vector< std::string > fieldVect;
 
-  std::transform( _data.begin(), _data.end(), std::back_inserter( fieldVect ), Select1st() );
+  std::transform( _data.begin(), _data.end(), std::back_inserter( fieldVect ), select1st() );
 
   return fieldVect;
 }
@@ -127,8 +130,8 @@ void Dataset::scatter()
 	  fieldLength = field->first.size() + 1;
 
 	  // Convert the C++ container objects to C arrays.
-	  std::transform( field->second.begin(), field->second.end(), allValues, Select1st() );
-	  std::transform( field->second.begin(), field->second.end(), allErrors, Select2nd() );
+	  std::transform( field->second.begin(), field->second.end(), allValues, RetrieveValue() );
+	  std::transform( field->second.begin(), field->second.end(), allErrors, RetrieveError() );
 
 	  // Broadcast the name of the field.
 	  world.Bcast( &fieldLength, 1          , MPI::INT , root );

@@ -5,10 +5,30 @@
 #include <vector>
 #include <utility>
 
+#include <cfit/variable.hh>
+
+class SelectValue
+{
+private:
+  std::string _name;
+
+public:
+  SelectValue( const std::string& name )
+    : _name( name )
+  {}
+
+  double operator()( const std::map< std::string, std::pair< double, double > >& container ) const
+  {
+    return container.find( _name )->second.first;
+  }
+};
+
+
 class Dataset
 {
 private:
-  std::map< std::string, std::vector< std::pair< double, double > > > _data;
+  std::vector< std::map< std::string, std::pair< double, double > > > _data;
+//   std::map< std::string, std::vector< std::pair< double, double > > > _data;
 
 public:
   Dataset()  {};
