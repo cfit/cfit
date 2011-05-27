@@ -1,8 +1,16 @@
 #ifndef __PARAMETER_HH__
 #define __PARAMETER_HH__
 
+#include <string>
+
+class PdfModel;
+class Pdf;
+class ParameterExpr;
+
 class Parameter
 {
+  friend class Pdf;
+
 private:
   std::string _name;
   double      _value; // Should contain the initial value.
@@ -51,20 +59,65 @@ public:
   double      lowerLimit() const { return   _lower;     }
 
   // Arithmetic operators.
-  friend const double operator+( const Parameter& l, const Parameter& r ) { return l._value + r._value; }
-  friend const double operator-( const Parameter& l, const Parameter& r ) { return l._value - r._value; }
-  friend const double operator*( const Parameter& l, const Parameter& r ) { return l._value * r._value; }
-  friend const double operator/( const Parameter& l, const Parameter& r ) { return l._value / r._value; }
+  friend const ParameterExpr operator+( const Parameter&     left, const Parameter&     right );
+  friend const ParameterExpr operator-( const Parameter&     left, const Parameter&     right );
+  friend const ParameterExpr operator*( const Parameter&     left, const Parameter&     right );
+  friend const ParameterExpr operator/( const Parameter&     left, const Parameter&     right );
 
-  friend const double operator+( const double& l, const Parameter& r ) { return l + r._value; }
-  friend const double operator-( const double& l, const Parameter& r ) { return l - r._value; }
-  friend const double operator*( const double& l, const Parameter& r ) { return l * r._value; }
-  friend const double operator/( const double& l, const Parameter& r ) { return l / r._value; }
+  friend const ParameterExpr operator+( const double&        left, const Parameter&     right );
+  friend const ParameterExpr operator-( const double&        left, const Parameter&     right );
+  friend const ParameterExpr operator*( const double&        left, const Parameter&     right );
+  friend const ParameterExpr operator/( const double&        left, const Parameter&     right );
 
-  friend const double operator+( const Parameter& l, const double& r ) { return l._value + r; }
-  friend const double operator-( const Parameter& l, const double& r ) { return l._value - r; }
-  friend const double operator*( const Parameter& l, const double& r ) { return l._value * r; }
-  friend const double operator/( const Parameter& l, const double& r ) { return l._value / r; }
+  friend const ParameterExpr operator+( const Parameter&     left, const double&        right );
+  friend const ParameterExpr operator-( const Parameter&     left, const double&        right );
+  friend const ParameterExpr operator*( const Parameter&     left, const double&        right );
+  friend const ParameterExpr operator/( const Parameter&     left, const double&        right );
+
+//   friend const ParameterExpr operator+( const ParameterExpr& left, const ParameterExpr& right );
+//   friend const ParameterExpr operator-( const ParameterExpr& left, const ParameterExpr& right );
+//   friend const ParameterExpr operator*( const ParameterExpr& left, const ParameterExpr& right );
+//   friend const ParameterExpr operator/( const ParameterExpr& left, const ParameterExpr& right );
+
+//   friend const ParameterExpr operator+( const double&        left, const ParameterExpr& right );
+//   friend const ParameterExpr operator-( const double&        left, const ParameterExpr& right );
+//   friend const ParameterExpr operator*( const double&        left, const ParameterExpr& right );
+//   friend const ParameterExpr operator/( const double&        left, const ParameterExpr& right );
+
+//   friend const ParameterExpr operator+( const ParameterExpr& left, const double&        right );
+//   friend const ParameterExpr operator-( const ParameterExpr& left, const double&        right );
+//   friend const ParameterExpr operator*( const ParameterExpr& left, const double&        right );
+//   friend const ParameterExpr operator/( const ParameterExpr& left, const double&        right );
+
+  friend const ParameterExpr operator+( const ParameterExpr& left, const Parameter&     right );
+  friend const ParameterExpr operator-( const ParameterExpr& left, const Parameter&     right );
+  friend const ParameterExpr operator*( const ParameterExpr& left, const Parameter&     right );
+  friend const ParameterExpr operator/( const ParameterExpr& left, const Parameter&     right );
+
+  friend const ParameterExpr operator+( const Parameter&     left, const ParameterExpr& right );
+  friend const ParameterExpr operator-( const Parameter&     left, const ParameterExpr& right );
+  friend const ParameterExpr operator*( const Parameter&     left, const ParameterExpr& right );
+  friend const ParameterExpr operator/( const Parameter&     left, const ParameterExpr& right );
+
+  friend const ParameterExpr pow      ( const Parameter&     left, const double&        right );
+  friend const ParameterExpr pow      ( const ParameterExpr& left, const double&        right );
+
+  friend const ParameterExpr operator-( const Parameter&     par );
+  friend const ParameterExpr operator-( const ParameterExpr& par );
+
+  friend const ParameterExpr exp      ( const Parameter&     par );
+  friend const ParameterExpr log      ( const Parameter&     par );
+  friend const ParameterExpr sin      ( const Parameter&     par );
+  friend const ParameterExpr cos      ( const Parameter&     par );
+  friend const ParameterExpr tan      ( const Parameter&     par );
+
+  friend const Pdf           operator*( const Parameter&     left, const PdfModel&      right );
+  friend const Pdf           operator*( const PdfModel&      left, const Parameter&     right );
+  friend const Pdf           operator/( const PdfModel&      left, const Parameter&     right );
+
+  friend const Pdf           operator*( const Parameter&     left, const Pdf&           right );
+  friend const Pdf           operator*( const Pdf&           left, const Parameter&     right );
+  friend const Pdf           operator/( const Pdf&           left, const Parameter&     right );
 };
 
 #endif

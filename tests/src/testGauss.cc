@@ -2,10 +2,13 @@
 #include <fstream>
 
 #include <cfit/parameter.hh>
+#include <cfit/parameterexpr.hh>
 #include <cfit/variable.hh>
 #include <cfit/dataset.hh>
 #include <cfit/chi2.hh>
 #include <cfit/pdf.hh>
+
+#include <cfit/operation.hh>
 
 #include <cfit/models/gauss.hh>
 
@@ -77,8 +80,10 @@ int main( int argc, char** argv )
   Variable y( "y" );
 
   // Parameters of the model.
-  Parameter area1 ( "area1" , 2.e5, 300. );
-  Parameter area2 ( "area2" , 2.e5, 300. );
+  Parameter area  ( "area"  , 4.e5, 300. );
+  Parameter phi   ( "phi"   , 0.5 , 0.1  );
+//Parameter area1 ( "area1" , 2.e5, 300. );
+//Parameter area2 ( "area2" , 2.e5, 300. );
   Parameter mean1 ( "mean1" , -1. , .003 ); 
   Parameter mean2 ( "mean2" , 2.  , .003 );
   Parameter sigma1( "sigma1", 2.  , .003 );
@@ -88,7 +93,7 @@ int main( int argc, char** argv )
   Gauss g1( x, mean1, sigma1 );
   Gauss g2( x, mean2, sigma2 );
 
-  Pdf sum = area1 * g1 + area2 * g2;
+  Pdf sum = ( area + 4.e5 ) * ( pow( sin( phi ), 2 ) * g1 + pow( cos( phi ), 2 ) * g2 );
 
   // Definition of the minimizer from the pdf.
   Chi2 chi2( sum, y, data );

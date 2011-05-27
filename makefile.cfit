@@ -15,7 +15,7 @@ HDRDIRS = $(HDIR)
 LIBDIRS = $(LDIR)
 LIBLIST = minuit
 
-OBJLIST = pdfbase pdfmodel pdf pdfops dataset minimizer nll chi2
+OBJLIST = parameterexpr pdfbase pdfmodel pdf operation dataset minimizer nll chi2
 
 
 #-------------------------------------------------------------------

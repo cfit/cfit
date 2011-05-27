@@ -11,11 +11,10 @@
 #include <cfit/pdf.hh>
 
 
-class Pdf;
-
-
 class PdfModel : public PdfBase
 {
+  friend class Pdf;
+
 protected:
   std::vector< std::string > _varOrder;
   std::vector< std::string > _parOrder;
@@ -23,8 +22,8 @@ protected:
   void push( const Variable&  var ) throw( PdfException );
   void push( const Parameter& par ) throw( PdfException );
 
-  const Variable&  getVar( int index ) const { return _vars.find( _varOrder[ index ] )->second; }
-  const Parameter& getPar( int index ) const { return _pars.find( _parOrder[ index ] )->second; }
+  const Variable&  getVar( int index ) const;
+  const Parameter& getPar( int index ) const;
 
 public:
   void setVars( const std::vector< double >& vars ) throw( PdfException );
@@ -35,18 +34,26 @@ public:
   virtual double evaluate( const std::vector< double >& vars ) const throw( PdfException ) = 0;
 
   // ALERTA AMB ELS OPERADORS. NO S'HAURIA DE PODER FER gauss1 += gauss2, O HAURIA D'ESTAR BEN CONTROLAT.
-  friend Pdf& operator+( const PdfModel& left, const PdfModel& right );
-  friend Pdf& operator*( const PdfModel& left, const PdfModel& right );
+  friend const Pdf operator+( const PdfModel&      left, const PdfModel&      right );
+  friend const Pdf operator*( const PdfModel&      left, const PdfModel&      right );
 
-  friend Pdf& operator+( const Pdf& left, const PdfModel& right );
-  friend Pdf& operator*( const Pdf& left, const PdfModel& right );
+  friend const Pdf operator+( const PdfModel&      left, const Pdf&           right );
+  friend const Pdf operator*( const PdfModel&      left, const Pdf&           right );
 
-  friend Pdf& operator+( const Pdf& left, const Pdf& right );
-  friend Pdf& operator*( const Pdf& left, const Pdf& right );
-  friend Pdf& operator^( const Pdf& left, const Pdf& right ) throw( PdfException );
+  friend const Pdf operator+( const Pdf&           left, const PdfModel&      right );
+  friend const Pdf operator*( const Pdf&           left, const PdfModel&      right );
 
-  friend Pdf& operator+( const Parameter& left, const PdfModel& right );
-  friend Pdf& operator*( const Parameter& left, const PdfModel& right );
+  friend const Pdf operator*( const Parameter&     left, const PdfModel&      right );
+  friend const Pdf operator*( const PdfModel&      left, const Parameter&     right );
+  friend const Pdf operator/( const PdfModel&      left, const Parameter&     right );
+
+  friend const Pdf operator*( const ParameterExpr& left, const PdfModel&      right );
+  friend const Pdf operator*( const PdfModel&      left, const ParameterExpr& right );
+  friend const Pdf operator/( const PdfModel&      left, const ParameterExpr& right );
+
+  friend const Pdf operator*( const double&        left, const PdfModel&      right );
+  friend const Pdf operator*( const PdfModel&      left, const double&        right );
+  friend const Pdf operator/( const PdfModel&      left, const double&        right );
 };
 
 #endif

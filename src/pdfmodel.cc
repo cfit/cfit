@@ -29,6 +29,20 @@ void PdfModel::push( const Parameter& par ) throw( PdfException )
 }
 
 
+// Retrieve the variable at specified index.
+const Variable& PdfModel::getVar( int index ) const
+{
+  return _vars.find( _varOrder[ index ] )->second;
+}
+
+// Retrieve the parameter at specified index.
+const Parameter& PdfModel::getPar( int index ) const
+{
+  return _pars.find( _parOrder[ index ] )->second;
+}
+
+
+
 // Set the variables to those given as argument.
 // They must be sorted alphabetically.
 void PdfModel::setVars( const std::vector< double >& vars ) throw( PdfException )

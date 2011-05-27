@@ -46,8 +46,10 @@ private:
   // Variables of the model.
   double m2AB() const { return getVar( 0 ).value(); }
   double m2AC() const { return getVar( 1 ).value(); }
-  double m2BC() const { return pow( _mD0, 2 ) + pow( _mKs, 2 ) + 2. * pow( _mPi, 2 ) - m2AB() - m2AC(); }
-  double t()    const { return getVar( 2 ).value(); }
+  double m2BC() const { return getVar( 2 ).value(); }
+  double t()    const { return getVar( 3 ).value(); }
+//double m2BC() const { return pow( _mD0, 2 ) + pow( _mKs, 2 ) + 2. * pow( _mPi, 2 ) - m2AB() - m2AC(); }
+//double t()    const { return getVar( 2 ).value(); }
 
   // Parameters of the model.
   double invGamma      () const { return getPar(  0 ).value(); }

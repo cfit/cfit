@@ -5,11 +5,60 @@
 #include <sstream>
 #include <vector>
 #include <stack>
+#include <cmath>
 
 #include <cfit/parameter.hh>
+#include <cfit/parameterexpr.hh>
 #include <cfit/pdfmodel.hh>
 #include <cfit/pdf.hh>
 
+
+void Pdf::append( const PdfModel& model )
+{
+  _vars   .insert( model._vars   .begin(), model._vars   .end() );
+  _pars   .insert( model._pars   .begin(), model._pars   .end() );
+  _pdfVect.push_back( const_cast<PdfModel*>( &model ) );
+
+  _expression += "m"; // m = model.
+}
+
+void Pdf::append( const Pdf& pdf )
+{
+  _vars   .insert(                 pdf._vars   .begin(), pdf._vars   .end() );
+  _pars   .insert(                 pdf._pars   .begin(), pdf._pars   .end() );
+  _opers  .insert( _opers  .end(), pdf._opers  .begin(), pdf._opers  .end() );
+  _consts .insert( _consts .end(), pdf._consts .begin(), pdf._consts .end() );
+  _parVect.insert( _parVect.end(), pdf._parVect.begin(), pdf._parVect.end() );
+  _pdfVect.insert( _pdfVect.end(), pdf._pdfVect.begin(), pdf._pdfVect.end() );
+
+  _expression += pdf._expression;
+}
+
+void Pdf::append( const Parameter& par )
+{
+  _pars[ par.name() ] = par;
+  _parVect.push_back( par.name() );
+
+  _expression += "p"; // p = parameter.
+}
+
+void Pdf::append( const ParameterExpr& expr )
+{
+  for ( std::vector< Parameter >::const_iterator par = expr._pars.begin(); par != expr._pars.end(); ++par )
+    _pars[ par->name() ] = *par;
+  _opers  .insert( _opers  .end(), expr._opers .begin(), expr._opers .end() );
+  _consts .insert( _consts .end(), expr._consts.begin(), expr._consts.end() );
+  _parVect.insert( _parVect.end(), expr._pars  .begin(), expr._pars  .end() );
+
+  _expression += expr._expression;
+}
+
+void Pdf::append( const double& ctnt )
+{
+  _consts.push_back( ctnt );
+
+  _expression += "c"; // c = constant.
+}
 
 
 void Pdf::setVars( const std::vector< double >& vars ) throw( PdfException )
@@ -28,7 +77,7 @@ void Pdf::setVars( const std::vector< double >& vars ) throw( PdfException )
   for ( pdfIter pdf = _pdfVect.begin(); pdf != _pdfVect.end(); ++pdf )
     {
       std::map< std::string, Variable >& pdfVars = (*pdf)->_vars;
-      for ( vIter var = pdfVars.begin(); var != pdfVars.end(); var++ )
+      for ( vIter var = pdfVars.begin(); var != pdfVars.end(); ++var )
 	var->second.setValue( _vars[ var->second.name() ].value() );
     }
 }
@@ -47,10 +96,10 @@ void Pdf::setPars( const std::vector< double >& pars ) throw( PdfException )
 
   // Propagate the values to the list of pdfs.
   typedef std::vector< PdfModel* >::const_iterator pdfIter;
-  for ( pdfIter pdf = _pdfVect.begin(); pdf != _pdfVect.end(); pdf++ )
+  for ( pdfIter pdf = _pdfVect.begin(); pdf != _pdfVect.end(); ++pdf )
     {
       std::map< std::string, Parameter >& pdfPars = (*pdf)->_pars;
-      for ( pIter par = pdfPars.begin(); par != pdfPars.end(); par++ )
+      for ( pIter par = pdfPars.begin(); par != pdfPars.end(); ++par )
 	par->second.setValue( _pars[ par->second.name() ].value() );
     }
 }
@@ -65,6 +114,41 @@ void Pdf::cache()
   return;
 }
 
+// Binary operations.
+double Pdf::operate( const double& x, const double& y, const Operation::Op& oper ) throw( PdfException )
+{
+  if ( oper == Operation::plus )
+    return x + y;
+  if ( oper == Operation::minus )
+    return x - y;
+  if ( oper == Operation::mult )
+    return x * y;
+  if ( oper == Operation::div )
+    return x / y;
+  if ( oper == Operation::pow )
+    return std::pow( x, y );
+
+  throw PdfException( std::string( "Parse error: unknown binary operation " ) + Operation::tostring( oper ) + "." );
+}
+
+// Unary operations.
+double Pdf::operate( const double& x, const Operation::Op& oper ) throw( PdfException )
+{
+  if ( oper == Operation::minus )
+    return -x;
+  if ( oper == Operation::exp )
+    return std::exp( x );
+  if ( oper == Operation::log )
+    return std::log( x );
+  if ( oper == Operation::sin )
+    return std::sin( x );
+  if ( oper == Operation::cos )
+    return std::cos( x );
+  if ( oper == Operation::tan )
+    return std::tan( x );
+
+  throw PdfException( std::string( "Parse error: unknown unary operation " ) + Operation::tostring( oper ) + "." );
+}
 
 // Before running this function, the Pdf::setVars( vars ) function must be called.
 //    To avoid the risk of forgetting it, run Pdf::evaluate( vars ).
@@ -74,38 +158,46 @@ double Pdf::evaluate() const throw( PdfException )
 
   double x;
   double y;
-  std::vector< PdfModel*   >::const_iterator pdf = _pdfVect.begin();
-  std::vector< std::string >::const_iterator par = _parVect.begin();
+  std::vector< PdfModel*     >::const_iterator pdf = _pdfVect.begin();
+  std::vector< Parameter     >::const_iterator par = _parVect.begin();
+  std::vector< double        >::const_iterator ctt = _consts .begin();
+  std::vector< Operation::Op >::const_iterator ops = _opers  .begin();
 
   typedef std::string::const_iterator eIter;
   for ( eIter ch = _expression.begin(); ch != _expression.end(); ch++ )
     if ( *ch == 'm' )
       values.push( (*pdf++)->evaluate() );
     else if ( *ch == 'p' )
-      values.push( _pars.find( *par++ )->second.value() );
+      values.push( _pars.find( par++->name() )->second.value() );
+    else if ( *ch == 'c' )
+      values.push( *ctt++ );
     else
       if ( values.size() < 2 )
 	throw PdfException( "Parse error: not enough values in the stack." );
       else
 	{
-	  x = values.top();
-	  values.pop();
-	  y = values.top();
-	  values.pop();
-	  if ( *ch == '+' )
-	    values.push( x + y );
-	  else if ( *ch == '*' )
-	    values.push( x * y );
+	  if ( *ch == 'b' )
+	    {
+	      y = values.top();
+	      values.pop();
+	      x = values.top();
+	      values.pop();
+	      values.push( operate( x, y, *ops++ ) );
+	    }
+	  else if ( *ch == 'u' )
+	    {
+	      x = values.top();
+	      values.pop();
+	      values.push( operate( x, *ops++ ) );
+	    }
 	  else
-	    throw PdfException( std::string( "Parse error: unknown operation " ) + *ch + "." );
+	    throw PdfException( std::string( "Parse error: unknown command " ) + *ch + "." );
 	}
 
-  if ( values.size() == 1 )
-    return values.top();
-  else
+  if ( values.size() != 1 )
     throw PdfException( "Parse error: too many values have been supplied." );
 
-  return 0.;
+  return values.top();
 }
 
 
@@ -128,11 +220,13 @@ double Pdf::evaluate( const std::vector< double >& vars ) const throw( PdfExcept
 
   double x;
   double y;
-  std::vector< PdfModel*   >::const_iterator pdf = _pdfVect.begin();
-  std::vector< std::string >::const_iterator par = _parVect.begin();
+  std::vector< PdfModel*     >::const_iterator pdf = _pdfVect.begin();
+  std::vector< Parameter     >::const_iterator par = _parVect.begin();
+  std::vector< double        >::const_iterator ctt = _consts .begin();
+  std::vector< Operation::Op >::const_iterator ops = _opers  .begin();
 
   typedef std::string::const_iterator eIter;
-  for ( eIter ch = _expression.begin(); ch != _expression.end(); ch++ )
+  for ( eIter ch = _expression.begin(); ch != _expression.end(); ++ch )
     if ( *ch == 'm' )
       {
 	// Determine the variables that the pdf depends on.
@@ -145,30 +239,36 @@ double Pdf::evaluate( const std::vector< double >& vars ) const throw( PdfExcept
 	values.push( (*pdf++)->evaluate( modelVars ) );
       }
     else if ( *ch == 'p' )
-      values.push( _pars.find( *par++ )->second.value() );
+      values.push( _pars.find( par++->name() )->second.value() );
+    else if ( *ch == 'c' )
+      values.push( *ctt++ );
     else
       if ( values.size() < 2 )
 	throw PdfException( "Parse error: not enough values in the stack." );
       else
 	{
-	  x = values.top();
-	  values.pop();
-	  y = values.top();
-	  values.pop();
-	  if ( *ch == '+' )
-	    values.push( x + y );
-	  else if ( *ch == '*' )
-	    values.push( x * y );
+	  if ( *ch == 'b' )
+	    {
+	      y = values.top();
+	      values.pop();
+	      x = values.top();
+	      values.pop();
+	      values.push( operate( x, y, *ops++ ) );
+	    }
+	  else if ( *ch == 'u' )
+	    {
+	      x = values.top();
+	      values.pop();
+	      values.push( operate( x, *ops++ ) );
+	    }
 	  else
 	    throw PdfException( std::string( "Parse error: unknown operation " ) + *ch + "." );
 	}
 
-  if ( values.size() == 1 )
-    return values.top();
-  else
+  if ( values.size() != 1 )
     throw PdfException( "Parse error: too many values have been supplied." );
 
-  return 0.;
+  return values.top();
 }
 
 
@@ -194,7 +294,7 @@ std::vector< std::string > Pdf::commonVars() const throw( PdfException )
 
   typedef std::string::const_iterator eIter;
   std::vector< std::string > varNames;
-  for ( eIter ch = _expression.begin(); ch != _expression.end(); ch++ )
+  for ( eIter ch = _expression.begin(); ch != _expression.end(); ++ch )
     if ( *ch == 'm' )
       {
 	std::map< std::string, Variable >& vars = (*models++)->_vars;

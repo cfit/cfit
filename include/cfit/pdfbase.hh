@@ -14,8 +14,6 @@
 
 class PdfBase
 {
-  friend class Pdf;
-
 protected:
   std::map< std::string, Variable  > _vars;
   std::map< std::string, Parameter > _pars;
