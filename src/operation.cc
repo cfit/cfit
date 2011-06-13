@@ -275,52 +275,104 @@ const ParameterExpr tan( const ParameterExpr& par )
 // Operations with two pdf models.
 const Pdf operator+( const PdfModel& left, const PdfModel& right )
 {
-  // ALERTA: FALTEN CONDICIONS.
+  // Cannot add two pdfs that do not depend on exactly the same variables.
+  if ( left.varNames() != right.varNames() )
+    throw PdfException( "Cannot add two pdfs that do not depend on the same variables." );
+
   return Pdf( left, right, Operation::plus );
 }
 
 const Pdf operator*( const PdfModel& left, const PdfModel& right )
 {
-  // ALERTA: FALTEN CONDICIONS.
+  // Cannot multiply two pdfs that share some variable.
+  std::vector< std::string > lVars = left. varNames();
+  std::vector< std::string > rVars = right.varNames();
+  std::vector< std::string > intersect;
+  std::set_intersection( lVars.begin(), lVars.end(),
+			 rVars.begin(), rVars.end(),
+			 std::back_inserter( intersect ) );
+
+  if ( ! intersect.empty() )
+    throw PdfException( "Cannot multiply two pdfs that depend on some common variable." );
+
   return Pdf( left, right, Operation::mult );
 }
 
 // Operations with a pdf model and a pdf expression.
 const Pdf operator+( const PdfModel& left, const Pdf& right )
 {
-  // ALERTA: FALTEN CONDICIONS.
+  // Cannot add two pdfs that do not depend on exactly the same variables.
+  if ( left.varNames() != right.varNames() )
+    throw PdfException( "Cannot add two pdfs that do not depend on the same variables." );
+
   return Pdf( left, right, Operation::plus );
 }
 
 const Pdf operator*( const PdfModel& left, const Pdf& right )
 {
-  // ALERTA: FALTEN CONDICIONS.
+  // Cannot multiply two pdfs that share some variable.
+  std::vector< std::string > lVars = left. varNames();
+  std::vector< std::string > rVars = right.varNames();
+  std::vector< std::string > intersect;
+  std::set_intersection( lVars.begin(), lVars.end(),
+			 rVars.begin(), rVars.end(),
+			 std::back_inserter( intersect ) );
+
+  if ( ! intersect.empty() )
+    throw PdfException( "Cannot multiply two pdfs that depend on some common variable." );
+
   return Pdf( left, right, Operation::mult );
 }
 
 // Operations with a pdf expression and a pdf model.
 const Pdf operator+( const Pdf& left, const PdfModel& right )
 {
-  // ALERTA: FALTEN CONDICIONS.
+  // Cannot add two pdfs that do not depend on exactly the same variables.
+  if ( left.varNames() != right.varNames() )
+    throw PdfException( "Cannot add two pdfs that do not depend on the same variables." );
+
   return Pdf( left, right, Operation::plus );
 }
 
 const Pdf operator*( const Pdf& left, const PdfModel& right )
 {
-  // ALERTA: FALTEN CONDICIONS.
+  // Cannot multiply two pdfs that share some variable.
+  std::vector< std::string > lVars = left. varNames();
+  std::vector< std::string > rVars = right.varNames();
+  std::vector< std::string > intersect;
+  std::set_intersection( lVars.begin(), lVars.end(),
+			 rVars.begin(), rVars.end(),
+			 std::back_inserter( intersect ) );
+
+  if ( ! intersect.empty() )
+    throw PdfException( "Cannot multiply two pdfs that depend on some common variable." );
+
   return Pdf( left, right, Operation::mult );
 }
 
 // Operations with two pdf expressions.
 const Pdf operator+( const Pdf& left, const Pdf& right )
 {
-  // ALERTA: FALTEN CONDICIONS.
+  // Cannot add two pdfs that do not depend on exactly the same variables.
+  if ( left.varNames() != right.varNames() )
+    throw PdfException( "Cannot add two pdfs that do not depend on the same variables." );
+
   return Pdf( left, right, Operation::plus );
 }
 
 const Pdf operator*( const Pdf& left, const Pdf& right )
 {
-  // ALERTA: FALTEN CONDICIONS.
+  // Cannot multiply two pdfs that share some variable.
+  std::vector< std::string > lVars = left. varNames();
+  std::vector< std::string > rVars = right.varNames();
+  std::vector< std::string > intersect;
+  std::set_intersection( lVars.begin(), lVars.end(),
+			 rVars.begin(), rVars.end(),
+			 std::back_inserter( intersect ) );
+
+  if ( ! intersect.empty() )
+    throw PdfException( "Cannot multiply two pdfs that depend on some common variable." );
+
   return Pdf( left, right, Operation::mult );
 }
 
