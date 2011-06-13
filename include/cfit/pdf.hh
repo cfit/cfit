@@ -29,15 +29,14 @@ private:
   void append( const Parameter&     par   );
   void append( const ParameterExpr& expr  );
   void append( const double&        ctnt  );
+  void append( const Operation::Op& oper  );
 
   template< class L, class R >
   Pdf( const L& left, const R& right, const Operation::Op& oper )
   {
     append( left  );
     append( right );
-
-    _expression += "b"; // b = binary operation.
-    _opers.push_back( oper );
+    append( oper  );
   }
 
   // Execute binary operations.
@@ -48,6 +47,10 @@ private:
 
 public:
   Pdf() {};
+  Pdf( const PdfModel& model )
+  {
+    append( model );
+  }
 
   void setVars( const std::vector< double >& vars ) throw( PdfException );
   void setPars( const std::vector< double >& pars ) throw( PdfException );
@@ -55,6 +58,23 @@ public:
   void   cache();
   double evaluate()                                    const throw( PdfException );
   double evaluate( const std::vector< double >& vars ) const throw( PdfException );
+
+  // Assignment operator.
+  const Pdf& operator= ( const PdfModel&      right );
+
+  // Assignment operators with pdf objects.
+  const Pdf& operator+=( const PdfModel&      right ) throw( PdfException );
+  const Pdf& operator*=( const PdfModel&      right ) throw( PdfException );
+  const Pdf& operator+=( const Pdf&           right ) throw( PdfException );
+  const Pdf& operator*=( const Pdf&           right ) throw( PdfException );
+
+  // Assignment operators with parameter objects and constants.
+  const Pdf& operator*=( const Parameter&     right );
+  const Pdf& operator/=( const Parameter&     right );
+  const Pdf& operator*=( const ParameterExpr& right );
+  const Pdf& operator/=( const ParameterExpr& right );
+  const Pdf& operator*=( const double&        right );
+  const Pdf& operator/=( const double&        right );
 
   std::vector< std::string > commonVars() const throw( PdfException );
 

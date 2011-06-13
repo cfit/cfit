@@ -12,7 +12,7 @@
 #include <cfit/pdfmodel.hh>
 #include <cfit/pdf.hh>
 
-
+// Append a model.
 void Pdf::append( const PdfModel& model )
 {
   _vars   .insert( model._vars   .begin(), model._vars   .end() );
@@ -22,6 +22,7 @@ void Pdf::append( const PdfModel& model )
   _expression += "m"; // m = model.
 }
 
+// Append a pdf expression.
 void Pdf::append( const Pdf& pdf )
 {
   _vars   .insert(                 pdf._vars   .begin(), pdf._vars   .end() );
@@ -34,6 +35,7 @@ void Pdf::append( const Pdf& pdf )
   _expression += pdf._expression;
 }
 
+// Append a parameter.
 void Pdf::append( const Parameter& par )
 {
   _pars[ par.name() ] = par;
@@ -42,6 +44,7 @@ void Pdf::append( const Parameter& par )
   _expression += "p"; // p = parameter.
 }
 
+// Append a parameter expression.
 void Pdf::append( const ParameterExpr& expr )
 {
   for ( std::vector< Parameter >::const_iterator par = expr._pars.begin(); par != expr._pars.end(); ++par )
@@ -53,12 +56,134 @@ void Pdf::append( const ParameterExpr& expr )
   _expression += expr._expression;
 }
 
+// Append a constant.
 void Pdf::append( const double& ctnt )
 {
   _consts.push_back( ctnt );
 
   _expression += "c"; // c = constant.
 }
+
+// Append a binary operation. No unary operation should ever be appended.
+void Pdf::append( const Operation::Op& oper )
+{
+  _expression += "b";
+  _opers.push_back( oper );
+}
+
+
+// Assignment operation.
+const Pdf& Pdf::operator=( const PdfModel& right )
+{
+  append( right );
+  return *this;
+}
+
+// Assignment operations with a pdf model.
+const Pdf& Pdf::operator+=( const PdfModel& right ) throw( PdfException )
+{
+  // Cannot add two pdfs that do not depend on exactly the same variables.
+  if ( this->varNames() != right.varNames() )
+    throw PdfException( "Cannot add two pdfs that do not depend on the same variables." );
+
+  append( right           );
+  append( Operation::plus );
+  return *this;
+}
+
+const Pdf& Pdf::operator*=( const PdfModel& right ) throw( PdfException )
+{
+  // Cannot multiply two pdfs that share some variable.
+  std::vector< std::string > theseVars = this->varNames();
+  std::vector< std::string > rightVars = right.varNames();
+  std::vector< std::string > intersect;
+  std::set_intersection( theseVars.begin(), theseVars.end(),
+			 rightVars.begin(), rightVars.end(),
+			 std::back_inserter( intersect ) );
+
+  if ( ! intersect.empty() )
+    throw PdfException( "Cannot multiply two pdfs that depend on some common variable." );
+
+  append( right           );
+  append( Operation::mult );
+  return *this;
+}
+
+// Assignment operations with a pdf expression.
+const Pdf& Pdf::operator+=( const Pdf& right ) throw( PdfException )
+{
+  // Cannot add two pdfs that do not depend on exactly the same variables.
+  if ( this->varNames() != right.varNames() )
+    throw PdfException( "Cannot add two pdfs that do not depend on the same variables." );
+
+  append( right           );
+  append( Operation::plus );
+  return *this;
+}
+
+const Pdf& Pdf::operator*=( const Pdf& right ) throw( PdfException )
+{
+  // Cannot multiply two pdfs that share some variable.
+  std::vector< std::string > theseVars = this->varNames();
+  std::vector< std::string > rightVars = right.varNames();
+  std::vector< std::string > intersect;
+  std::set_intersection( theseVars.begin(), theseVars.end(),
+			 rightVars.begin(), rightVars.end(),
+			 std::back_inserter( intersect ) );
+
+  if ( ! intersect.empty() )
+    throw PdfException( "Cannot multiply two pdfs that depend on some common variable." );
+
+  append( right           );
+  append( Operation::mult );
+  return *this;
+}
+
+// Assignment operations with a parameter.
+const Pdf& Pdf::operator*=( const Parameter& right )
+{
+  append( right           );
+  append( Operation::mult );
+  return *this;
+}
+
+const Pdf& Pdf::operator/=( const Parameter& right )
+{
+  append( right          );
+  append( Operation::div );
+  return *this;
+}
+
+// Assignment operations with a parameter expression.
+const Pdf& Pdf::operator*=( const ParameterExpr& right )
+{
+  append( right           );
+  append( Operation::mult );
+  return *this;
+}
+
+const Pdf& Pdf::operator/=( const ParameterExpr& right )
+{
+  append( right          );
+  append( Operation::div );
+  return *this;
+}
+
+// Assignment operations with a constant.
+const Pdf& Pdf::operator*=( const double& right )
+{
+  append( right           );
+  append( Operation::mult );
+  return *this;
+}
+
+const Pdf& Pdf::operator/=( const double& right )
+{
+  append( right          );
+  append( Operation::div );
+  return *this;
+}
+
 
 
 void Pdf::setVars( const std::vector< double >& vars ) throw( PdfException )
@@ -322,11 +447,9 @@ std::vector< std::string > Pdf::commonVars() const throw( PdfException )
 	  calcs.push( z );
 	}
 
-  if ( calcs.size() == 1 )
-    return calcs.top();
-  else
+  if ( calcs.size() != 1 )
     throw PdfException( "Parse error computing convolution: too many values have been supplied." );
 
-  return voidVec;
+  return calcs.top();
 }
 
