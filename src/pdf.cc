@@ -15,8 +15,8 @@
 // Append a model.
 void Pdf::append( const PdfModel& model )
 {
-  _vars   .insert( model._vars   .begin(), model._vars   .end() );
-  _pars   .insert( model._pars   .begin(), model._pars   .end() );
+  _vars   .insert( model._vars.begin(), model._vars.end() );
+  _pars   .insert( model._pars.begin(), model._pars.end() );
   _pdfVect.push_back( const_cast<PdfModel*>( &model ) );
 
   _expression += "m"; // m = model.
@@ -67,8 +67,9 @@ void Pdf::append( const double& ctnt )
 // Append a binary operation. No unary operation should ever be appended.
 void Pdf::append( const Operation::Op& oper )
 {
-  _expression += "b";
   _opers.push_back( oper );
+
+  _expression += "b";
 }
 
 
@@ -297,27 +298,28 @@ double Pdf::evaluate() const throw( PdfException )
     else if ( *ch == 'c' )
       values.push( *ctt++ );
     else
-      if ( values.size() < 2 )
-	throw PdfException( "Parse error: not enough values in the stack." );
-      else
-	{
-	  if ( *ch == 'b' )
-	    {
-	      y = values.top();
-	      values.pop();
-	      x = values.top();
-	      values.pop();
-	      values.push( operate( x, y, *ops++ ) );
-	    }
-	  else if ( *ch == 'u' )
-	    {
-	      x = values.top();
-	      values.pop();
-	      values.push( operate( x, *ops++ ) );
-	    }
-	  else
-	    throw PdfException( std::string( "Parse error: unknown command " ) + *ch + "." );
-	}
+      {
+	if ( *ch == 'b' )
+	  {
+	    if ( values.size() < 2 )
+	      throw PdfException( "Parse error: not enough values in the stack." );
+	    y = values.top();
+	    values.pop();
+	    x = values.top();
+	    values.pop();
+	    values.push( operate( x, y, *ops++ ) );
+	  }
+	else if ( *ch == 'u' )
+	  {
+	    if ( values.empty() )
+	      throw PdfException( "Parse error: not enough values in the stack." );
+	    x = values.top();
+	    values.pop();
+	    values.push( operate( x, *ops++ ) );
+	  }
+	else
+	  throw PdfException( std::string( "Parse error: unknown operation " ) + *ch + "." );
+      }
 
   if ( values.size() != 1 )
     throw PdfException( "Parse error: too many values have been supplied." );
@@ -368,27 +370,28 @@ double Pdf::evaluate( const std::vector< double >& vars ) const throw( PdfExcept
     else if ( *ch == 'c' )
       values.push( *ctt++ );
     else
-      if ( values.size() < 2 )
-	throw PdfException( "Parse error: not enough values in the stack." );
-      else
-	{
-	  if ( *ch == 'b' )
-	    {
-	      y = values.top();
-	      values.pop();
-	      x = values.top();
-	      values.pop();
-	      values.push( operate( x, y, *ops++ ) );
-	    }
-	  else if ( *ch == 'u' )
-	    {
-	      x = values.top();
-	      values.pop();
-	      values.push( operate( x, *ops++ ) );
-	    }
-	  else
-	    throw PdfException( std::string( "Parse error: unknown operation " ) + *ch + "." );
-	}
+      {
+	if ( *ch == 'b' )
+	  {
+	    if ( values.size() < 2 )
+	      throw PdfException( "Parse error: not enough values in the stack." );
+	    y = values.top();
+	    values.pop();
+	    x = values.top();
+	    values.pop();
+	    values.push( operate( x, y, *ops++ ) );
+	  }
+	else if ( *ch == 'u' )
+	  {
+	    if ( values.empty() )
+	      throw PdfException( "Parse error: not enough values in the stack." );
+	    x = values.top();
+	    values.pop();
+	    values.push( operate( x, *ops++ ) );
+	  }
+	else
+	  throw PdfException( std::string( "Parse error: unknown operation " ) + *ch + "." );
+      }
 
   if ( values.size() != 1 )
     throw PdfException( "Parse error: too many values have been supplied." );
