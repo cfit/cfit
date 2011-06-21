@@ -20,9 +20,9 @@ class Pdf : public PdfBase
 private:
   std::string                  _expression;
   std::vector< Operation::Op > _opers;
-  std::vector< double        > _consts;
-  std::vector< Parameter     > _parVect;
-  std::vector< PdfModel*     > _pdfVect;
+  std::vector< double        > _ctnts;
+  std::vector< Parameter     > _pars;
+  std::vector< PdfModel*     > _pdfs;
 
   void append( const PdfModel&      model );
   void append( const Pdf&           pdf   );
@@ -78,7 +78,7 @@ public:
 
   std::vector< std::string > commonVars() const throw( PdfException );
 
-  // ALERTA AMB ELS OPERADORS. NO S'HAURIA DE PODER FER gauss1 += gauss2, O HAURIA D'ESTAR BEN CONTROLAT.
+  // Binary operators that need access to this class.
   friend const Pdf operator+( const PdfModel&      left, const PdfModel&      right );
   friend const Pdf operator*( const PdfModel&      left, const PdfModel&      right );
 

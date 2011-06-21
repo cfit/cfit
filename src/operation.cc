@@ -1,6 +1,4 @@
 
-#include <iostream> // TEMPORAL
-#include <iterator> // TEMPORAL
 // FALTA CONSTRUIR EL PARVECT QUAN S'OPERA SOBRE UN OBJECTE PDF.
 
 #include <sstream>

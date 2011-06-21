@@ -10,10 +10,10 @@
 // Add a variable to the variables map.
 void PdfModel::push( const Variable& var ) throw( PdfException )
 {
-  if ( _vars.find( var.name() ) != _vars.end() )
+  if ( _varMap.find( var.name() ) != _varMap.end() )
     throw PdfException( "Variable \"" + var.name() + "\" does already exist in this model." );
 
-  _vars[ var.name() ] = var;
+  _varMap[ var.name() ] = var;
   _varOrder.push_back( var.name() );
 }
 
@@ -21,10 +21,10 @@ void PdfModel::push( const Variable& var ) throw( PdfException )
 // Add a parameter to the parameters map and add its name to the ordering vector.
 void PdfModel::push( const Parameter& par ) throw( PdfException )
 {
-  if ( _pars.find( par.name() ) != _pars.end() )
+  if ( _parMap.find( par.name() ) != _parMap.end() )
     throw PdfException( "Parameter \"" + par.name() + "\" does already exist in this model." );
 
-  _pars[ par.name() ] = par;
+  _parMap[ par.name() ] = par;
   _parOrder.push_back( par.name() );
 }
 
@@ -32,13 +32,13 @@ void PdfModel::push( const Parameter& par ) throw( PdfException )
 // Retrieve the variable at specified index.
 const Variable& PdfModel::getVar( int index ) const
 {
-  return _vars.find( _varOrder[ index ] )->second;
+  return _varMap.find( _varOrder[ index ] )->second;
 }
 
 // Retrieve the parameter at specified index.
 const Parameter& PdfModel::getPar( int index ) const
 {
-  return _pars.find( _parOrder[ index ] )->second;
+  return _parMap.find( _parOrder[ index ] )->second;
 }
 
 
@@ -47,12 +47,12 @@ const Parameter& PdfModel::getPar( int index ) const
 // They must be sorted alphabetically.
 void PdfModel::setVars( const std::vector< double >& vars ) throw( PdfException )
 {
-  if ( _vars.size() != vars.size() )
+  if ( _varMap.size() != vars.size() )
     throw PdfException( "Number of arguments passed does not match number of required arguments." );
 
   typedef std::map< std::string, Variable >::iterator vIter;
   int index = 0;
-  for ( vIter var = _vars.begin(); var != _vars.end(); var++ )
+  for ( vIter var = _varMap.begin(); var != _varMap.end(); var++ )
     var->second.setValue( vars[ index++ ] );
 }
 
@@ -63,12 +63,12 @@ void PdfModel::setVars( const std::vector< double >& vars ) throw( PdfException 
 //    two parameters with the same name would create confusion otherwise.
 void PdfModel::setPars( const std::vector< double >& pars ) throw( PdfException )
 {
-  if ( _pars.size() != pars.size() )
+  if ( _parMap.size() != pars.size() )
     throw PdfException( "Number of arguments passed does not match number of required arguments." );
 
   typedef std::map< std::string, Parameter >::iterator pIter;
   int index = 0;
-  for ( pIter par = _pars.begin(); par != _pars.end(); par++ )
+  for ( pIter par = _parMap.begin(); par != _parMap.end(); par++ )
     par->second.setValue( pars[ index++ ] );
 }
 

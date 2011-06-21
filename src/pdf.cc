@@ -1,7 +1,4 @@
 
-#include <iostream> // TEMPORAL
-#include <iterator> // TEMPORAL
-
 #include <sstream>
 #include <vector>
 #include <stack>
@@ -15,9 +12,9 @@
 // Append a model.
 void Pdf::append( const PdfModel& model )
 {
-  _vars   .insert( model._vars.begin(), model._vars.end() );
-  _pars   .insert( model._pars.begin(), model._pars.end() );
-  _pdfVect.push_back( const_cast<PdfModel*>( &model ) );
+  _varMap.insert( model._varMap.begin(), model._varMap.end() );
+  _parMap.insert( model._parMap.begin(), model._parMap.end() );
+  _pdfs.push_back( const_cast<PdfModel*>( &model ) );
 
   _expression += "m"; // m = model.
 }
@@ -25,12 +22,12 @@ void Pdf::append( const PdfModel& model )
 // Append a pdf expression.
 void Pdf::append( const Pdf& pdf )
 {
-  _vars   .insert(                 pdf._vars   .begin(), pdf._vars   .end() );
-  _pars   .insert(                 pdf._pars   .begin(), pdf._pars   .end() );
-  _opers  .insert( _opers  .end(), pdf._opers  .begin(), pdf._opers  .end() );
-  _consts .insert( _consts .end(), pdf._consts .begin(), pdf._consts .end() );
-  _parVect.insert( _parVect.end(), pdf._parVect.begin(), pdf._parVect.end() );
-  _pdfVect.insert( _pdfVect.end(), pdf._pdfVect.begin(), pdf._pdfVect.end() );
+  _varMap.insert(               pdf._varMap.begin(), pdf._varMap .end() );
+  _parMap.insert(               pdf._parMap.begin(), pdf._parMap .end() );
+  _opers .insert( _opers.end(), pdf._opers .begin(), pdf._opers  .end() );
+  _ctnts .insert( _ctnts.end(), pdf._ctnts .begin(), pdf._ctnts  .end() );
+  _pars  .insert( _pars .end(), pdf._pars  .begin(), pdf._pars   .end() );
+  _pdfs  .insert( _pdfs .end(), pdf._pdfs  .begin(), pdf._pdfs   .end() );
 
   _expression += pdf._expression;
 }
@@ -38,8 +35,8 @@ void Pdf::append( const Pdf& pdf )
 // Append a parameter.
 void Pdf::append( const Parameter& par )
 {
-  _pars[ par.name() ] = par;
-  _parVect.push_back( par.name() );
+  _parMap[ par.name() ] = par;
+  _pars.push_back( par.name() );
 
   _expression += "p"; // p = parameter.
 }
@@ -48,10 +45,10 @@ void Pdf::append( const Parameter& par )
 void Pdf::append( const ParameterExpr& expr )
 {
   for ( std::vector< Parameter >::const_iterator par = expr._pars.begin(); par != expr._pars.end(); ++par )
-    _pars[ par->name() ] = *par;
-  _opers  .insert( _opers  .end(), expr._opers .begin(), expr._opers .end() );
-  _consts .insert( _consts .end(), expr._consts.begin(), expr._consts.end() );
-  _parVect.insert( _parVect.end(), expr._pars  .begin(), expr._pars  .end() );
+    _parMap[ par->name() ] = *par;
+  _opers.insert( _opers.end(), expr._opers.begin(), expr._opers.end() );
+  _ctnts.insert( _ctnts.end(), expr._ctnts.begin(), expr._ctnts.end() );
+  _pars .insert( _pars .end(), expr._pars .begin(), expr._pars .end() );
 
   _expression += expr._expression;
 }
@@ -59,7 +56,7 @@ void Pdf::append( const ParameterExpr& expr )
 // Append a constant.
 void Pdf::append( const double& ctnt )
 {
-  _consts.push_back( ctnt );
+  _ctnts.push_back( ctnt );
 
   _expression += "c"; // c = constant.
 }
@@ -189,44 +186,44 @@ const Pdf& Pdf::operator/=( const double& right )
 
 void Pdf::setVars( const std::vector< double >& vars ) throw( PdfException )
 {
-  if ( _vars.size() != vars.size() )
+  if ( _varMap.size() != vars.size() )
     throw PdfException( "Number of arguments passed does not match number of required arguments." );
 
   // Set the local values of the variables.
   typedef std::map< std::string, Variable >::iterator vIter;
   int index = 0;
-  for ( vIter var = _vars.begin(); var != _vars.end(); ++var )
+  for ( vIter var = _varMap.begin(); var != _varMap.end(); ++var )
     var->second.setValue( vars[ index++ ] );
 
   // Propagate the values to the list of pdfs.
   typedef std::vector< PdfModel* >::const_iterator pdfIter;
-  for ( pdfIter pdf = _pdfVect.begin(); pdf != _pdfVect.end(); ++pdf )
+  for ( pdfIter pdf = _pdfs.begin(); pdf != _pdfs.end(); ++pdf )
     {
-      std::map< std::string, Variable >& pdfVars = (*pdf)->_vars;
+      std::map< std::string, Variable >& pdfVars = (*pdf)->_varMap;
       for ( vIter var = pdfVars.begin(); var != pdfVars.end(); ++var )
-	var->second.setValue( _vars[ var->second.name() ].value() );
+	var->second.setValue( _varMap[ var->second.name() ].value() );
     }
 }
 
 
 void Pdf::setPars( const std::vector< double >& pars ) throw( PdfException )
 {
-  if ( _pars.size() != pars.size() )
+  if ( _parMap.size() != pars.size() )
     throw PdfException( "Number of arguments passed does not match number of required arguments." );
 
   // Set the local values of the parameters.
   typedef std::map< std::string, Parameter >::iterator pIter;
   int index = 0;
-  for ( pIter par = _pars.begin(); par != _pars.end(); par++ )
+  for ( pIter par = _parMap.begin(); par != _parMap.end(); ++par )
     par->second.setValue( pars[ index++ ] );
 
   // Propagate the values to the list of pdfs.
   typedef std::vector< PdfModel* >::const_iterator pdfIter;
-  for ( pdfIter pdf = _pdfVect.begin(); pdf != _pdfVect.end(); ++pdf )
+  for ( pdfIter pdf = _pdfs.begin(); pdf != _pdfs.end(); ++pdf )
     {
-      std::map< std::string, Parameter >& pdfPars = (*pdf)->_pars;
+      std::map< std::string, Parameter >& pdfPars = (*pdf)->_parMap;
       for ( pIter par = pdfPars.begin(); par != pdfPars.end(); ++par )
-	par->second.setValue( _pars[ par->second.name() ].value() );
+	par->second.setValue( _parMap[ par->second.name() ].value() );
     }
 }
 
@@ -234,7 +231,7 @@ void Pdf::setPars( const std::vector< double >& pars ) throw( PdfException )
 void Pdf::cache()
 {
   typedef std::vector< PdfModel* >::const_iterator pIter;
-  for ( pIter pdf = _pdfVect.begin(); pdf != _pdfVect.end(); pdf++ )
+  for ( pIter pdf = _pdfs.begin(); pdf != _pdfs.end(); ++pdf )
     (*pdf)->cache();
 
   return;
@@ -284,17 +281,17 @@ double Pdf::evaluate() const throw( PdfException )
 
   double x;
   double y;
-  std::vector< PdfModel*     >::const_iterator pdf = _pdfVect.begin();
-  std::vector< Parameter     >::const_iterator par = _parVect.begin();
-  std::vector< double        >::const_iterator ctt = _consts .begin();
-  std::vector< Operation::Op >::const_iterator ops = _opers  .begin();
+  std::vector< PdfModel*     >::const_iterator pdf = _pdfs .begin();
+  std::vector< Parameter     >::const_iterator par = _pars .begin();
+  std::vector< double        >::const_iterator ctt = _ctnts.begin();
+  std::vector< Operation::Op >::const_iterator ops = _opers.begin();
 
   typedef std::string::const_iterator eIter;
-  for ( eIter ch = _expression.begin(); ch != _expression.end(); ch++ )
+  for ( eIter ch = _expression.begin(); ch != _expression.end(); ++ch )
     if ( *ch == 'm' )
       values.push( (*pdf++)->evaluate() );
     else if ( *ch == 'p' )
-      values.push( _pars.find( par++->name() )->second.value() );
+      values.push( _parMap.find( par++->name() )->second.value() );
     else if ( *ch == 'c' )
       values.push( *ctt++ );
     else
@@ -330,7 +327,7 @@ double Pdf::evaluate() const throw( PdfException )
 
 double Pdf::evaluate( const std::vector< double >& vars ) const throw( PdfException )
 {
-  if ( _vars.size() != vars.size() )
+  if ( _varMap.size() != vars.size() )
     throw PdfException( "Number of arguments passed does not match number of required arguments." );
 
   // Dictionary of the variable names with the values passed.
@@ -340,17 +337,17 @@ double Pdf::evaluate( const std::vector< double >& vars ) const throw( PdfExcept
   // Set the local values of the variables.
   int index = 0;
   typedef std::map< std::string, Variable >::const_iterator vIter;
-  for ( vIter var = _vars.begin(); var != _vars.end(); var++ )
+  for ( vIter var = _varMap.begin(); var != _varMap.end(); ++var )
     localVars[ var->first ] = vars[ index++ ];
 
   std::stack< double > values;
 
   double x;
   double y;
-  std::vector< PdfModel*     >::const_iterator pdf = _pdfVect.begin();
-  std::vector< Parameter     >::const_iterator par = _parVect.begin();
-  std::vector< double        >::const_iterator ctt = _consts .begin();
-  std::vector< Operation::Op >::const_iterator ops = _opers  .begin();
+  std::vector< PdfModel*     >::const_iterator pdf = _pdfs .begin();
+  std::vector< Parameter     >::const_iterator par = _pars .begin();
+  std::vector< double        >::const_iterator ctt = _ctnts.begin();
+  std::vector< Operation::Op >::const_iterator ops = _opers.begin();
 
   typedef std::string::const_iterator eIter;
   for ( eIter ch = _expression.begin(); ch != _expression.end(); ++ch )
@@ -358,7 +355,7 @@ double Pdf::evaluate( const std::vector< double >& vars ) const throw( PdfExcept
       {
 	// Determine the variables that the pdf depends on.
 	modelVars.clear();
-	std::map< std::string, Variable >& pdfVars = (*pdf)->_vars;
+	std::map< std::string, Variable >& pdfVars = (*pdf)->_varMap;
 	for ( vIter var = pdfVars.begin(); var != pdfVars.end(); ++var )
 	  modelVars.push_back( localVars.find( var->second.name() )->second );
 
@@ -366,7 +363,7 @@ double Pdf::evaluate( const std::vector< double >& vars ) const throw( PdfExcept
 	values.push( (*pdf++)->evaluate( modelVars ) );
       }
     else if ( *ch == 'p' )
-      values.push( _pars.find( par++->name() )->second.value() );
+      values.push( _parMap.find( par++->name() )->second.value() );
     else if ( *ch == 'c' )
       values.push( *ctt++ );
     else
@@ -418,14 +415,14 @@ std::vector< std::string > Pdf::commonVars() const throw( PdfException )
   std::stack< std::vector< std::string > > calcs;
 
   // Iterator over the models that the pdf depends on.
-  std::vector< PdfModel* >::const_iterator models = _pdfVect.begin();
+  std::vector< PdfModel* >::const_iterator models = _pdfs.begin();
 
   typedef std::string::const_iterator eIter;
   std::vector< std::string > varNames;
   for ( eIter ch = _expression.begin(); ch != _expression.end(); ++ch )
     if ( *ch == 'm' )
       {
-	std::map< std::string, Variable >& vars = (*models++)->_vars;
+	std::map< std::string, Variable >& vars = (*models++)->_varMap;
 	std::transform( vars.begin(), vars.end(), std::back_inserter( varNames ), Select1st() );
 	calcs.push( varNames );
       }

@@ -15,8 +15,8 @@
 class PdfBase
 {
 protected:
-  std::map< std::string, Variable  > _vars;
-  std::map< std::string, Parameter > _pars;
+  std::map< std::string, Variable  > _varMap;
+  std::map< std::string, Parameter > _parMap;
 
 public:
   virtual ~PdfBase() {};
@@ -27,10 +27,10 @@ public:
 
   // Getters.
   // ALERTA: SI NO ES RETORNEN REFERÈNCIES NO VA BÉ L'ASSIGNACIÓ AMB setVars I setPars.
-//const std::map< std::string, Variable  >& getVariables()  const { return _vars;        }
-  const std::map< std::string, Parameter >& getParameters() const { return _pars;        }
-  const unsigned                            nVars()         const { return _vars.size(); }
-  const unsigned                            nPars()         const { return _pars.size(); }
+//const std::map< std::string, Variable  >& getVariables()  const { return _varMap;        }
+  const std::map< std::string, Parameter >& getParameters() const { return _parMap;        }
+  const unsigned                            nVars()         const { return _varMap.size(); }
+  const unsigned                            nPars()         const { return _parMap.size(); }
   const std::vector< std::string >          varNames()      const;
 
   // Before evaluating the pdf at all data points, cache anything common to

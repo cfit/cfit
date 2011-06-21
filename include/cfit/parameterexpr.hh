@@ -16,7 +16,7 @@ class ParameterExpr
   friend class Pdf;
 
 private:
-  std::vector< double >        _consts;
+  std::vector< double >        _ctnts;
   std::vector< Parameter >     _pars;
   std::string                  _expression;
   std::vector< Operation::Op > _opers;
