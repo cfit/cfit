@@ -36,7 +36,7 @@ void Pdf::append( const Pdf& pdf )
 void Pdf::append( const Parameter& par )
 {
   _parMap[ par.name() ] = par;
-  _pars.push_back( par.name() );
+  _pars.push_back( par );
 
   _expression += "p"; // p = parameter.
 }
