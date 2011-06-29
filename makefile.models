@@ -15,8 +15,10 @@ HDRDIRS = $(HDIR)
 LIBDIRS = $(LDIR)
 LIBLIST = minuit cfit
 
-MODELS = gauss d0mix
+MODELS = gauss d0mix relbreitwigner
 FILES_gauss =
+FILES_relbreitwigner =
+
 FILES_d0mix = dalitzReso
 
 # FILES_dalitzD0mix = EvtComplex EvtCyclic3 EvtDalitzPlot EvtDalitzPoint	\
