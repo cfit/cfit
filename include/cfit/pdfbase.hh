@@ -37,6 +37,11 @@ public:
   //    all points (usually compute the norm).
   virtual void cache() = 0;
 
+  // Compute the norm of the pdf. If it is not necessary it is because the
+  //    pdf is so simple that it does not need to have a norm function defined,
+  //    so return 1 in this case.
+  virtual double norm() const { return 1.; }
+
   virtual double evaluate()                                    const throw( PdfException ) = 0;
   virtual double evaluate( const std::vector< double >& vars ) const throw( PdfException ) = 0;
 };
