@@ -229,11 +229,11 @@ void Pdf::setVars( const std::vector< double >& vars ) throw( PdfException )
   // Propagate the values to the list of pdfs.
   typedef std::vector< PdfModel* >::const_iterator pdfIter;
   for ( pdfIter pdf = _pdfs.begin(); pdf != _pdfs.end(); ++pdf )
-    {
-      std::map< std::string, Variable >& pdfVars = (*pdf)->_varMap;
-      for ( vIter var = pdfVars.begin(); var != pdfVars.end(); ++var )
-	var->second.setValue( _varMap[ var->second.name() ].value() );
-    }
+  {
+    std::map< std::string, Variable >& pdfVars = (*pdf)->_varMap;
+    for ( vIter var = pdfVars.begin(); var != pdfVars.end(); ++var )
+      var->second.setValue( _varMap[ var->second.name() ].value() );
+  }
 }
 
 
@@ -251,11 +251,11 @@ void Pdf::setPars( const std::vector< double >& pars ) throw( PdfException )
   // Propagate the values to the list of pdfs.
   typedef std::vector< PdfModel* >::const_iterator pdfIter;
   for ( pdfIter pdf = _pdfs.begin(); pdf != _pdfs.end(); ++pdf )
-    {
-      std::map< std::string, Parameter >& pdfPars = (*pdf)->_parMap;
-      for ( pIter par = pdfPars.begin(); par != pdfPars.end(); ++par )
-	par->second.setValue( _parMap[ par->second.name() ].value() );
-    }
+  {
+    std::map< std::string, Parameter >& pdfPars = (*pdf)->_parMap;
+    for ( pIter par = pdfPars.begin(); par != pdfPars.end(); ++par )
+      par->second.setValue( _parMap[ par->second.name() ].value() );
+  }
 }
 
 

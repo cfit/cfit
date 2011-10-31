@@ -278,59 +278,59 @@ void DalitzD0mix::cacheIntegralsMatrix( bool all ) const
   // Compute the integral on the grid.
   for ( int binX = 0; binX < nBins; binX++ )
     for ( int binY = binX; binY < nBins; binY++ )
+    {
+      m2AB = min + step * ( binX + .5 );
+      m2AC = min + step * ( binY + .5 );
+      m2BC = pow( mD0(), 2 ) + pow( mKs(), 2 ) + 2. * pow( mPi(), 2 ) - m2AB - m2AC;
+
+      // Proceed only if the point lies inside the kinematically allowed Dalitz region.
+      if ( ( m2AC > m2ACmin( m2AB ) ) && ( m2AC < m2ACmax( m2AB ) ) )
       {
-	m2AB = min + step * ( binX + .5 );
-	m2AC = min + step * ( binY + .5 );
-	m2BC = pow( mD0(), 2 ) + pow( mKs(), 2 ) + 2. * pow( mPi(), 2 ) - m2AB - m2AC;
+        // Compute the resonances that may have varied.
+        for ( int reso = 0; reso < 15; reso++ )
+          if ( _conjOfPrevious[ reso ] )
+          {
+            A   [ reso ] = ABar[ reso - 1 ];
+            ABar[ reso ] = A   [ reso - 1 ];
+          }
+          else
+          {
+            A   [ reso ] = evaluateReso( reso, m2AB, m2AC, m2BC );
+            ABar[ reso ] = evaluateReso( reso, m2AC, m2AB, m2BC );
+          }
 
-	// Proceed only if the point lies inside the kinematically allowed Dalitz region.
-	if ( ( m2AC > m2ACmin( m2AB ) ) && ( m2AC < m2ACmax( m2AB ) ) )
-	  {
-	    // Compute the resonances that may have varied.
-	    for ( int reso = 0; reso < 15; reso++ )
-	      if ( _conjOfPrevious[ reso ] )
-		{
-		  A   [ reso ] = ABar[ reso - 1 ];
-		  ABar[ reso ] = A   [ reso - 1 ];
-		}
-	      else
-		{
-		  A   [ reso ] = evaluateReso( reso, m2AB, m2AC, m2BC );
-		  ABar[ reso ] = evaluateReso( reso, m2AC, m2AB, m2BC );
-		}
-
-	    // Add the terms to the matrices.
-	    for ( int i = 0; i < 15; i++ )
-	      for ( int j = i; j < 15; j++ )
-		if ( all || _unfixed[ i ] || _unfixed[ j ] )
-		  {
-		    if ( binX == binY )
-		      {
-			_Id[ i ][ j ] += ( conj( A[ i ] ) * A   [ j ] + conj( ABar[ i ] ) * ABar[ j ] ) / 2.;
-			_Ix[ i ][ j ] += ( conj( A[ i ] ) * ABar[ j ] + conj( ABar[ i ] ) * A   [ j ] ) / 2.;
-		      }
-		    else
-		      {
-			_Id[ i ][ j ] +=   conj( A[ i ] ) * A   [ j ] + conj( ABar[ i ] ) * ABar[ j ];
-			_Ix[ i ][ j ] +=   conj( A[ i ] ) * ABar[ j ] + conj( ABar[ i ] ) * A   [ j ];
-		      }
-		  }
-	  }
+        // Add the terms to the matrices.
+        for ( int i = 0; i < 15; i++ )
+          for ( int j = i; j < 15; j++ )
+            if ( all || _unfixed[ i ] || _unfixed[ j ] )
+            {
+              if ( binX == binY )
+              {
+                _Id[ i ][ j ] += ( conj( A[ i ] ) * A   [ j ] + conj( ABar[ i ] ) * ABar[ j ] ) / 2.;
+                _Ix[ i ][ j ] += ( conj( A[ i ] ) * ABar[ j ] + conj( ABar[ i ] ) * A   [ j ] ) / 2.;
+              }
+              else
+              {
+                _Id[ i ][ j ] +=   conj( A[ i ] ) * A   [ j ] + conj( ABar[ i ] ) * ABar[ j ];
+                _Ix[ i ][ j ] +=   conj( A[ i ] ) * ABar[ j ] + conj( ABar[ i ] ) * A   [ j ];
+              }
+            }
       }
+    }
 
   // Finish the computation of the integrals and compute the lower triangle elements.
   for ( int i = 0; i < 15; i++ )
     for ( int j = i; j < 15; j++ )
-      {
-	_Id[ i ][ j ] *= pow( step, 2 );
-	_Ix[ i ][ j ] *= pow( step, 2 );
+    {
+      _Id[ i ][ j ] *= pow( step, 2 );
+      _Ix[ i ][ j ] *= pow( step, 2 );
 
-	if ( i != j )
-	  {
-	    _Id[ j ][ i ] = conj( _Id[ i ][ j ] );
-	    _Ix[ j ][ i ] = conj( _Ix[ i ][ j ] );
-	  }
+      if ( i != j )
+      {
+        _Id[ j ][ i ] = conj( _Id[ i ][ j ] );
+        _Ix[ j ][ i ] = conj( _Ix[ i ][ j ] );
       }
+    }
 
   return;
 }
