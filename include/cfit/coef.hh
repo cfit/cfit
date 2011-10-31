@@ -20,6 +20,11 @@ public:
   const Parameter& real() const { return _real; }
   const Parameter& imag() const { return _imag; }
 
+  void setValue( const double& re, const double& im )
+  {
+    _real.setValue( re );
+    _imag.setValue( im );
+  };
   const std::complex< double > value() const;
 
   // Operations of coefficients with themselves.
