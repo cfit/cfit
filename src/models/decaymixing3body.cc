@@ -2,21 +2,23 @@
 #include <cfit/models/decaymixing3body.hh>
 
 DecayMixing3Body::DecayMixing3Body( const Variable&   mSq12,
-				    const Variable&   mSq13,
-				    const Variable&   mSq23,
-				    const Variable&   t    ,
-				    const Amplitude&  amp  ,
-				    const Parameter&  tau  ,
-				    const Parameter&  x    ,
-				    const Parameter&  y    ,
-				    const PhaseSpace& ps     )
-  : _t( t ), _tau( tau ), _x( x ), _y( y )
+                                    const Variable&   mSq13,
+                                    const Variable&   mSq23,
+                                    const Variable&   t    ,
+                                    const Amplitude&  amp  ,
+                                    const Parameter&  tau  ,
+                                    const Parameter&  x    ,
+                                    const Parameter&  y    ,
+                                    const PhaseSpace& ps     )
+  : DecayModel( mSq12, mSq13, mSq23, amp, ps ), _t( t ), _tau( tau ), _x( x ), _y( y )
 {
-  _mSq12 = mSq12;
-  _mSq13 = mSq13;
-  _mSq23 = mSq23;
-  _amp   = amp;
-  _ps    = ps;
+  // Push the variables.
+  push( _t );
+
+  // Push the parameters.
+  push( _tau );
+  push( _x   );
+  push( _y   );
 }
 
 double DecayMixing3Body::evaluate() const throw( PdfException )

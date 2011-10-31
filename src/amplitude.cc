@@ -76,8 +76,8 @@ void Amplitude::append( const Operation::Op& oper )
 
 // Binary operations with complex numbers.
 std::complex< double > Amplitude::operate( const std::complex< double >& x,
-					   const std::complex< double >& y,
-					   const Operation::Op&          oper ) const throw( PdfException )
+                                           const std::complex< double >& y,
+                                           const Operation::Op&          oper ) const throw( PdfException )
 {
   if ( oper == Operation::plus )
     return x + y;
@@ -94,9 +94,9 @@ std::complex< double > Amplitude::operate( const std::complex< double >& x,
 
 // Evaluate the amplitude at the given point, with the current values of its parameters.
 std::complex< double > Amplitude::evaluate( const PhaseSpace& ps,
-					    const double&     mSq12,
-					    const double&     mSq13,
-					    const double&     mSq23 ) const throw( PdfException )
+                                            const double&     mSq12,
+                                            const double&     mSq13,
+                                            const double&     mSq23 ) const throw( PdfException )
 {
   std::stack< std::complex< double > > values;
 
@@ -118,21 +118,21 @@ std::complex< double > Amplitude::evaluate( const PhaseSpace& ps,
     else if ( *ch == 'r' )
       values.push( (*res++)->evaluate( ps, mSq12, mSq13, mSq23 ) );
     else
+    {
+      if ( *ch == 'b' ) // Binary operation with complex numbers.
       {
-        if ( *ch == 'b' ) // Binary operation with complex numbers.
-          {
-            if ( values.size() < 2 )
-              throw PdfException( "Parse error: not enough values in the stack." );
-            y = values.top();
-	    values.pop();
-	    x = values.top();
-	    values.pop();
+        if ( values.size() < 2 )
+          throw PdfException( "Parse error: not enough values in the stack." );
+        y = values.top();
+        values.pop();
+        x = values.top();
+        values.pop();
 
-            values.push( operate( x, y, *ops++ ) );
-          }
-        else
-          throw PdfException( std::string( "Parse error: unknown operation " ) + *ch + "." );
+        values.push( operate( x, y, *ops++ ) );
       }
+      else
+        throw PdfException( std::string( "Parse error: unknown operation " ) + *ch + "." );
+    }
 
   if ( values.size() != 1 )
     throw PdfException( "Parse error: too many values have been supplied." );

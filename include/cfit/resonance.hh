@@ -41,17 +41,15 @@ public:
   double                 blattWeisskopfPrime( const PhaseSpace& ps, const double& mSqAB )                     const;
   double                 blattWeisskopf     ( const PhaseSpace& ps, const double& mSqAB )                     const;
   double                 zemach             ( const PhaseSpace& ps,
-					      const double&     mSqAB,
-					      const double&     mSqAC,
-					      const double&     mSqBC )                                       const;
+                                              const double&     mSqAB,
+                                              const double&     mSqAC,
+                                              const double&     mSqBC )                                       const;
   std::complex< double > evaluate           ( const PhaseSpace& ps,
-					      const double&     mSqAB,
-					      const double&     mSqAC,
-					      const double&     mSqBC )                                       const;
+                                              const double&     mSqAB,
+                                              const double&     mSqAC,
+                                              const double&     mSqBC )                                       const;
 
   virtual std::complex< double > propagator( const PhaseSpace& ps, const double& mSqAB ) const = 0;
-
-
 
   // Operations of resonances with themselves.
   friend const Amplitude operator+( const Resonance& left, const Resonance& right );

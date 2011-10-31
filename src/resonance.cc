@@ -142,10 +142,10 @@ double Resonance::blattWeisskopf( const PhaseSpace& ps, const double& mSqAB ) co
 }
 
 
-std::complex< double > Resonance::evaluate( const PhaseSpace& ps, 
-					    const double&     mSq12,
-					    const double&     mSq13,
-					    const double&     mSq23 ) const
+std::complex< double > Resonance::evaluate( const PhaseSpace& ps,
+                                            const double&     mSq12,
+                                            const double&     mSq13,
+                                            const double&     mSq23 ) const
 {
   // Determine the resonant pair.
   const double& mSqAB = m2AB( mSq12, mSq13, mSq23 );
