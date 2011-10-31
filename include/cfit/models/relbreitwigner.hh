@@ -23,6 +23,7 @@ public:
     {}
 
   std::complex< double > propagator( const PhaseSpace& ps, const double& mSqAB ) const;
+  RelBreitWigner*        copy()                                                  const;
 };
 
 #endif

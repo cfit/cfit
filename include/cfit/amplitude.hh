@@ -4,12 +4,13 @@
 #include <vector>
 #include <string>
 #include <complex>
+#include <map>
 
 #include <cfit/operation.hh>
 #include <cfit/pdfexception.hh>
 #include <cfit/coef.hh>
+#include <cfit/resonance.hh>
 
-class Resonance;
 class PhaseSpace;
 
 class Amplitude
@@ -17,7 +18,7 @@ class Amplitude
 private:
   std::vector< std::complex< double > > _ctnts;
   std::vector< Coef                   > _coefs;
-  std::vector< const Resonance*       > _resos;
+  std::vector< Resonance*             > _resos;
   std::vector< Operation::Op          > _opers;
   std::string                           _expression;
 
@@ -47,6 +48,22 @@ public:
     append( reso );
   }
 
+  Amplitude( const Amplitude& amp )
+  {
+    append( amp );
+  }
+
+  ~Amplitude()
+  {
+    // Delete all the pointers to resonance, since they have been allocated
+    //    by the copy() function of each resonance.
+    typedef std::vector< Resonance* >::iterator rIter;
+    for ( rIter res = _resos.begin(); res != _resos.end(); ++res )
+      delete *res;
+  }
+
+  void setPars( const std::map< std::string, Parameter >& pars );
+
   std::complex< double > evaluate( const PhaseSpace& ps,
 				   const double&     mSq12,
 				   const double&     mSq13,
@@ -54,6 +71,7 @@ public:
 
   // Assignment operations.
   const Amplitude& operator= ( const Resonance& right );
+  const Amplitude& operator= ( const Amplitude& right );
 
   const Amplitude& operator+=( const double&    right );
   const Amplitude& operator-=( const double&    right );

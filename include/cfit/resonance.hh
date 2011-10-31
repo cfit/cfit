@@ -76,6 +76,7 @@ public:
                                               const double&     mSqBC )                                       const;
 
   virtual std::complex< double > propagator( const PhaseSpace& ps, const double& mSqAB ) const = 0;
+  virtual Resonance*             copy()                                                  const = 0;
 
   // Operations of resonances with themselves.
   friend const Amplitude operator+( const Resonance& left, const Resonance& right );

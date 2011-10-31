@@ -25,18 +25,19 @@ void Amplitude::append( const Coef& coef )
 
 void Amplitude::append( const Resonance& reso )
 {
-  _resos.push_back( &reso );
+  _resos.push_back( reso.copy() );
   _expression += "r"; // r = resonance.
 }
 
 void Amplitude::append( const Amplitude& ampl )
 {
-  _ctnts.insert( _ctnts.end(), ampl._ctnts.begin(), ampl._ctnts.end() );;
-  _coefs.insert( _coefs.end(), ampl._coefs.begin(), ampl._coefs.end() );;
-  _resos.insert( _resos.end(), ampl._resos.begin(), ampl._resos.end() );;
-  _opers.insert( _opers.end(), ampl._opers.begin(), ampl._opers.end() );;
+  _ctnts.insert( _ctnts.end(), ampl._ctnts.begin(), ampl._ctnts.end() );
+  _coefs.insert( _coefs.end(), ampl._coefs.begin(), ampl._coefs.end() );
+  _opers.insert( _opers.end(), ampl._opers.begin(), ampl._opers.end() );
 
-  //_resos.push_back( &reso );
+  std::transform( ampl._resos.begin(), ampl._resos.end(),
+                  std::back_inserter( _resos ), std::mem_fun( &Resonance::copy ) );
+
   _expression += ampl._expression;
 }
 
@@ -47,31 +48,19 @@ void Amplitude::append( const Operation::Op& oper )
 }
 
 
+void Amplitude::setPars( const std::map< std::string, Parameter >& pars )
+{
+  // Set the values of the coefficients.
+  typedef std::vector< Coef >::iterator cIter;
+  for ( cIter coef = _coefs.begin(); coef != _coefs.end(); ++coef )
+    coef->setValue( pars.find( coef->real().name() )->second.value(),
+                    pars.find( coef->imag().name() )->second.value() );
 
-
-// void Amplitude::setPars( const std::vector< double >& pars ) throw( PdfException )
-// {
-//   if ( _parMap.size() != pars.size() )
-//     throw PdfException( "Number of arguments passed does not match number of required arguments." );
-
-//   // Set the local values of the parameters.
-//   typedef std::map< std::string, Parameter >::iterator pIter;
-//   int index = 0;
-//   for ( pIter par = _parMap.begin(); par != _parMap.end(); ++par )
-//     par->second.setValue( pars[ index++ ] );
-
-//   // Propagate the values to the list of resonances.
-//   typedef std::vector< const Resonance* >::const_iterator resIter;
-//   for ( resIter res = _resos.begin(); res != _resos.end(); ++res )
-//     {
-//       std::map< std::string, Parameter >& resPars = (*res)->_parMap;
-//       for ( pIter par = resPars.begin(); par != resPars.end(); ++par )
-// 	par->second.setValue( _parMap[ par->second.name() ].value() );
-//     }
-// }
-
-
-
+  // Propagate the values to the list of resonances.
+  typedef std::vector< Resonance* >::iterator rIter;
+  for ( rIter reso = _resos.begin(); reso != _resos.end(); ++reso )
+    (*reso)->setPars( pars );
+}
 
 
 // Binary operations with complex numbers.
@@ -105,7 +94,7 @@ std::complex< double > Amplitude::evaluate( const PhaseSpace& ps,
 
   std::vector< std::complex< double > >::const_iterator ctt = _ctnts.begin();
   std::vector< Coef                   >::const_iterator coe = _coefs.begin();
-  std::vector< const Resonance*       >::const_iterator res = _resos.begin();
+  std::vector< Resonance*             >::const_iterator res = _resos.begin();
   std::vector< Operation::Op          >::const_iterator ops = _opers.begin();
 
   // Parsing loop.
@@ -144,6 +133,12 @@ std::complex< double > Amplitude::evaluate( const PhaseSpace& ps,
 
 // Assignment operations.
 const Amplitude& Amplitude::operator=( const Resonance& right )
+{
+  append( right );
+  return *this;
+}
+
+const Amplitude& Amplitude::operator=( const Amplitude& right )
 {
   append( right );
   return *this;

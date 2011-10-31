@@ -11,3 +11,8 @@ std::complex< double > RelBreitWigner::propagator( const PhaseSpace& ps, const d
 }
 
 
+RelBreitWigner* RelBreitWigner::copy() const
+{
+  return new RelBreitWigner( *this );
+}
+
