@@ -9,12 +9,18 @@
 class DecayModel : public PdfModel
 {
 protected:
-  Variable _mSq12;
-  Variable _mSq13;
-  Variable _mSq23;
-
   Amplitude  _amp;
   PhaseSpace _ps;
+public:
+  DecayModel( const Variable&   mSq12,
+              const Variable&   mSq13,
+              const Variable&   mSq23,
+              const Amplitude&  amp  ,
+              const PhaseSpace& ps    );
+
+  double mSq12() const { return getVar( 0 ).value(); }
+  double mSq13() const { return getVar( 1 ).value(); }
+  double mSq23() const { return getVar( 2 ).value(); }
 };
 
 #endif
