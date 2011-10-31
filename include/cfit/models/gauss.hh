@@ -12,10 +12,10 @@
 class Gauss : public PdfModel
 {
 public:
-  Gauss( const Variable& x, const Parameter& mean, const Parameter& sigma );
+  Gauss( const Variable& x, const Parameter& mu, const Parameter& sigma );
 
   // Getters.
-  double mean()  const;
+  double mu()    const;
   double sigma() const;
 
   double evaluate(                                   ) const throw( PdfException );

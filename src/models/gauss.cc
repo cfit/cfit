@@ -1,16 +1,16 @@
 
 #include <cfit/models/gauss.hh>
 
-Gauss::Gauss( const Variable& x, const Parameter& mean, const Parameter& sigma )
+Gauss::Gauss( const Variable& x, const Parameter& mu, const Parameter& sigma )
 {
   push( x );
 
-  push( mean  );
+  push( mu    );
   push( sigma );
 }
 
 
-double Gauss::mean()  const
+double Gauss::mu()  const
 {
   return getPar( 0 ).value();
 }
@@ -30,7 +30,7 @@ double Gauss::evaluate() const throw( PdfException )
 
 double Gauss::evaluate( double x ) const throw( PdfException )
 {
-  return 1. / ( sigma() * sqrt( 2. * M_PI ) ) * exp( - .5 * pow( x - mean(), 2 ) / pow( sigma(), 2 ) );
+  return 1. / ( sigma() * sqrt( 2. * M_PI ) ) * exp( - .5 * pow( x - mu(), 2 ) / pow( sigma(), 2 ) );
 }
 
 
