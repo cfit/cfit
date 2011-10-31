@@ -1,6 +1,8 @@
 #ifndef __RESONANCE_HH__
 #define __RESONANCE_HH__
 
+#include <map>
+#include <vector>
 #include <complex>
 #include <cfit/parameter.hh>
 
@@ -16,11 +18,35 @@ protected:
   unsigned  _noRes;      // Index of the non-resonant particle.
   int       _l;          // Angular momentum quantum number.
 
-  Parameter _mass;       // Squared mass of the resonant propagator.
-  Parameter _width;      // Width of the resonant propagator.
-  Parameter _R;          // Radius of the Blatt-Weisskopf centrifugal barrier factor.
+  std::map< const std::string, Parameter > _parMap;
+  std::vector< std::string >               _parOrder;
 public:
+  template <class T>
+  Resonance( const T&         resoA, const T&         resoB,
+             const Parameter& mass , const Parameter& width,
+             const Parameter& r    , const int&       l      )
+  {
+    _resoA  = resoA;
+    _resoB  = resoB;
+    _noRes  = 6 - resoA - resoB;
+    _l      = l;
+
+    push( mass  );
+    push( width );
+    push( r     );
+  }
+
   virtual ~Resonance() {};
+
+  void push( const Parameter& par );
+
+  double mass()   const { return _parMap.find( _parOrder[ 0 ] )->second.value(); }
+  double m()      const { return _parMap.find( _parOrder[ 0 ] )->second.value(); }
+  double width()  const { return _parMap.find( _parOrder[ 1 ] )->second.value(); }
+  double r()      const { return _parMap.find( _parOrder[ 2 ] )->second.value(); }
+  double radius() const { return _parMap.find( _parOrder[ 2 ] )->second.value(); }
+
+  void setPars( const std::map< std::string, Parameter >& pars );
 
   // AB is the resonant pair, with A the first and B the second particle in the pair.
   //    Order is only relevant for the sign of the Zemach angular term for l = 1.
@@ -82,5 +108,20 @@ public:
   friend const Amplitude operator+( const Amplitude& left, const Resonance& right );
   friend const Amplitude operator-( const Amplitude& left, const Resonance& right );
 };
+
+template <>
+inline Resonance::Resonance( const char&      resoA, const char&      resoB,
+                             const Parameter& mass , const Parameter& width,
+                             const Parameter& r    , const int&       l      )
+{
+  _resoA  = std::tolower( resoA ) - 'a' + 1;
+  _resoB  = std::tolower( resoB ) - 'a' + 1;
+  _noRes  = 6 - resoA - resoB;
+  _l      = l;
+
+  push( mass  );
+  push( width );
+  push( r     );
+}
 
 #endif

@@ -2,6 +2,22 @@
 #include <cfit/resonance.hh>
 #include <cfit/phasespace.hh>
 
+
+void Resonance::push( const Parameter& par )
+{
+  _parMap[ par.name() ] = par;
+  _parOrder.push_back( par.name() );
+}
+
+
+void Resonance::setPars( const std::map< std::string, Parameter >& pars )
+{
+  typedef std::map< const std::string, Parameter >::iterator pIter;
+  for ( pIter par = _parMap.begin(); par != _parMap.end(); ++par )
+    par->second.setValue( pars.find( par->first )->second.value() );
+}
+
+// Kallen function lambda( x, y, z ) = x^2 + y^2 + z^2 - 2xy - 2xz - 2yz.
 double Resonance::kallen( const double& x, const double& y, const double& z )
 {
   double result = 0.;
@@ -15,6 +31,7 @@ double Resonance::kallen( const double& x, const double& y, const double& z )
   return result;
 }
 
+// Invariant mass of the resonant pair.
 double Resonance::m2AB( const double& mSq12, const double& mSq13, const double& mSq23 ) const
 {
   if ( _noRes == 3 ) return mSq12;
@@ -24,6 +41,7 @@ double Resonance::m2AB( const double& mSq12, const double& mSq13, const double& 
   return 0.;
 }
 
+// Invariant mass of the first non-resonant pair.
 double Resonance::m2AC( const double& mSq12, const double& mSq13, const double& mSq23 ) const
 {
   if ( _resoB == 3 ) return mSq12;
@@ -33,6 +51,7 @@ double Resonance::m2AC( const double& mSq12, const double& mSq13, const double& 
   return 0.;
 }
 
+// Invariant mass of the second non-resonant pair.
 double Resonance::m2BC( const double& mSq12, const double& mSq13, const double& mSq23 ) const
 {
   if ( _resoA == 3 ) return mSq12;
@@ -42,7 +61,7 @@ double Resonance::m2BC( const double& mSq12, const double& mSq13, const double& 
   return 0.;
 }
 
-
+// Momentum of a resonant particle in the rest frame of the resonant pair.
 double Resonance::q( const PhaseSpace& ps, const double& mSqAB ) const
 {
   return std::sqrt( kallen( mSqAB, ps.mSq( _resoA ), ps.mSq( _resoB ) ) ) / ( 2. * std::sqrt( mSqAB ) );
@@ -57,19 +76,15 @@ double Resonance::rho( const PhaseSpace& ps, const double& mSqAB ) const
 }
 
 
-
 double Resonance::runningWidth( const PhaseSpace& ps, const double& mSqAB ) const
 {
-  const double& rho0 = rho( ps, std::pow( _mass.value(), 2 ) );
-  return _width.value() * ( rho( ps, mSqAB ) / rho0 ) * std::pow( blattWeisskopf( ps, mSqAB ), 2 );
+  const double& rho0 = rho( ps, std::pow( mass(), 2 ) );
+  return width() * ( rho( ps, mSqAB ) / rho0 ) * std::pow( blattWeisskopf( ps, mSqAB ), 2 );
 }
-
 
 
 double Resonance::zemach( const PhaseSpace& ps, const double& mSqAB, const double& mSqAC, const double& mSqBC ) const
 {
-//   std::cout << "DEBUG zemach: " << _l << " " << _mMotherSq << " " << _mNonResoSq << " " << _mResoSqA << " " << _mResoSqB << std::endl;
-
   if ( _l == 0 )
     return 1.;
 
@@ -107,10 +122,10 @@ double Resonance::blattWeisskopfPrime( const PhaseSpace& ps, const double& mSqAB
   if ( _l == 0 )
     return 1.;
 
-  const double& q0    = q( ps, std::pow( _mass.value(), 2 ) );
+  const double& q0    = q( ps, std::pow( mass(), 2 ) );
   const double& qm    = q( ps, mSqAB );
-  const double& rqSq0 = std::pow( _R.value() * q0, 2 );
-  const double& rqSq  = std::pow( _R.value() * qm, 2 );
+  const double& rqSq0 = std::pow( r() * q0, 2 );
+  const double& rqSq  = std::pow( r() * qm, 2 );
 
   if ( _l == 1 )
     return std::sqrt( ( 1. + rqSq0 ) / ( 1. + rqSq ) );
@@ -135,7 +150,7 @@ double Resonance::blattWeisskopf( const PhaseSpace& ps, const double& mSqAB ) co
   if ( _l == 0 )
     return 1.;
 
-  const double& q0 = q( ps, std::pow( _mass.value(), 2 ) );
+  const double& q0 = q( ps, std::pow( mass(), 2 ) );
   const double& qm = q( ps, mSqAB );
 
   return std::pow( qm / q0, _l ) * blattWeisskopfPrime( ps, mSqAB );

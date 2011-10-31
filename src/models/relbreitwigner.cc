@@ -7,5 +7,7 @@ std::complex< double > RelBreitWigner::propagator( const PhaseSpace& ps, const d
 {
   const std::complex< double > I( 0., 1. );
 
-  return 1. / ( std::pow( _mass.value(), 2 ) - mSqAB - I * _mass.value() * runningWidth( ps, mSqAB ) );
+  return 1. / ( std::pow( mass(), 2 ) - mSqAB - I * mass() * runningWidth( ps, mSqAB ) );
 }
+
+
