@@ -41,7 +41,8 @@ public:
 
   const double mSq( unsigned index ) const;
 
-  bool inside( const double& mSq12, const double& mSq13, const double& mSq23 ) const;
+  // Check if the kinematically allowed region contains a given point.
+  bool contains( const double& mSq12, const double& mSq13, const double& mSq23 ) const;
 };
 
 #endif

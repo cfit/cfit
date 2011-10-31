@@ -59,6 +59,8 @@ const double PhaseSpace::mSq23max( const double& mSq12 ) const
 
 const double PhaseSpace::mSq( unsigned index ) const
 {
+  if ( index == 0 )
+    return _mSqMother;
   if ( index == 1 )
     return _mSq1;
   if ( index == 2 )
@@ -70,8 +72,10 @@ const double PhaseSpace::mSq( unsigned index ) const
 }
 
 
-bool PhaseSpace::inside( const double& mSq12, const double& mSq13, const double& mSq23 ) const
+// Check if the kinematically allowed region contains a given point.
+bool PhaseSpace::contains( const double& mSq12, const double& mSq13, const double& mSq23 ) const
 {
   return ( mSq13 > mSq13min( mSq12 ) ) && ( mSq13 < mSq13max( mSq12 ) ) &&
          ( mSq23 > mSq23min( mSq12 ) ) && ( mSq23 < mSq23max( mSq12 ) );
 }
+
