@@ -183,6 +183,37 @@ const Pdf& Pdf::operator/=( const double& right )
 }
 
 
+// Setter for individual variable.
+void Pdf::setVar( const std::string& name, const double& val, const double& err ) throw( PdfException )
+{
+  if ( ! _varMap.count( name ) )
+    throw PdfException( "Cannot set unexisting variable " + name + "." );
+
+  _varMap[ name ].set( val, err );
+
+  // Propagate the values to the list of pdfs.
+  typedef std::vector< PdfModel* >::const_iterator pdfIter;
+  for ( pdfIter pdf = _pdfs.begin(); pdf != _pdfs.end(); ++pdf )
+    if ( (*pdf)->_varMap.count( name ) )
+      (*pdf)->_varMap[ name ].set( val, err );
+}
+
+// Setter for individual parameter.
+void Pdf::setPar( const std::string& name, const double& val, const double& err ) throw( PdfException )
+{
+  if ( ! _parMap.count( name ) )
+    throw PdfException( "Cannot set unexisting parameter " + name + "." );
+
+  _parMap[ name ].set( val, err );
+
+  // Propagate the values to the list of pdfs.
+  typedef std::vector< PdfModel* >::const_iterator pdfIter;
+  for ( pdfIter pdf = _pdfs.begin(); pdf != _pdfs.end(); ++pdf )
+    if ( (*pdf)->_parMap.count( name ) )
+      (*pdf)->_parMap[ name ].set( val, err );
+}
+
+
 
 void Pdf::setVars( const std::vector< double >& vars ) throw( PdfException )
 {

@@ -42,6 +42,23 @@ const Parameter& PdfModel::getPar( int index ) const
 }
 
 
+// Setter for individual variable.
+void PdfModel::setVar( const std::string& name, const double& val, const double& err ) throw( PdfException )
+{
+  if ( ! _varMap.count( name ) )
+    throw PdfException( "Cannot set unexisting variable " + name + "." );
+
+  _varMap[ name ].set( val, err );
+}
+
+// Setter for individual parameter.
+void PdfModel::setPar( const std::string& name, const double& val, const double& err ) throw( PdfException )
+{
+  if ( ! _parMap.count( name ) )
+    throw PdfException( "Cannot set unexisting parameter " + name + "." );
+
+  _parMap[ name ].set( val, err );
+}
 
 // Set the variables to those given as argument.
 // They must be sorted alphabetically.
