@@ -356,6 +356,21 @@ void DalitzD0mix::cacheDalitzIntegrals()
 
 
 
+void DalitzD0mix::cache()
+{
+  // Compute the terms of the matrices of integrals (Id and Ix) that need recalculation.
+  if ( ! _propagatorsFixed )
+    cacheIntegralsMatrix();
+
+  // Compute the integrals I_1 and I_\chi if the amplitudes are constant.
+  if ( ! _integralsFixed )
+    cacheDalitzIntegrals();
+
+  _norm = norm();
+}
+
+
+
 double DalitzD0mix::kallen( double x, double y, double z )
 {
   double result = 0.;

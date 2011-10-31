@@ -135,18 +135,8 @@ public:
   static const double& mKs() { return _mKs; }
   static const double& mD0() { return _mD0; }
 
-  void cache()
-  {
-    // Compute the terms of the matrices of integrals (Id and Ix) that need recalculation.
-    if ( ! _propagatorsFixed )
-      cacheIntegralsMatrix();
+  void cache();
 
-    // Compute the integrals I_1 and I_\chi if the amplitudes are constant.
-    if ( ! _integralsFixed )
-      cacheDalitzIntegrals();
-
-    _norm = norm();
-  }
   double evaluate()                                    const throw( PdfException );
   double evaluate( const std::vector< double >& vars ) const throw( PdfException );
 
