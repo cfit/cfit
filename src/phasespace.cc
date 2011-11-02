@@ -72,6 +72,22 @@ const double PhaseSpace::mSq( unsigned index ) const
 }
 
 
+const double PhaseSpace::m( unsigned index ) const
+{
+  if ( index == 0 )
+    return _mMother;
+  if ( index == 1 )
+    return _m1;
+  if ( index == 2 )
+    return _m2;
+  if ( index == 3 )
+    return _m3;
+
+  return 0.;
+}
+
+
+
 // Check if the kinematically allowed region contains a given point.
 bool PhaseSpace::contains( const double& mSq12, const double& mSq13, const double& mSq23 ) const
 {

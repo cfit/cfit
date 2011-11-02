@@ -39,6 +39,7 @@ public:
   const double mSq2()      const { return _mSq2;      }
   const double mSq3()      const { return _mSq3;      }
 
+  const double m  ( unsigned index ) const;
   const double mSq( unsigned index ) const;
 
   // Check if the kinematically allowed region contains a given point.
