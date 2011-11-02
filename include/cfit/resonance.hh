@@ -46,6 +46,8 @@ public:
   double r()      const { return _parMap.find( _parOrder[ 2 ] )->second.value(); }
   double radius() const { return _parMap.find( _parOrder[ 2 ] )->second.value(); }
 
+  double mSq()    const { return std::pow( m(), 2 );                             }
+
   void setPars( const std::map< std::string, Parameter >& pars );
 
   // AB is the resonant pair, with A the first and B the second particle in the pair.
@@ -60,6 +62,7 @@ public:
 
   // Momentum of a resonant particle in the rest frame of the resonant pair.
   double                 q                  ( const PhaseSpace& ps, const double& mSqAB )                     const;
+  double                 qSq                ( const PhaseSpace& ps, const double& mSqAB )                     const;
 
   // Phase space factor, equal to 2q/m.
   double                 rho                ( const PhaseSpace& ps, const double& mSqAB )                     const;

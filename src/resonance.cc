@@ -67,6 +67,12 @@ double Resonance::q( const PhaseSpace& ps, const double& mSqAB ) const
   return std::sqrt( kallen( mSqAB, ps.mSq( _resoA ), ps.mSq( _resoB ) ) ) / ( 2. * std::sqrt( mSqAB ) );
 }
 
+// Squared momentum of a resonant particle in the rest frame of the resonant pair.
+double Resonance::qSq( const PhaseSpace& ps, const double& mSqAB ) const
+{
+  return kallen( mSqAB, ps.mSq( _resoA ), ps.mSq( _resoB ) ) / ( 4. * mSqAB );
+}
+
 
 // Phase space factor, 2 q / m, where q is the momentum of a resonant particle in the
 //    rest frame of the resonant pair, and m is the invariant mass of the resonant pair.
