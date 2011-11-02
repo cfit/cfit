@@ -1,8 +1,6 @@
 #ifndef __RELBREITWIGNER_HH__
 #define __RELBREITWIGNER_HH__
 
-#include <cctype> // For the tolower function.
-
 #include <cfit/parameter.hh>
 #include <cfit/resonance.hh>
 
