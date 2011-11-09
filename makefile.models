@@ -15,10 +15,11 @@ HDRDIRS = $(HDIR)
 LIBDIRS = $(LDIR)
 LIBLIST = minuit cfit
 
-MODELS = gauss d0mix relbreitwigner gounarissakurai decay3body #decaymixing3body
+MODELS = gauss d0mix relbreitwigner gounarissakurai glass decay3body #decaymixing3body
 FILES_gauss =
 FILES_relbreitwigner =
 FILES_gounarissakurai =
+FILES_glass =
 FILES_decaymixing3body =
 
 FILES_d0mix = dalitzReso
