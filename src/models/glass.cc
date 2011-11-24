@@ -18,7 +18,7 @@ std::complex< double > GLass::propagator( const PhaseSpace& ps, const double& mS
   rTerm *= ( qCotDeltaB + I * qAB ) / ( qCotDeltaB - I * qAB );
   rTerm *= m() * width() / ( mSq() - mSqAB - I * m() * runningWidth( ps, mSqAB ) );
 
-  std::complex< double > bTerm = lassB() * mSqAB / 2. * std::exp( I * phiB() );
+  std::complex< double > bTerm = lassB() * std::sqrt( mSqAB ) / 2. * std::exp( I * phiB() );
   bTerm *= ( std::cos( phiB() ) + std::sin( phiB() ) * cotDeltaB ) / ( qCotDeltaB - I * qAB );
 
   return rTerm + bTerm;
@@ -29,3 +29,4 @@ GLass* GLass::copy() const
 {
   return new GLass( *this );
 }
+

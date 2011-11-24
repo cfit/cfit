@@ -28,16 +28,12 @@ public:
       push( lassa );
     }
 
-  GLass( const GLass& right )
-    : Resonance( right )
-    {}
-
   double lassR() const { return getPar( 0 ); }
   double lassB() const { return getPar( 1 ); }
   double phiR()  const { return getPar( 2 ); }
   double phiB()  const { return getPar( 3 ); }
-  double lassa() const { return getPar( 4 ); }
-  double lassr() const { return getPar( 5 ); }
+  double lassr() const { return getPar( 4 ); }
+  double lassa() const { return getPar( 5 ); }
 
   std::complex< double > propagator( const PhaseSpace& ps, const double& mSqAB ) const;
   GLass*                 copy()                                                  const;
