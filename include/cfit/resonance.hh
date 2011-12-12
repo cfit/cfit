@@ -4,7 +4,9 @@
 #include <map>
 #include <vector>
 #include <complex>
+
 #include <cfit/parameter.hh>
+#include <cfit/pdfexception.hh>
 
 class Coef;
 class Amplitude;
@@ -39,6 +41,10 @@ public:
   virtual ~Resonance() {};
 
   void push( const Parameter& par );
+
+  // For resonances with larger number of parameters, be able to get them by index.
+  //    Important: the zeroth extra parameter is the 3rd element in the vector.
+  double getPar( const unsigned index ) const throw( PdfException );
 
   double mass()   const { return _parMap.find( _parOrder[ 0 ] )->second.value(); }
   double m()      const { return _parMap.find( _parOrder[ 0 ] )->second.value(); }

@@ -10,6 +10,17 @@ void Resonance::push( const Parameter& par )
 }
 
 
+// For resonances with larger number of parameters, be able to get them by index.
+//    Important: the zeroth extra parameter is the 3rd element in the vector.
+double Resonance::getPar( const unsigned index ) const throw( PdfException )
+{
+  if ( _parOrder.size() > index + 3 )
+    return _parMap.find( _parOrder[ index + 3 ] )->second.value();
+
+  throw PdfException( "Trying to access unexisting parameter." );
+}
+
+
 void Resonance::setPars( const std::map< std::string, Parameter >& pars )
 {
   typedef std::map< const std::string, Parameter >::iterator pIter;
