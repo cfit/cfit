@@ -1,6 +1,8 @@
 
 #include <stack>
+#include <algorithm>
 
+#include <cfit/phasespace.hh>
 #include <cfit/amplitude.hh>
 #include <cfit/coef.hh>
 #include <cfit/resonance.hh>
@@ -29,6 +31,12 @@ void Amplitude::append( const Resonance& reso )
   _expression += "r"; // r = resonance.
 }
 
+void Amplitude::append( const Fvector& fvec )
+{
+  _fvecs.push_back( fvec );
+  _expression += "F"; // F = element of F vector.
+}
+
 void Amplitude::append( const Amplitude& ampl )
 {
   _ctnts.insert( _ctnts.end(), ampl._ctnts.begin(), ampl._ctnts.end() );
@@ -37,6 +45,7 @@ void Amplitude::append( const Amplitude& ampl )
 
   std::transform( ampl._resos.begin(), ampl._resos.end(),
                   std::back_inserter( _resos ), std::mem_fun( &Resonance::copy ) );
+  _fvecs.insert( _fvecs.end(), ampl._fvecs.begin(), ampl._fvecs.end() );
 
   _expression += ampl._expression;
 }
@@ -60,6 +69,11 @@ void Amplitude::setPars( const std::map< std::string, Parameter >& pars )
   typedef std::vector< Resonance* >::iterator rIter;
   for ( rIter reso = _resos.begin(); reso != _resos.end(); ++reso )
     (*reso)->setPars( pars );
+
+  // Propagate the values to the list of fvector components.
+  typedef std::vector< Fvector >::iterator fIter;
+  for ( fIter fvec = _fvecs.begin(); fvec != _fvecs.end(); ++fvec )
+    fvec->setPars( pars );
 }
 
 
@@ -87,6 +101,9 @@ std::complex< double > Amplitude::evaluate( const PhaseSpace& ps,
                                             const double&     mSq13,
                                             const double&     mSq23 ) const throw( PdfException )
 {
+  if ( ! ps.contains( mSq12, mSq13, mSq23 ) )
+    return 0.;
+
   std::stack< std::complex< double > > values;
 
   std::complex< double > x;
@@ -95,17 +112,20 @@ std::complex< double > Amplitude::evaluate( const PhaseSpace& ps,
   std::vector< std::complex< double > >::const_iterator ctt = _ctnts.begin();
   std::vector< Coef                   >::const_iterator coe = _coefs.begin();
   std::vector< Resonance*             >::const_iterator res = _resos.begin();
+  std::vector< Fvector                >::const_iterator fvc = _fvecs.begin();
   std::vector< Operation::Op          >::const_iterator ops = _opers.begin();
 
   // Parsing loop.
   typedef std::string::const_iterator eIter;
-  for ( eIter ch = _expression.begin(); ch != _expression.end(); ch++ )
+  for ( eIter ch = _expression.begin(); ch != _expression.end(); ++ch )
     if ( *ch == 'c' )
       values.push( *ctt++ );
     else if ( *ch == 'k' )
       values.push( coe++->value() );
     else if ( *ch == 'r' )
       values.push( (*res++)->evaluate( ps, mSq12, mSq13, mSq23 ) );
+    else if ( *ch == 'F' )
+      values.push( fvc++->evaluate( ps, mSq12, mSq13, mSq23 ) );
     else
     {
       if ( *ch == 'b' ) // Binary operation with complex numbers.
@@ -133,6 +153,12 @@ std::complex< double > Amplitude::evaluate( const PhaseSpace& ps,
 
 // Assignment operations.
 const Amplitude& Amplitude::operator=( const Resonance& right )
+{
+  append( right );
+  return *this;
+}
+
+const Amplitude& Amplitude::operator=( const Fvector& right )
 {
   append( right );
   return *this;
@@ -259,6 +285,16 @@ const Amplitude operator+( const Resonance& left, const Resonance& right )
 }
 
 const Amplitude operator-( const Resonance& left, const Resonance& right )
+{
+  return Amplitude( left, right, Operation::minus );
+}
+
+const Amplitude operator+( const Fvector& left, const Fvector& right )
+{
+  return Amplitude( left, right, Operation::plus );
+}
+
+const Amplitude operator-( const Fvector& left, const Fvector& right )
 {
   return Amplitude( left, right, Operation::minus );
 }
@@ -484,6 +520,28 @@ const Amplitude operator+( const Amplitude& left, const Resonance& right )
 }
 
 const Amplitude operator-( const Amplitude& left, const Resonance& right )
+{
+  return Amplitude( left, right, Operation::minus );
+}
+
+
+
+const Amplitude operator+( const Fvector& left, const Amplitude& right )
+{
+  return Amplitude( left, right, Operation::plus );
+}
+
+const Amplitude operator-( const Fvector& left, const Amplitude& right )
+{
+  return Amplitude( left, right, Operation::minus );
+}
+
+const Amplitude operator+( const Amplitude& left, const Fvector& right )
+{
+  return Amplitude( left, right, Operation::plus );
+}
+
+const Amplitude operator-( const Amplitude& left, const Fvector& right )
 {
   return Amplitude( left, right, Operation::minus );
 }

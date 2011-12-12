@@ -10,6 +10,7 @@
 #include <cfit/pdfexception.hh>
 #include <cfit/coef.hh>
 #include <cfit/resonance.hh>
+#include <cfit/fvector.hh>
 
 class PhaseSpace;
 
@@ -19,6 +20,7 @@ private:
   std::vector< std::complex< double > > _ctnts;
   std::vector< Coef                   > _coefs;
   std::vector< Resonance*             > _resos;
+  std::vector< Fvector                > _fvecs;
   std::vector< Operation::Op          > _opers;
   std::string                           _expression;
 
@@ -26,6 +28,7 @@ private:
   void append( const std::complex< double >& ctnt );
   void append( const Coef&                   coef );
   void append( const Resonance&              reso );
+  void append( const Fvector&                fvec );
   void append( const Amplitude&              ampl );
   void append( const Operation::Op&          oper );
 
@@ -46,6 +49,11 @@ public:
   Amplitude( const Resonance& reso )
   {
     append( reso );
+  }
+
+  Amplitude( const Fvector& vec )
+  {
+    append( vec );
   }
 
   Amplitude( const Amplitude& amp )
@@ -71,6 +79,7 @@ public:
 
   // Assignment operations.
   const Amplitude& operator= ( const Resonance& right );
+  const Amplitude& operator= ( const Fvector&   right );
   const Amplitude& operator= ( const Amplitude& right );
 
   const Amplitude& operator+=( const double&    right );
@@ -97,6 +106,9 @@ public:
 
   friend const Amplitude operator+( const Resonance& left, const Resonance& right );
   friend const Amplitude operator-( const Resonance& left, const Resonance& right );
+
+  friend const Amplitude operator+( const Fvector&   left, const Fvector&   right );
+  friend const Amplitude operator-( const Fvector&   left, const Fvector&   right );
 
   friend const Amplitude operator+( const Amplitude& left, const Amplitude& right );
   friend const Amplitude operator-( const Amplitude& left, const Amplitude& right );
@@ -164,6 +176,14 @@ public:
 
   friend const Amplitude operator+( const Amplitude& left, const Resonance& right );
   friend const Amplitude operator-( const Amplitude& left, const Resonance& right );
+
+
+  // Operations with Fvector components and amplitudes.
+  friend const Amplitude operator+( const Fvector&   left, const Amplitude& right );
+  friend const Amplitude operator-( const Fvector&   left, const Amplitude& right );
+
+  friend const Amplitude operator+( const Amplitude& left, const Fvector&   right );
+  friend const Amplitude operator-( const Amplitude& left, const Fvector&   right );
 };
 
 #endif
