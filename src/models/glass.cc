@@ -10,13 +10,14 @@ std::complex< double > GLass::propagator( const PhaseSpace& ps, const double& mS
 
   double qAB   = q  ( ps, mSqAB );
   double qSqAB = qSq( ps, mSqAB );
+  double rho0  = rho( ps, mSq() );
 
   double qCotDeltaB = 1. / lassa() + lassr() * qSqAB / 2.;
   double cotDeltaB  = qCotDeltaB / qAB;
 
   std::complex< double > rTerm = lassR() * std::exp( I * phiR() + 2. * I * phiB() );
   rTerm *= ( qCotDeltaB + I * qAB ) / ( qCotDeltaB - I * qAB );
-  rTerm *= m() * width() / ( mSq() - mSqAB - I * m() * runningWidth( ps, mSqAB ) );
+  rTerm *= m() * width() / rho0 / ( mSq() - mSqAB - I * m() * runningWidth( ps, mSqAB ) );
 
   std::complex< double > bTerm = lassB() * std::sqrt( mSqAB ) / 2. * std::exp( I * phiB() );
   bTerm *= ( std::cos( phiB() ) + std::sin( phiB() ) * cotDeltaB ) / ( qCotDeltaB - I * qAB );
