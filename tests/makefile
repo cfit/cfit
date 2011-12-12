@@ -1,5 +1,5 @@
 
-BINARIES = testGauss testDalitz
+BINARIES = testGauss testResos
 
 BDIR = bin
 HDIR = ../include
