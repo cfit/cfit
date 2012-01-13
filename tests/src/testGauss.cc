@@ -40,14 +40,13 @@ void   readData ( std::string fileName, Dataset& data )
   std::ifstream file( fileName.c_str() );
   while ( file >> x )
     y[ bin( x ) ]++;
+  file.close();
 
   for ( int b = 0; b < 100; b++ )
     {
       data.push( "x", binCenter( b ) );
       data.push( "y", y[ b ], error( y[ b ] ) );
     }
-
-  file.close();
 
   return;
 }
@@ -93,6 +92,8 @@ int main( int argc, char** argv )
   Gauss g1( x, mean1, sigma1 );
   Gauss g2( x, mean2, sigma2 );
 
+//Pdf sum =                     pow( sin( phi ), 2 ) * g1 + pow( cos( phi ), 2 ) * g2;
+//Pdf sum =   area          * ( pow( sin( phi ), 2 ) * g1 + pow( cos( phi ), 2 ) * g2 );
   Pdf sum = ( area + 4.e5 ) * ( pow( sin( phi ), 2 ) * g1 + pow( cos( phi ), 2 ) * g2 );
 
   // Definition of the minimizer from the pdf.
