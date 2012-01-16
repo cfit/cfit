@@ -70,19 +70,6 @@ public:
 
     pushBeta( beta );
     pushfPr ( fPr  );
-
-//     typedef std::vector< Coef      >::const_iterator kIter;
-//     typedef std::vector< Parameter >::const_iterator pIter;
-
-//     for ( kIter coef = beta.begin(); coef != beta.end(); ++coef )
-//       push( *coef );
-
-//     for ( pIter par = fPr.begin(); par != fPr.end(); ++par )
-//       push( *par );
-
-//     std::for_each( beta.begin(), beta.end(), std::bind1st( std::mem_fun( &Fvector::push ), this ) );
-//     std::for_each( fPr .begin(), fPr .end(), std::bind1st( std::mem_fun( &Fvector::push ), this ) );
-
     pushS0pr( s0pr );
   }
 
@@ -91,21 +78,6 @@ public:
   void pushBeta( const std::vector< Coef >& beta );
   void pushfPr ( const std::vector< Coef >& fPr  );
   void pushS0pr( const Parameter&           s0pr );
-
-//   void push( const Parameter& par  );
-//   void push( const Coef&      coef );
-
-//   // For resonances with larger number of parameters, be able to get them by index.
-//   //    Important: the zeroth extra parameter is the 3rd element in the vector.
-//   double getPar( const unsigned index ) const throw( PdfException );
-
-//   double mass()   const { return _parMap.find( _parOrder[ 0 ] )->second.value(); }
-//   double m()      const { return _parMap.find( _parOrder[ 0 ] )->second.value(); }
-//   double width()  const { return _parMap.find( _parOrder[ 1 ] )->second.value(); }
-//   double r()      const { return _parMap.find( _parOrder[ 2 ] )->second.value(); }
-//   double radius() const { return _parMap.find( _parOrder[ 2 ] )->second.value(); }
-
-//   double mSq()    const { return std::pow( m(), 2 );                             }
 
   void setPars( const std::map< std::string, Parameter >& pars );
 
@@ -183,8 +155,9 @@ inline Fvector::Fvector( const char&                  resoA, const char&        
   _resoB  = std::tolower( resoB ) - 'a' + 1;
   _noRes  = 6 - resoA - resoB;
 
-  g0.dump();
-  fSc.dump();
+  pushBeta( beta );
+  pushfPr ( fPr  );
+  pushS0pr( s0pr );
 }
 
 
