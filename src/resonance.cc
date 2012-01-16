@@ -186,5 +186,5 @@ std::complex< double > Resonance::evaluate( const PhaseSpace& ps,
   const double& mSqAC = m2AC( mSq12, mSq13, mSq23 );
   const double& mSqBC = m2BC( mSq12, mSq13, mSq23 );
 
-  return propagator( ps, mSqAB ) * zemach( ps, mSqAB, mSqAC, mSqBC ) * blattWeisskopf( ps, mSqAB );
+  return propagator( ps, mSqAB ) * zemach( ps, mSqAB, mSqAC, mSqBC ) * blattWeisskopfPrime( ps, mSqAB );
 }
