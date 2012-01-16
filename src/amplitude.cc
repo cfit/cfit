@@ -172,13 +172,22 @@ const Amplitude& Amplitude::operator=( const Amplitude& right )
 
 const Amplitude& Amplitude::operator+=( const double& right )
 {
-  append( right           );
-  append( Operation::plus );
+  if ( _expression.empty() )
+    append( right );
+  else
+  {
+    append( right           );
+    append( Operation::plus );
+  }
+
   return *this;
 }
 
 const Amplitude& Amplitude::operator-=( const double& right )
 {
+  if ( _expression.empty() )
+    throw PdfException( "Attempting to subtract a constant from an empty amplitude." );
+
   append( right            );
   append( Operation::minus );
   return *this;
@@ -186,6 +195,9 @@ const Amplitude& Amplitude::operator-=( const double& right )
 
 const Amplitude& Amplitude::operator*=( const double& right )
 {
+  if ( _expression.empty() )
+    throw PdfException( "Attempting to multiply an empty amplitude by a constant." );
+
   append( right           );
   append( Operation::mult );
   return *this;
@@ -193,6 +205,9 @@ const Amplitude& Amplitude::operator*=( const double& right )
 
 const Amplitude& Amplitude::operator/=( const double& right )
 {
+  if ( _expression.empty() )
+    throw PdfException( "Attempting to divide an empty amplitude by a constant." );
+
   append( right          );
   append( Operation::div );
   return *this;
@@ -200,8 +215,14 @@ const Amplitude& Amplitude::operator/=( const double& right )
 
 const Amplitude& Amplitude::operator+=( const Coef& right )
 {
-  append( right           );
-  append( Operation::plus );
+  if ( _expression.empty() )
+    append( right );
+  else
+  {
+    append( right           );
+    append( Operation::plus );
+  }
+
   return *this;
 }
 
@@ -229,8 +250,14 @@ const Amplitude& Amplitude::operator/=( const Coef& right )
 
 const Amplitude& Amplitude::operator+=( const Resonance& right )
 {
-  append( right           );
-  append( Operation::plus );
+  if ( _expression.empty() )
+    append( right );
+  else
+  {
+    append( right           );
+    append( Operation::plus );
+  }
+
   return *this;
 }
 
@@ -243,8 +270,14 @@ const Amplitude& Amplitude::operator-=( const Resonance& right )
 
 const Amplitude& Amplitude::operator+=( const Amplitude& right )
 {
-  append( right           );
-  append( Operation::plus );
+  if ( _expression.empty() )
+    append( right );
+  else
+  {
+    append( right           );
+    append( Operation::plus );
+  }
+
   return *this;
 }
 
