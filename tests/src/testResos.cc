@@ -205,26 +205,20 @@ int main( int argc, char** argv )
   Coef coef_K2stp_1430( reCoef_K2stp_1430, imCoef_K2stp_1430 );
   Coef coef_Kstm_1680 ( reCoef_Kstm_1680 , imCoef_Kstm_1680  );
 
-  Parameter mKstm      ( "mKstm"      , 0.8937010, 0.1 );
-  Parameter mKstp      ( "mKstm"      , 0.8929300, 0.1 );
+  Parameter mKst       ( "mKst"       , 0.8937010, 0.1 );
   Parameter mRho       ( "mRho"       , 0.7758000, 0.1 );
   Parameter momega     ( "momega"     , 0.7825900, 0.1 );
   Parameter mf2_1270   ( "mf2_1270"   , 1.2754000, 0.1 );
-  Parameter mK0stm_1430( "mK0stm_1430", 1.4215500, 0.1 );
-  Parameter mK0stp_1430( "mK0stm_1430", 1.4470000, 0.1 );
-  Parameter mK2stm_1430( "mK2stm_1430", 1.4256000, 0.1 );
-  Parameter mK2stp_1430( "mK2stm_1430", 1.4256000, 0.1 );
+  Parameter mK0st_1430 ( "mK0st_1430" , 1.4215500, 0.1 );
+  Parameter mK2st_1430 ( "mK2st_1430" , 1.4256000, 0.1 );
   Parameter mKstm_1680 ( "mKstm_1680" , 1.6770000, 0.1 );
 
-  Parameter wKstm      ( "wKstm"      , 0.0467401, 0.1 );
-  Parameter wKstp      ( "wKstm"      , 0.0466400, 0.1 );
+  Parameter wKst       ( "wKst"       , 0.0467401, 0.1 );
   Parameter wRho       ( "wRho"       , 0.1464000, 0.1 );
   Parameter womega     ( "womega"     , 0.0084900, 0.1 );
   Parameter wf2_1270   ( "wf2_1270"   , 0.1851000, 0.1 );
-  Parameter wK0stm_1430( "wK0stm_1430", 0.2467310, 0.1 );
-  Parameter wK0stp_1430( "wK0stm_1430", 0.2720000, 0.1 );
-  Parameter wK2stm_1430( "wK2stm_1430", 0.0985000, 0.1 );
-  Parameter wK2stp_1430( "wK2stm_1430", 0.0985000, 0.1 );
+  Parameter wK0st_1430 ( "wK0st_1430" , 0.2467310, 0.1 );
+  Parameter wK2st_1430 ( "wK2st_1430" , 0.0985000, 0.1 );
   Parameter wKstm_1680 ( "wKstm_1680" , 0.2050000, 0.1 );
 
   Parameter rBW        ( "rBW"        , 1.5      , 0.5 ); // Blatt-Weisskopf radius.
@@ -237,15 +231,15 @@ int main( int argc, char** argv )
   Parameter gLassr     ( "lassr"   , -15.010300, 0.1 );
   Parameter gLassa     ( "lassa"   ,   0.224004, 0.1 );
 
-  RelBreitWigner  prop_Kstm      ( 1, 3, mKstm      , wKstm      , rBW, 1 );
-  RelBreitWigner  prop_Kstp      ( 1, 2, mKstp      , wKstp      , rBW, 1 );
+  RelBreitWigner  prop_Kstm      ( 1, 3, mKst       , wKst       , rBW, 1 );
+  RelBreitWigner  prop_Kstp      ( 1, 2, mKst       , wKst       , rBW, 1 );
   GounarisSakurai prop_rho       ( 2, 3, mRho       , wRho       , rBW, 1 );
   RelBreitWigner  prop_omega     ( 2, 3, momega     , womega     , rBW, 1 );
   RelBreitWigner  prop_f2_1270   ( 2, 3, mf2_1270   , wf2_1270   , rBW, 2 );
-  GLass           prop_K0stm_1430( 1, 3, mK0stm_1430, wK0stm_1430, rBW, gLassR, gLassB, gLassPhiR, gLassPhiB, gLassr, gLassa, 0 );
-  GLass           prop_K0stp_1430( 1, 2, mK0stp_1430, wK0stp_1430, rBW, gLassR, gLassB, gLassPhiR, gLassPhiB, gLassr, gLassa, 0 );
-  RelBreitWigner  prop_K2stm_1430( 1, 3, mK2stm_1430, wK2stm_1430, rBW, 2 );
-  RelBreitWigner  prop_K2stp_1430( 1, 2, mK2stp_1430, wK2stp_1430, rBW, 2 );
+  GLass           prop_K0stm_1430( 1, 3, mK0st_1430 , wK0st_1430 , rBW, gLassR, gLassB, gLassPhiR, gLassPhiB, gLassr, gLassa, 0 );
+  GLass           prop_K0stp_1430( 1, 2, mK0st_1430 , wK0st_1430 , rBW, gLassR, gLassB, gLassPhiR, gLassPhiB, gLassr, gLassa, 0 );
+  RelBreitWigner  prop_K2stm_1430( 1, 3, mK2st_1430 , wK2st_1430 , rBW, 2 );
+  RelBreitWigner  prop_K2stp_1430( 1, 2, mK2st_1430 , wK2st_1430 , rBW, 2 );
   RelBreitWigner  prop_Kstm_1680 ( 1, 3, mKstm_1680 , wKstm_1680 , rBW, 1 );
 
   // Parameters of the F-vector component.
