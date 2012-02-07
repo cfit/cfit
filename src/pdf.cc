@@ -26,7 +26,7 @@ void Pdf::append( const Pdf& pdf )
   _parMap.insert(               pdf._parMap.begin(), pdf._parMap .end() );
   _opers .insert( _opers.end(), pdf._opers .begin(), pdf._opers  .end() );
   _ctnts .insert( _ctnts.end(), pdf._ctnts .begin(), pdf._ctnts  .end() );
-  _pars  .insert( _pars .end(), pdf._pars  .begin(), pdf._pars   .end() );
+  _parms .insert( _parms.end(), pdf._parms .begin(), pdf._parms  .end() );
   _pdfs  .insert( _pdfs .end(), pdf._pdfs  .begin(), pdf._pdfs   .end() );
 
   _expression += pdf._expression;
@@ -36,7 +36,7 @@ void Pdf::append( const Pdf& pdf )
 void Pdf::append( const Parameter& par )
 {
   _parMap[ par.name() ] = par;
-  _pars.push_back( par );
+  _parms.push_back( par );
 
   _expression += "p"; // p = parameter.
 }
@@ -44,11 +44,11 @@ void Pdf::append( const Parameter& par )
 // Append a parameter expression.
 void Pdf::append( const ParameterExpr& expr )
 {
-  for ( std::vector< Parameter >::const_iterator par = expr._pars.begin(); par != expr._pars.end(); ++par )
+  for ( std::vector< Parameter >::const_iterator par = expr._parms.begin(); par != expr._parms.end(); ++par )
     _parMap[ par->name() ] = *par;
   _opers.insert( _opers.end(), expr._opers.begin(), expr._opers.end() );
   _ctnts.insert( _ctnts.end(), expr._ctnts.begin(), expr._ctnts.end() );
-  _pars .insert( _pars .end(), expr._pars .begin(), expr._pars .end() );
+  _parms.insert( _parms.end(), expr._parms.begin(), expr._parms.end() );
 
   _expression += expr._expression;
 }
@@ -313,7 +313,7 @@ double Pdf::evaluate() const throw( PdfException )
   double x;
   double y;
   std::vector< PdfModel*     >::const_iterator pdf = _pdfs .begin();
-  std::vector< Parameter     >::const_iterator par = _pars .begin();
+  std::vector< Parameter     >::const_iterator par = _parms.begin();
   std::vector< double        >::const_iterator ctt = _ctnts.begin();
   std::vector< Operation::Op >::const_iterator ops = _opers.begin();
 
@@ -376,7 +376,7 @@ double Pdf::evaluate( const std::vector< double >& vars ) const throw( PdfExcept
   double x;
   double y;
   std::vector< PdfModel*     >::const_iterator pdf = _pdfs .begin();
-  std::vector< Parameter     >::const_iterator par = _pars .begin();
+  std::vector< Parameter     >::const_iterator par = _parms.begin();
   std::vector< double        >::const_iterator ctt = _ctnts.begin();
   std::vector< Operation::Op >::const_iterator ops = _opers.begin();
 

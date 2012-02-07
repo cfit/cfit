@@ -21,7 +21,7 @@ private:
   std::string                  _expression;
   std::vector< Operation::Op > _opers;
   std::vector< double        > _ctnts;
-  std::vector< Parameter     > _pars;
+  std::vector< Parameter     > _parms;
   std::vector< PdfModel*     > _pdfs;
 
   void append( const PdfModel&      model );
