@@ -3,7 +3,9 @@
 #include <ctime>
 
 #include <cfit/parameter.hh>
+#include <cfit/parameterexpr.hh>
 #include <cfit/coef.hh>
+#include <cfit/coefexpr.hh>
 #include <cfit/amplitude.hh>
 #include <cfit/phasespace.hh>
 #include <cfit/matrix.hh>
@@ -268,6 +270,14 @@ int main( int argc, char** argv )
   amp += coef_K2stp_1430 * prop_K2stp_1430;
   amp += coef_Kstm_1680  * prop_Kstm_1680;
   amp += fvec;
+
+  Parameter rB   ( "rB"   ,   0.1 );
+  Parameter delta( "delta", 130.0 );
+  Parameter gamma( "gamma",  70.0 );
+  const std::complex< double > I( 0., 1. );
+
+  const double& deg2rad = std::atan( 1. ) / 45.; // pi / 180.
+  amp *= rB * exp( I * ( delta + gamma ) * deg2rad );
 
   const double& mD0 = 1.8645;
   const double& mKs = 0.49767;
