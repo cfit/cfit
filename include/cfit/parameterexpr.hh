@@ -1,6 +1,7 @@
 #ifndef __PARAMETEREXPR_HH__
 #define __PARAMETEREXPR_HH__
 
+#include <complex>
 #include <vector>
 #include <string>
 
@@ -10,14 +11,16 @@
 
 class PdfModel;
 class Pdf;
+class CoefExpr;
 
 class ParameterExpr
 {
+  friend class CoefExpr;
   friend class Pdf;
 
 private:
   std::vector< double >        _ctnts;
-  std::vector< Parameter >     _pars;
+  std::vector< Parameter >     _parms;
   std::string                  _expression;
   std::vector< Operation::Op > _opers;
 
@@ -107,6 +110,16 @@ public:
   friend const ParameterExpr sin      ( const ParameterExpr& par );
   friend const ParameterExpr cos      ( const ParameterExpr& par );
   friend const ParameterExpr tan      ( const ParameterExpr& par );
+
+  friend const CoefExpr operator+( const std::complex< double >& left, const ParameterExpr& right );
+  friend const CoefExpr operator-( const std::complex< double >& left, const ParameterExpr& right );
+  friend const CoefExpr operator*( const std::complex< double >& left, const ParameterExpr& right );
+  friend const CoefExpr operator/( const std::complex< double >& left, const ParameterExpr& right );
+
+  friend const CoefExpr operator+( const ParameterExpr& left, const std::complex< double >& right );
+  friend const CoefExpr operator-( const ParameterExpr& left, const std::complex< double >& right );
+  friend const CoefExpr operator*( const ParameterExpr& left, const std::complex< double >& right );
+  friend const CoefExpr operator/( const ParameterExpr& left, const std::complex< double >& right );
 
   // Binary arithmetic operations with pdfs.
   friend const Pdf           operator*( const ParameterExpr& left, const PdfModel&      right );

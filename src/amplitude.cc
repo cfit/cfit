@@ -25,6 +25,16 @@ void Amplitude::append( const Coef& coef )
   _expression += "k"; // k = coefficient.
 }
 
+void Amplitude::append( const CoefExpr& expr )
+{
+  _ctnts.insert( _ctnts.end(), expr._ctnts.begin(), expr._ctnts.end() );
+  _parms.insert( _parms.end(), expr._parms.begin(), expr._parms.end() );
+  _coefs.insert( _coefs.end(), expr._coefs.begin(), expr._coefs.end() );
+  _opers.insert( _opers.end(), expr._opers.begin(), expr._opers.end() );
+
+  _expression += expr._expression;
+}
+
 void Amplitude::append( const Resonance& reso )
 {
   _resos.push_back( reso.copy() );
@@ -40,6 +50,7 @@ void Amplitude::append( const Fvector& fvec )
 void Amplitude::append( const Amplitude& ampl )
 {
   _ctnts.insert( _ctnts.end(), ampl._ctnts.begin(), ampl._ctnts.end() );
+  _parms.insert( _parms.end(), ampl._parms.begin(), ampl._parms.end() );
   _coefs.insert( _coefs.end(), ampl._coefs.begin(), ampl._coefs.end() );
   _opers.insert( _opers.end(), ampl._opers.begin(), ampl._opers.end() );
 
@@ -59,6 +70,11 @@ void Amplitude::append( const Operation::Op& oper )
 
 void Amplitude::setPars( const std::map< std::string, Parameter >& pars )
 {
+  // Set the values of the parameters.
+  typedef std::vector< Parameter >::iterator pIter;
+  for ( pIter par = _parms.begin(); par != _parms.end(); ++par )
+    par->setValue( pars.find( par->name() )->second.value() );
+
   // Set the values of the coefficients.
   typedef std::vector< Coef >::iterator cIter;
   for ( cIter coef = _coefs.begin(); coef != _coefs.end(); ++coef )
@@ -95,6 +111,29 @@ std::complex< double > Amplitude::operate( const std::complex< double >& x,
 }
 
 
+
+// Unary operations with complex numbers.
+std::complex< double > Amplitude::operate( const std::complex< double >& x,
+                                           const Operation::Op&          oper ) const throw( PdfException )
+{
+  if ( oper == Operation::minus )
+    return -x;
+  if ( oper == Operation::exp )
+    return std::exp( x );
+  if ( oper == Operation::log )
+    return std::log( x );
+  if ( oper == Operation::sin )
+    return std::sin( x );
+  if ( oper == Operation::cos )
+    return std::cos( x );
+  if ( oper == Operation::tan )
+    return std::tan( x );
+
+  throw PdfException( std::string( "Parse error: unknown unary operation " ) + Operation::tostring( oper ) + "." );
+}
+
+
+
 // Evaluate the amplitude at the given point, with the current values of its parameters.
 std::complex< double > Amplitude::evaluate( const PhaseSpace& ps,
                                             const double&     mSq12,
@@ -110,6 +149,7 @@ std::complex< double > Amplitude::evaluate( const PhaseSpace& ps,
   std::complex< double > y;
 
   std::vector< std::complex< double > >::const_iterator ctt = _ctnts.begin();
+  std::vector< Parameter              >::const_iterator par = _parms.begin();
   std::vector< Coef                   >::const_iterator coe = _coefs.begin();
   std::vector< Resonance*             >::const_iterator res = _resos.begin();
   std::vector< Fvector                >::const_iterator fvc = _fvecs.begin();
@@ -120,6 +160,8 @@ std::complex< double > Amplitude::evaluate( const PhaseSpace& ps,
   for ( eIter ch = _expression.begin(); ch != _expression.end(); ++ch )
     if ( *ch == 'c' )
       values.push( *ctt++ );
+    else if ( *ch == 'p' )
+      values.push( std::complex< double >( par++->value(), 0. ) );
     else if ( *ch == 'k' )
       values.push( coe++->value() );
     else if ( *ch == 'r' )
@@ -138,6 +180,15 @@ std::complex< double > Amplitude::evaluate( const PhaseSpace& ps,
         values.pop();
 
         values.push( operate( x, y, *ops++ ) );
+      }
+      else if ( *ch == 'u' ) // Unary operation with complex numbers.
+      {
+        if ( values.empty() )
+          throw PdfException( "Parse error: not enough values in the stack." );
+        x = values.top();
+        values.pop();
+
+        values.push( operate( x, *ops++ ) );
       }
       else
         throw PdfException( std::string( "Parse error: unknown operation " ) + *ch + "." );
@@ -248,6 +299,43 @@ const Amplitude& Amplitude::operator/=( const Coef& right )
 }
 
 
+
+const Amplitude& Amplitude::operator+=( const CoefExpr& right )
+{
+  if ( _expression.empty() )
+    append( right );
+  else
+  {
+    append( right           );
+    append( Operation::plus );
+  }
+
+  return *this;
+}
+
+const Amplitude& Amplitude::operator-=( const CoefExpr& right )
+{
+  append( right            );
+  append( Operation::minus );
+  return *this;
+}
+
+const Amplitude& Amplitude::operator*=( const CoefExpr& right )
+{
+  append( right           );
+  append( Operation::mult );
+  return *this;
+}
+
+const Amplitude& Amplitude::operator/=( const CoefExpr& right )
+{
+  append( right          );
+  append( Operation::div );
+  return *this;
+}
+
+
+
 const Amplitude& Amplitude::operator+=( const Resonance& right )
 {
   if ( _expression.empty() )
@@ -290,28 +378,6 @@ const Amplitude& Amplitude::operator-=( const Amplitude& right )
 
 
 
-
-// Operations of objects with themselves.
-const Amplitude operator+( const Coef& left, const Coef& right )
-{
-  return Amplitude( left, right, Operation::plus );
-}
-
-const Amplitude operator-( const Coef& left, const Coef& right )
-{
-  return Amplitude( left, right, Operation::minus );
-}
-
-const Amplitude operator*( const Coef& left, const Coef& right )
-{
-  return Amplitude( left, right, Operation::mult );
-}
-
-const Amplitude operator/( const Coef& left, const Coef& right )
-{
-  return Amplitude( left, right, Operation::div );
-}
-
 const Amplitude operator+( const Resonance& left, const Resonance& right )
 {
   return Amplitude( left, right, Operation::plus );
@@ -342,47 +408,6 @@ const Amplitude operator-( const Amplitude& left, const Amplitude& right )
   return Amplitude( left, right, Operation::minus );
 }
 
-
-// Operations of constants and coefficients.
-const Amplitude operator+( const double& left, const Coef& right )
-{
-  return Amplitude( left, right, Operation::plus );
-}
-
-const Amplitude operator-( const double& left, const Coef& right )
-{
-  return Amplitude( left, right, Operation::minus );
-}
-
-const Amplitude operator*( const double& left, const Coef& right )
-{
-  return Amplitude( left, right, Operation::mult );
-}
-
-const Amplitude operator/( const double& left, const Coef& right )
-{
-  return Amplitude( left, right, Operation::div );
-}
-
-const Amplitude operator+( const Coef& left, const double& right )
-{
-  return Amplitude( left, right, Operation::plus );
-}
-
-const Amplitude operator-( const Coef& left, const double& right )
-{
-  return Amplitude( left, right, Operation::minus );
-}
-
-const Amplitude operator*( const Coef& left, const double& right )
-{
-  return Amplitude( left, right, Operation::mult );
-}
-
-const Amplitude operator/( const Coef& left, const double& right )
-{
-  return Amplitude( left, right, Operation::div );
-}
 
 
 // Operations of constants and resonances.
@@ -530,6 +555,82 @@ const Amplitude operator*( const Amplitude& left, const Coef& right )
 }
 
 const Amplitude operator/( const Amplitude& left, const Coef& right )
+{
+  return Amplitude( left, right, Operation::div );
+}
+
+
+
+// Operations of coefficient expressions and resonances.
+const Amplitude operator+( const CoefExpr& left, const Resonance& right )
+{
+  return Amplitude( left, right, Operation::plus );
+}
+
+const Amplitude operator-( const CoefExpr& left, const Resonance& right )
+{
+  return Amplitude( left, right, Operation::minus );
+}
+
+const Amplitude operator*( const CoefExpr& left, const Resonance& right )
+{
+  return Amplitude( left, right, Operation::mult );
+}
+
+const Amplitude operator+( const Resonance& left, const CoefExpr& right )
+{
+  return Amplitude( left, right, Operation::plus );
+}
+
+const Amplitude operator-( const Resonance& left, const CoefExpr& right )
+{
+  return Amplitude( left, right, Operation::minus );
+}
+
+const Amplitude operator*( const Resonance& left, const CoefExpr& right )
+{
+  return Amplitude( left, right, Operation::mult );
+}
+
+const Amplitude operator/( const Resonance& left, const CoefExpr& right )
+{
+  return Amplitude( left, right, Operation::div );
+}
+
+
+
+// Operations with coefficient expressions and amplitudes.
+const Amplitude operator+( const CoefExpr& left, const Amplitude& right )
+{
+  return Amplitude( left, right, Operation::plus );
+}
+
+const Amplitude operator-( const CoefExpr& left, const Amplitude& right )
+{
+  return Amplitude( left, right, Operation::minus );
+}
+
+const Amplitude operator*( const CoefExpr& left, const Amplitude& right )
+{
+  return Amplitude( left, right, Operation::mult );
+}
+
+const Amplitude operator+( const Amplitude& left, const CoefExpr& right )
+{
+  return Amplitude( left, right, Operation::plus );
+}
+
+const Amplitude operator-( const Amplitude& left, const CoefExpr& right )
+{
+  return Amplitude( left, right, Operation::minus );
+}
+
+const Amplitude operator*( const Amplitude& left, const CoefExpr& right )
+{
+  return Amplitude( left, right, Operation::mult );
+}
+
+const Amplitude operator/( const Amplitude& left, const CoefExpr& right )
 {
   return Amplitude( left, right, Operation::div );
 }

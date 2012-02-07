@@ -9,6 +9,7 @@
 #include <cfit/operation.hh>
 #include <cfit/pdfexception.hh>
 #include <cfit/coef.hh>
+#include <cfit/coefexpr.hh>
 #include <cfit/resonance.hh>
 #include <cfit/fvector.hh>
 
@@ -18,6 +19,7 @@ class Amplitude
 {
 private:
   std::vector< std::complex< double > > _ctnts;
+  std::vector< Parameter              > _parms;
   std::vector< Coef                   > _coefs;
   std::vector< Resonance*             > _resos;
   std::vector< Fvector                > _fvecs;
@@ -26,7 +28,9 @@ private:
 
   void append( const double&                 ctnt );
   void append( const std::complex< double >& ctnt );
+  void append( const Parameter&              parm );
   void append( const Coef&                   coef );
+  void append( const CoefExpr&               expr );
   void append( const Resonance&              reso );
   void append( const Fvector&                fvec );
   void append( const Amplitude&              ampl );
@@ -42,8 +46,11 @@ private:
   }
 
   std::complex< double > operate( const std::complex< double >& x,
-				  const std::complex< double >& y,
-				  const Operation::Op&          oper ) const throw( PdfException );
+                                  const std::complex< double >& y,
+                                  const Operation::Op&          oper ) const throw( PdfException );
+
+  std::complex< double > operate( const std::complex< double >& x,
+                                  const Operation::Op&          oper ) const throw( PdfException );
 public:
   Amplitude() {};
   Amplitude( const Resonance& reso )
@@ -92,17 +99,16 @@ public:
   const Amplitude& operator*=( const Coef&      right );
   const Amplitude& operator/=( const Coef&      right );
 
+  const Amplitude& operator+=( const CoefExpr&  right );
+  const Amplitude& operator-=( const CoefExpr&  right );
+  const Amplitude& operator*=( const CoefExpr&  right );
+  const Amplitude& operator/=( const CoefExpr&  right );
+
   const Amplitude& operator+=( const Resonance& right );
   const Amplitude& operator-=( const Resonance& right );
 
   const Amplitude& operator+=( const Amplitude& right );
   const Amplitude& operator-=( const Amplitude& right );
-
-  // Operations of objects with themselves.
-  friend const Amplitude operator+( const Coef&      left, const Coef&      right );
-  friend const Amplitude operator-( const Coef&      left, const Coef&      right );
-  friend const Amplitude operator*( const Coef&      left, const Coef&      right );
-  friend const Amplitude operator/( const Coef&      left, const Coef&      right );
 
   friend const Amplitude operator+( const Resonance& left, const Resonance& right );
   friend const Amplitude operator-( const Resonance& left, const Resonance& right );
@@ -112,18 +118,6 @@ public:
 
   friend const Amplitude operator+( const Amplitude& left, const Amplitude& right );
   friend const Amplitude operator-( const Amplitude& left, const Amplitude& right );
-
-
-  // Operations of constants and coefficients.
-  friend const Amplitude operator+( const double&    left, const Coef&      right );
-  friend const Amplitude operator-( const double&    left, const Coef&      right );
-  friend const Amplitude operator*( const double&    left, const Coef&      right );
-  friend const Amplitude operator/( const double&    left, const Coef&      right );
-
-  friend const Amplitude operator+( const Coef&      left, const double&    right );
-  friend const Amplitude operator-( const Coef&      left, const double&    right );
-  friend const Amplitude operator*( const Coef&      left, const double&    right );
-  friend const Amplitude operator/( const Coef&      left, const double&    right );
 
 
   // Operations of constants and resonances.
@@ -168,6 +162,28 @@ public:
   friend const Amplitude operator-( const Amplitude& left, const Coef&      right );
   friend const Amplitude operator*( const Amplitude& left, const Coef&      right );
   friend const Amplitude operator/( const Amplitude& left, const Coef&      right );
+
+
+  // Operations of coefficient expressions and resonances.
+  friend const Amplitude operator+( const CoefExpr&  left, const Resonance& right );
+  friend const Amplitude operator-( const CoefExpr&  left, const Resonance& right );
+  friend const Amplitude operator*( const CoefExpr&  left, const Resonance& right );
+
+  friend const Amplitude operator+( const Resonance& left, const CoefExpr&  right );
+  friend const Amplitude operator-( const Resonance& left, const CoefExpr&  right );
+  friend const Amplitude operator*( const Resonance& left, const CoefExpr&  right );
+  friend const Amplitude operator/( const Resonance& left, const CoefExpr&  right );
+
+
+  // Operations with coefficient expressions and amplitudes.
+  friend const Amplitude operator+( const CoefExpr&  left, const Amplitude& right );
+  friend const Amplitude operator-( const CoefExpr&  left, const Amplitude& right );
+  friend const Amplitude operator*( const CoefExpr&  left, const Amplitude& right );
+
+  friend const Amplitude operator+( const Amplitude& left, const CoefExpr&  right );
+  friend const Amplitude operator-( const Amplitude& left, const CoefExpr&  right );
+  friend const Amplitude operator*( const Amplitude& left, const CoefExpr&  right );
+  friend const Amplitude operator/( const Amplitude& left, const CoefExpr&  right );
 
 
   // Operations with resonances and amplitudes.

@@ -11,7 +11,10 @@
 
 #include <cfit/parameter.hh>
 #include <cfit/parameterexpr.hh>
+#include <cfit/coef.hh>
+#include <cfit/coefexpr.hh>
 #include <cfit/operation.hh>
+
 
 
 // Operations with two parameters.
@@ -265,6 +268,625 @@ const ParameterExpr cos( const ParameterExpr& par )
 const ParameterExpr tan( const ParameterExpr& par )
 {
   return ParameterExpr( par, Operation::tan );
+}
+
+
+
+
+// Operations with two coefficients.
+const CoefExpr operator+( const Coef& left, const Coef& right )
+{
+  return CoefExpr( left, right, Operation::plus );
+}
+
+const CoefExpr operator-( const Coef& left, const Coef& right )
+{
+  return CoefExpr( left, right, Operation::minus );
+}
+
+const CoefExpr operator*( const Coef& left, const Coef& right )
+{
+  return CoefExpr( left, right, Operation::mult );
+}
+
+const CoefExpr operator/( const Coef& left, const Coef& right )
+{
+  return CoefExpr( left, right, Operation::div );
+}
+
+
+// Operations with a constant and a coefficient.
+const CoefExpr operator+( const double& left, const Coef& right )
+{
+  return CoefExpr( left, right, Operation::plus );
+}
+
+const CoefExpr operator-( const double& left, const Coef& right )
+{
+  return CoefExpr( left, right, Operation::minus );
+}
+
+const CoefExpr operator*( const double& left, const Coef& right )
+{
+  return CoefExpr( left, right, Operation::mult );
+}
+
+const CoefExpr operator/( const double& left, const Coef& right )
+{
+  return CoefExpr( left, right, Operation::div );
+}
+
+
+// Operations with a coefficient and a constant.
+const CoefExpr operator+( const Coef& left, const double& right )
+{
+  return CoefExpr( left, right, Operation::plus );
+}
+
+const CoefExpr operator-( const Coef& left, const double& right )
+{
+  return CoefExpr( left, right, Operation::minus );
+}
+
+const CoefExpr operator*( const Coef& left, const double& right )
+{
+  return CoefExpr( left, right, Operation::mult );
+}
+
+const CoefExpr operator/( const Coef& left, const double& right )
+{
+  return CoefExpr( left, right, Operation::div );
+}
+
+
+
+
+// Operations with a parameter and a coefficient.
+const CoefExpr operator+( const Parameter& left, const Coef& right )
+{
+  return CoefExpr( left, right, Operation::plus );
+}
+
+const CoefExpr operator-( const Parameter& left, const Coef& right )
+{
+  return CoefExpr( left, right, Operation::minus );
+}
+
+const CoefExpr operator*( const Parameter& left, const Coef& right )
+{
+  return CoefExpr( left, right, Operation::mult );
+}
+
+const CoefExpr operator/( const Parameter& left, const Coef& right )
+{
+  return CoefExpr( left, right, Operation::div );
+}
+
+
+// Operations with a coefficient and a parameter.
+const CoefExpr operator+( const Coef& left, const Parameter& right )
+{
+  return CoefExpr( left, right, Operation::plus );
+}
+
+const CoefExpr operator-( const Coef& left, const Parameter& right )
+{
+  return CoefExpr( left, right, Operation::minus );
+}
+
+const CoefExpr operator*( const Coef& left, const Parameter& right )
+{
+  return CoefExpr( left, right, Operation::mult );
+}
+
+const CoefExpr operator/( const Coef& left, const Parameter& right )
+{
+  return CoefExpr( left, right, Operation::div );
+}
+
+
+
+
+// Operations with a parameter expression and a coefficient.
+const CoefExpr operator+( const ParameterExpr& left, const Coef& right )
+{
+  return CoefExpr( left, right, Operation::plus );
+}
+
+const CoefExpr operator-( const ParameterExpr& left, const Coef& right )
+{
+  return CoefExpr( left, right, Operation::minus );
+}
+
+const CoefExpr operator*( const ParameterExpr& left, const Coef& right )
+{
+  return CoefExpr( left, right, Operation::mult );
+}
+
+const CoefExpr operator/( const ParameterExpr& left, const Coef& right )
+{
+  return CoefExpr( left, right, Operation::div );
+}
+
+
+// Operations with a coefficient and a parameter expression.
+const CoefExpr operator+( const Coef& left, const ParameterExpr& right )
+{
+  return CoefExpr( left, right, Operation::plus );
+}
+
+const CoefExpr operator-( const Coef& left, const ParameterExpr& right )
+{
+  return CoefExpr( left, right, Operation::minus );
+}
+
+const CoefExpr operator*( const Coef& left, const ParameterExpr& right )
+{
+  return CoefExpr( left, right, Operation::mult );
+}
+
+const CoefExpr operator/( const Coef& left, const ParameterExpr& right )
+{
+  return CoefExpr( left, right, Operation::div );
+}
+
+
+
+// Operations with a parameter and a coefficient.
+const CoefExpr operator+( const Parameter& left, const CoefExpr& right )
+{
+  return CoefExpr( left, right, Operation::plus );
+}
+
+const CoefExpr operator-( const Parameter& left, const CoefExpr& right )
+{
+  return CoefExpr( left, right, Operation::minus );
+}
+
+const CoefExpr operator*( const Parameter& left, const CoefExpr& right )
+{
+  return CoefExpr( left, right, Operation::mult );
+}
+
+const CoefExpr operator/( const Parameter& left, const CoefExpr& right )
+{
+  return CoefExpr( left, right, Operation::div );
+}
+
+
+// Operations with a coefficient and a parameter.
+const CoefExpr operator+( const CoefExpr& left, const Parameter& right )
+{
+  return CoefExpr( left, right, Operation::plus );
+}
+
+const CoefExpr operator-( const CoefExpr& left, const Parameter& right )
+{
+  return CoefExpr( left, right, Operation::minus );
+}
+
+const CoefExpr operator*( const CoefExpr& left, const Parameter& right )
+{
+  return CoefExpr( left, right, Operation::mult );
+}
+
+const CoefExpr operator/( const CoefExpr& left, const Parameter& right )
+{
+  return CoefExpr( left, right, Operation::div );
+}
+
+
+
+// Operations with a parameter expression and a coefficient.
+const CoefExpr operator+( const ParameterExpr& left, const CoefExpr& right )
+{
+  return CoefExpr( left, right, Operation::plus );
+}
+
+const CoefExpr operator-( const ParameterExpr& left, const CoefExpr& right )
+{
+  return CoefExpr( left, right, Operation::minus );
+}
+
+const CoefExpr operator*( const ParameterExpr& left, const CoefExpr& right )
+{
+  return CoefExpr( left, right, Operation::mult );
+}
+
+const CoefExpr operator/( const ParameterExpr& left, const CoefExpr& right )
+{
+  return CoefExpr( left, right, Operation::div );
+}
+
+
+// Operations with a coefficient and a parameter expression.
+const CoefExpr operator+( const CoefExpr& left, const ParameterExpr& right )
+{
+  return CoefExpr( left, right, Operation::plus );
+}
+
+const CoefExpr operator-( const CoefExpr& left, const ParameterExpr& right )
+{
+  return CoefExpr( left, right, Operation::minus );
+}
+
+const CoefExpr operator*( const CoefExpr& left, const ParameterExpr& right )
+{
+  return CoefExpr( left, right, Operation::mult );
+}
+
+const CoefExpr operator/( const CoefExpr& left, const ParameterExpr& right )
+{
+  return CoefExpr( left, right, Operation::div );
+}
+
+
+
+// Operations with a complex constant and a coefficient.
+const CoefExpr operator+( const std::complex< double >& left, const Coef& right )
+{
+  return CoefExpr( left, right, Operation::plus );
+}
+
+const CoefExpr operator-( const std::complex< double >& left, const Coef& right )
+{
+  return CoefExpr( left, right, Operation::minus );
+}
+
+const CoefExpr operator*( const std::complex< double >& left, const Coef& right )
+{
+  return CoefExpr( left, right, Operation::mult );
+}
+
+const CoefExpr operator/( const std::complex< double >& left, const Coef& right )
+{
+  return CoefExpr( left, right, Operation::div );
+}
+
+
+// Operations with a coefficient and a complex constant.
+const CoefExpr operator+( const Coef& left, const std::complex< double >& right )
+{
+  return CoefExpr( left, right, Operation::plus );
+}
+
+const CoefExpr operator-( const Coef& left, const std::complex< double >& right )
+{
+  return CoefExpr( left, right, Operation::minus );
+}
+
+const CoefExpr operator*( const Coef& left, const std::complex< double >& right )
+{
+  return CoefExpr( left, right, Operation::mult );
+}
+
+const CoefExpr operator/( const Coef& left, const std::complex< double >& right )
+{
+  return CoefExpr( left, right, Operation::div );
+}
+
+
+
+// Operations with a complex constant and a coefficient.
+const CoefExpr operator+( const std::complex< double >& left, const CoefExpr& right )
+{
+  return CoefExpr( left, right, Operation::plus );
+}
+
+const CoefExpr operator-( const std::complex< double >& left, const CoefExpr& right )
+{
+  return CoefExpr( left, right, Operation::minus );
+}
+
+const CoefExpr operator*( const std::complex< double >& left, const CoefExpr& right )
+{
+  return CoefExpr( left, right, Operation::mult );
+}
+
+const CoefExpr operator/( const std::complex< double >& left, const CoefExpr& right )
+{
+  return CoefExpr( left, right, Operation::div );
+}
+
+
+// Operations with a coefficient and a constant.
+const CoefExpr operator+( const CoefExpr& left, const std::complex< double >& right )
+{
+  return CoefExpr( left, right, Operation::plus );
+}
+
+const CoefExpr operator-( const CoefExpr& left, const std::complex< double >& right )
+{
+  return CoefExpr( left, right, Operation::minus );
+}
+
+const CoefExpr operator*( const CoefExpr& left, const std::complex< double >& right )
+{
+  return CoefExpr( left, right, Operation::mult );
+}
+
+const CoefExpr operator/( const CoefExpr& left, const std::complex< double >& right )
+{
+  return CoefExpr( left, right, Operation::div );
+}
+
+
+
+// Operations with a complex constant and a coefficient.
+const CoefExpr operator+( const std::complex< double >& left, const Parameter& right )
+{
+  return CoefExpr( left, right, Operation::plus );
+}
+
+const CoefExpr operator-( const std::complex< double >& left, const Parameter& right )
+{
+  return CoefExpr( left, right, Operation::minus );
+}
+
+const CoefExpr operator*( const std::complex< double >& left, const Parameter& right )
+{
+  return CoefExpr( left, right, Operation::mult );
+}
+
+const CoefExpr operator/( const std::complex< double >& left, const Parameter& right )
+{
+  return CoefExpr( left, right, Operation::div );
+}
+
+
+// Operations with a coefficient and a complex constant.
+const CoefExpr operator+( const Parameter& left, const std::complex< double >& right )
+{
+  return CoefExpr( left, right, Operation::plus );
+}
+
+const CoefExpr operator-( const Parameter& left, const std::complex< double >& right )
+{
+  return CoefExpr( left, right, Operation::minus );
+}
+
+const CoefExpr operator*( const Parameter& left, const std::complex< double >& right )
+{
+  return CoefExpr( left, right, Operation::mult );
+}
+
+const CoefExpr operator/( const Parameter& left, const std::complex< double >& right )
+{
+  return CoefExpr( left, right, Operation::div );
+}
+
+
+
+// Operations with a complex constant and a parameter expression.
+const CoefExpr operator+( const std::complex< double >& left, const ParameterExpr& right )
+{
+  return CoefExpr( left, right, Operation::plus );
+}
+
+const CoefExpr operator-( const std::complex< double >& left, const ParameterExpr& right )
+{
+  return CoefExpr( left, right, Operation::minus );
+}
+
+const CoefExpr operator*( const std::complex< double >& left, const ParameterExpr& right )
+{
+  return CoefExpr( left, right, Operation::mult );
+}
+
+const CoefExpr operator/( const std::complex< double >& left, const ParameterExpr& right )
+{
+  return CoefExpr( left, right, Operation::div );
+}
+
+
+// Operations with a parameter expression and a constant.
+const CoefExpr operator+( const ParameterExpr& left, const std::complex< double >& right )
+{
+  return CoefExpr( left, right, Operation::plus );
+}
+
+const CoefExpr operator-( const ParameterExpr& left, const std::complex< double >& right )
+{
+  return CoefExpr( left, right, Operation::minus );
+}
+
+const CoefExpr operator*( const ParameterExpr& left, const std::complex< double >& right )
+{
+  return CoefExpr( left, right, Operation::mult );
+}
+
+const CoefExpr operator/( const ParameterExpr& left, const std::complex< double >& right )
+{
+  return CoefExpr( left, right, Operation::div );
+}
+
+
+
+// Operations with two coefficient expressions.
+const CoefExpr operator+( const CoefExpr& left, const CoefExpr& right )
+{
+  return CoefExpr( left, right, Operation::plus );
+}
+
+const CoefExpr operator-( const CoefExpr& left, const CoefExpr& right )
+{
+  return CoefExpr( left, right, Operation::minus );
+}
+
+const CoefExpr operator*( const CoefExpr& left, const CoefExpr& right )
+{
+  return CoefExpr( left, right, Operation::mult );
+}
+
+const CoefExpr operator/( const CoefExpr& left, const CoefExpr& right )
+{
+  return CoefExpr( left, right, Operation::div );
+}
+
+
+// Operations with a constant and a coefficient expression.
+const CoefExpr operator+( const double& left, const CoefExpr& right )
+{
+  return CoefExpr( left, right, Operation::plus );
+}
+
+const CoefExpr operator-( const double& left, const CoefExpr& right )
+{
+  return CoefExpr( left, right, Operation::minus );
+}
+
+const CoefExpr operator*( const double& left, const CoefExpr& right )
+{
+  return CoefExpr( left, right, Operation::mult );
+}
+
+const CoefExpr operator/( const double& left, const CoefExpr& right )
+{
+  return CoefExpr( left, right, Operation::div );
+}
+
+
+// Operations with a coefficient expression and a constant.
+const CoefExpr operator+( const CoefExpr& left, const double& right )
+{
+  return CoefExpr( left, right, Operation::plus );
+}
+
+const CoefExpr operator-( const CoefExpr& left, const double& right )
+{
+  return CoefExpr( left, right, Operation::minus );
+}
+
+const CoefExpr operator*( const CoefExpr& left, const double& right )
+{
+  return CoefExpr( left, right, Operation::mult );
+}
+
+const CoefExpr operator/( const CoefExpr& left, const double& right )
+{
+  return CoefExpr( left, right, Operation::div );
+}
+
+
+// Operations with a coefficient and a coefficient expression.
+const CoefExpr operator+( const Coef& left, const CoefExpr& right )
+{
+  return CoefExpr( left, right, Operation::plus );
+}
+
+const CoefExpr operator-( const Coef& left, const CoefExpr& right )
+{
+  return CoefExpr( left, right, Operation::minus );
+}
+
+const CoefExpr operator*( const Coef& left, const CoefExpr& right )
+{
+  return CoefExpr( left, right, Operation::mult );
+}
+
+const CoefExpr operator/( const Coef& left, const CoefExpr& right )
+{
+  return CoefExpr( left, right, Operation::div );
+}
+
+
+// Operations with a coefficient expression and a coefficient.
+const CoefExpr operator+( const CoefExpr& left, const Coef& right )
+{
+  return CoefExpr( left, right, Operation::plus );
+}
+
+const CoefExpr operator-( const CoefExpr& left, const Coef& right )
+{
+  return CoefExpr( left, right, Operation::minus );
+}
+
+const CoefExpr operator*( const CoefExpr& left, const Coef& right )
+{
+  return CoefExpr( left, right, Operation::mult );
+}
+
+const CoefExpr operator/( const CoefExpr& left, const Coef& right )
+{
+  return CoefExpr( left, right, Operation::div );
+}
+
+
+
+// Unary minus.
+const CoefExpr operator-( const Coef& coef )
+{
+  return CoefExpr( coef, Operation::minus );
+}
+
+const CoefExpr operator-( const CoefExpr& coef )
+{
+  return CoefExpr( coef, Operation::minus );
+}
+
+
+// Binary operations with a coefficient.
+const CoefExpr pow( const Coef& left, const std::complex< double >& right )
+{
+  return CoefExpr( left, right, Operation::pow );
+}
+
+const CoefExpr pow( const CoefExpr& left, const std::complex< double >& right )
+{
+  return CoefExpr( left, right, Operation::pow );
+}
+
+
+// Unary operations with a coefficient.
+const CoefExpr exp( const Coef& coef )
+{
+  return CoefExpr( coef, Operation::exp );
+}
+
+const CoefExpr log( const Coef& coef )
+{
+  return CoefExpr( coef, Operation::log );
+}
+
+const CoefExpr sin( const Coef& coef )
+{
+  return CoefExpr( coef, Operation::sin );
+}
+
+const CoefExpr cos( const Coef& coef )
+{
+  return CoefExpr( coef, Operation::cos );
+}
+
+const CoefExpr tan( const Coef& coef )
+{
+  return CoefExpr( coef, Operation::tan );
+}
+
+
+const CoefExpr exp( const CoefExpr& coef )
+{
+  return CoefExpr( coef, Operation::exp );
+}
+
+const CoefExpr log( const CoefExpr& coef )
+{
+  return CoefExpr( coef, Operation::log );
+}
+
+const CoefExpr sin( const CoefExpr& coef )
+{
+  return CoefExpr( coef, Operation::sin );
+}
+
+const CoefExpr cos( const CoefExpr& coef )
+{
+  return CoefExpr( coef, Operation::cos );
+}
+
+const CoefExpr tan( const CoefExpr& coef )
+{
+  return CoefExpr( coef, Operation::tan );
 }
 
 
