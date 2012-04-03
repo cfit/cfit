@@ -22,6 +22,10 @@ void Amplitude::append( const std::complex< double >& ctnt )
 void Amplitude::append( const Coef& coef )
 {
   _coefs.push_back( coef );
+
+  _parMap[ coef.real().name() ] = coef.real();
+  _parMap[ coef.imag().name() ] = coef.imag();
+
   _expression += "k"; // k = coefficient.
 }
 
@@ -32,18 +36,35 @@ void Amplitude::append( const CoefExpr& expr )
   _coefs.insert( _coefs.end(), expr._coefs.begin(), expr._coefs.end() );
   _opers.insert( _opers.end(), expr._opers.begin(), expr._opers.end() );
 
+  typedef std::vector< Parameter >::const_iterator pIter;
+  for ( pIter par = expr._parms.begin(); par != expr._parms.end(); ++par )
+    _parMap[ par->name() ] = *par;
+
+  typedef std::vector< Coef >::const_iterator cIter;
+  for ( cIter coef = expr._coefs.begin(); coef != expr._coefs.end(); ++coef )
+  {
+    _parMap[ coef->real().name() ] = coef->real();
+    _parMap[ coef->imag().name() ] = coef->imag();
+  }
+
   _expression += expr._expression;
 }
 
 void Amplitude::append( const Resonance& reso )
 {
   _resos.push_back( reso.copy() );
+
+  _parMap.insert( reso._parMap.begin(), reso._parMap.end() );
+
   _expression += "r"; // r = resonance.
 }
 
 void Amplitude::append( const Fvector& fvec )
 {
   _fvecs.push_back( fvec );
+
+  _parMap.insert( fvec._parMap.begin(), fvec._parMap.end() );
+
   _expression += "F"; // F = element of F vector.
 }
 
@@ -57,6 +78,8 @@ void Amplitude::append( const Amplitude& ampl )
   std::transform( ampl._resos.begin(), ampl._resos.end(),
                   std::back_inserter( _resos ), std::mem_fun( &Resonance::copy ) );
   _fvecs.insert( _fvecs.end(), ampl._fvecs.begin(), ampl._fvecs.end() );
+
+  _parMap.insert( ampl._parMap.begin(), ampl._parMap.end() );
 
   _expression += ampl._expression;
 }

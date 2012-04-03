@@ -17,6 +17,7 @@ class PhaseSpace;
 
 class Fvector
 {
+  friend class Amplitude;
 protected:
   unsigned  _resoA;      // Indices of the resonant particles.
   unsigned  _resoB;      //

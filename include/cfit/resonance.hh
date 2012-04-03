@@ -14,6 +14,7 @@ class PhaseSpace;
 
 class Resonance
 {
+  friend class Amplitude;
 protected:
   unsigned  _resoA;      // Indices of the resonant particles.
   unsigned  _resoB;      //

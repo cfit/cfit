@@ -18,6 +18,8 @@ class PhaseSpace;
 class Amplitude
 {
 private:
+  std::map< std::string, Parameter > _parMap;
+
   std::vector< std::complex< double > > _ctnts;
   std::vector< Parameter              > _parms;
   std::vector< Coef                   > _coefs;
@@ -77,6 +79,7 @@ public:
       delete *res;
   }
 
+  const std::map< std::string, Parameter >& getParameters() const { return _parMap; };
   void setPars( const std::map< std::string, Parameter >& pars );
 
   std::complex< double > evaluate( const PhaseSpace& ps,
