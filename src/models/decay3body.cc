@@ -14,12 +14,6 @@ Decay3Body::Decay3Body( const Variable&   mSq12,
 }
 
 
-void Decay3Body::setPars( const std::map< std::string, Parameter >& pars )
-{
-  _amp.setPars( pars );
-}
-
-
 void Decay3Body::cache()
 {
   // Compute the value of _norm.

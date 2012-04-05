@@ -20,8 +20,6 @@ public:
 	      const Amplitude&  amp  ,
 	      const PhaseSpace& ps     );
 
-  void setPars( const std::map< std::string, Parameter >& pars );
-
   void cache();
   double evaluate(                                   ) const throw( PdfException );
   double evaluate( const std::vector< double >& vars ) const throw( PdfException );
