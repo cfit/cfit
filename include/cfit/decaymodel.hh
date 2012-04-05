@@ -18,6 +18,9 @@ public:
               const Amplitude&  amp  ,
               const PhaseSpace& ps    );
 
+  void setPars( const std::vector< double >& pars              ) throw( PdfException );
+  void setPars( const std::map< std::string, Parameter >& pars ) throw( PdfException );
+
   double mSq12() const { return getVar( 0 ).value(); }
   double mSq13() const { return getVar( 1 ).value(); }
   double mSq23() const { return getVar( 2 ).value(); }
