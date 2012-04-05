@@ -31,6 +31,7 @@ public:
 
   void setVars( const std::vector< double >& vars ) throw( PdfException );
   void setPars( const std::vector< double >& pars ) throw( PdfException );
+  virtual void setPars( const std::map< std::string, Parameter >& pars ) throw( PdfException );
 
   virtual void   cache() {};
   virtual double evaluate()                                    const throw( PdfException ) = 0;
