@@ -93,6 +93,10 @@ void Amplitude::append( const Operation::Op& oper )
 
 void Amplitude::setPars( const std::map< std::string, Parameter >& pars )
 {
+  typedef std::map< std::string, Parameter >::iterator mIter;
+  for ( mIter par = _parMap.begin(); par != _parMap.end(); ++par )
+    par->second.setValue( pars.find( par->first )->second.value() );
+
   // Set the values of the parameters.
   typedef std::vector< Parameter >::iterator pIter;
   for ( pIter par = _parms.begin(); par != _parms.end(); ++par )
