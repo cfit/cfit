@@ -15,8 +15,8 @@ HDRDIRS = $(HDIR)
 LIBDIRS = $(LDIR)
 LIBLIST = minuit
 
-OBJLIST = parameterexpr pdfbase pdfmodel pdf operation dataset minimizer nll chi2	\
-        phasespace resonance fvector coef coefexpr amplitude decaymodel
+OBJLIST = parameterexpr pdfbase pdfmodel pdf operation dataset minimizer minimizerexpr	\
+          nll chi2 phasespace resonance fvector coef coefexpr amplitude decaymodel
 
 
 #-------------------------------------------------------------------
