@@ -22,6 +22,7 @@ public:
     : _pdf( pdf ), _data( data )
   {}
 
+  const PdfBase& pdf() const { return _pdf; }
   double up() const = 0;
   double operator()( const std::vector<double>& par ) const throw( PdfException ) = 0;
 
