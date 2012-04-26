@@ -47,12 +47,6 @@ private:
     append( oper  );
   }
 
-  std::complex< double > operate( const std::complex< double >& x,
-                                  const std::complex< double >& y,
-                                  const Operation::Op&          oper ) const throw( PdfException );
-
-  std::complex< double > operate( const std::complex< double >& x,
-                                  const Operation::Op&          oper ) const throw( PdfException );
 public:
   Amplitude() {};
   Amplitude( const Resonance& reso )
@@ -88,30 +82,38 @@ public:
 				   const double&     mSq23 ) const throw( PdfException );
 
   // Assignment operations.
-  const Amplitude& operator= ( const Resonance& right );
-  const Amplitude& operator= ( const Fvector&   right );
-  const Amplitude& operator= ( const Amplitude& right );
+  const Amplitude& operator= ( const Resonance&              right );
+  const Amplitude& operator= ( const Fvector&                right );
+  const Amplitude& operator= ( const Amplitude&              right );
 
-  const Amplitude& operator+=( const double&    right );
-  const Amplitude& operator-=( const double&    right );
-  const Amplitude& operator*=( const double&    right );
-  const Amplitude& operator/=( const double&    right );
+  const Amplitude& operator+=( const double&                 right );
+  const Amplitude& operator-=( const double&                 right );
+  const Amplitude& operator*=( const double&                 right );
+  const Amplitude& operator/=( const double&                 right );
 
-  const Amplitude& operator+=( const Coef&      right );
-  const Amplitude& operator-=( const Coef&      right );
-  const Amplitude& operator*=( const Coef&      right );
-  const Amplitude& operator/=( const Coef&      right );
+  const Amplitude& operator+=( const std::complex< double >& right );
+  const Amplitude& operator-=( const std::complex< double >& right );
+  const Amplitude& operator*=( const std::complex< double >& right );
+  const Amplitude& operator/=( const std::complex< double >& right );
 
-  const Amplitude& operator+=( const CoefExpr&  right );
-  const Amplitude& operator-=( const CoefExpr&  right );
-  const Amplitude& operator*=( const CoefExpr&  right );
-  const Amplitude& operator/=( const CoefExpr&  right );
+  const Amplitude& operator+=( const Coef&                   right );
+  const Amplitude& operator-=( const Coef&                   right );
+  const Amplitude& operator*=( const Coef&                   right );
+  const Amplitude& operator/=( const Coef&                   right );
 
-  const Amplitude& operator+=( const Resonance& right );
-  const Amplitude& operator-=( const Resonance& right );
+  const Amplitude& operator+=( const CoefExpr&               right );
+  const Amplitude& operator-=( const CoefExpr&               right );
+  const Amplitude& operator*=( const CoefExpr&               right );
+  const Amplitude& operator/=( const CoefExpr&               right );
 
-  const Amplitude& operator+=( const Amplitude& right );
-  const Amplitude& operator-=( const Amplitude& right );
+  const Amplitude& operator+=( const Resonance&              right );
+  const Amplitude& operator-=( const Resonance&              right );
+
+  const Amplitude& operator+=( const Fvector&                right );
+  const Amplitude& operator-=( const Fvector&                right );
+
+  const Amplitude& operator+=( const Amplitude&              right );
+  const Amplitude& operator-=( const Amplitude&              right );
 
   friend const Amplitude operator+( const Resonance& left, const Resonance& right );
   friend const Amplitude operator-( const Resonance& left, const Resonance& right );
