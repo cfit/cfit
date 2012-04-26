@@ -8,6 +8,7 @@
 #include <cfit/parameterexpr.hh>
 #include <cfit/pdfmodel.hh>
 #include <cfit/pdf.hh>
+#include <cfit/operation.hh>
 
 // Append a model.
 void Pdf::append( const PdfModel& model )
@@ -268,41 +269,7 @@ void Pdf::cache()
   return;
 }
 
-// Binary operations.
-double Pdf::operate( const double& x, const double& y, const Operation::Op& oper ) throw( PdfException )
-{
-  if ( oper == Operation::plus )
-    return x + y;
-  if ( oper == Operation::minus )
-    return x - y;
-  if ( oper == Operation::mult )
-    return x * y;
-  if ( oper == Operation::div )
-    return x / y;
-  if ( oper == Operation::pow )
-    return std::pow( x, y );
 
-  throw PdfException( std::string( "Parse error: unknown binary operation " ) + Operation::tostring( oper ) + "." );
-}
-
-// Unary operations.
-double Pdf::operate( const double& x, const Operation::Op& oper ) throw( PdfException )
-{
-  if ( oper == Operation::minus )
-    return -x;
-  if ( oper == Operation::exp )
-    return std::exp( x );
-  if ( oper == Operation::log )
-    return std::log( x );
-  if ( oper == Operation::sin )
-    return std::sin( x );
-  if ( oper == Operation::cos )
-    return std::cos( x );
-  if ( oper == Operation::tan )
-    return std::tan( x );
-
-  throw PdfException( std::string( "Parse error: unknown unary operation " ) + Operation::tostring( oper ) + "." );
-}
 
 // Before running this function, the Pdf::setVars( vars ) function must be called.
 //    To avoid the risk of forgetting it, run Pdf::evaluate( vars ).
@@ -335,7 +302,7 @@ double Pdf::evaluate() const throw( PdfException )
 	    values.pop();
 	    x = values.top();
 	    values.pop();
-	    values.push( operate( x, y, *ops++ ) );
+	    values.push( Operation::operate( x, y, *ops++ ) );
 	  }
 	else if ( *ch == 'u' )
 	  {
@@ -343,7 +310,7 @@ double Pdf::evaluate() const throw( PdfException )
 	      throw PdfException( "Parse error: not enough values in the stack." );
 	    x = values.top();
 	    values.pop();
-	    values.push( operate( x, *ops++ ) );
+	    values.push( Operation::operate( x, *ops++ ) );
 	  }
 	else
 	  throw PdfException( std::string( "Parse error: unknown operation " ) + *ch + "." );
@@ -407,7 +374,7 @@ double Pdf::evaluate( const std::vector< double >& vars ) const throw( PdfExcept
 	    values.pop();
 	    x = values.top();
 	    values.pop();
-	    values.push( operate( x, y, *ops++ ) );
+	    values.push( Operation::operate( x, y, *ops++ ) );
 	  }
 	else if ( *ch == 'u' )
 	  {
@@ -415,7 +382,7 @@ double Pdf::evaluate( const std::vector< double >& vars ) const throw( PdfExcept
 	      throw PdfException( "Parse error: not enough values in the stack." );
 	    x = values.top();
 	    values.pop();
-	    values.push( operate( x, *ops++ ) );
+	    values.push( Operation::operate( x, *ops++ ) );
 	  }
 	else
 	  throw PdfException( std::string( "Parse error: unknown operation " ) + *ch + "." );

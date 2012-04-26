@@ -39,12 +39,6 @@ private:
     append( oper  );
   }
 
-  // Execute binary operations.
-  static double operate( const double& x, const double& y, const Operation::Op& oper ) throw( PdfException );
-
-  // Execute unary operations.
-  static double operate( const double& x,                  const Operation::Op& oper ) throw( PdfException );
-
 public:
   Pdf() {};
   Pdf( const PdfModel& model )

@@ -6,6 +6,7 @@
 #include <cfit/amplitude.hh>
 #include <cfit/coef.hh>
 #include <cfit/resonance.hh>
+#include <cfit/operation.hh>
 
 void Amplitude::append( const double& ctnt )
 {
@@ -120,46 +121,6 @@ void Amplitude::setPars( const std::map< std::string, Parameter >& pars )
 }
 
 
-// Binary operations with complex numbers.
-std::complex< double > Amplitude::operate( const std::complex< double >& x,
-                                           const std::complex< double >& y,
-                                           const Operation::Op&          oper ) const throw( PdfException )
-{
-  if ( oper == Operation::plus )
-    return x + y;
-  if ( oper == Operation::minus )
-    return x - y;
-  if ( oper == Operation::mult )
-    return x * y;
-  if ( oper == Operation::div )
-    return x / y;
-
-  throw PdfException( std::string( "Parse error: unknown binary operation " ) + Operation::tostring( oper ) + "." );
-}
-
-
-
-// Unary operations with complex numbers.
-std::complex< double > Amplitude::operate( const std::complex< double >& x,
-                                           const Operation::Op&          oper ) const throw( PdfException )
-{
-  if ( oper == Operation::minus )
-    return -x;
-  if ( oper == Operation::exp )
-    return std::exp( x );
-  if ( oper == Operation::log )
-    return std::log( x );
-  if ( oper == Operation::sin )
-    return std::sin( x );
-  if ( oper == Operation::cos )
-    return std::cos( x );
-  if ( oper == Operation::tan )
-    return std::tan( x );
-
-  throw PdfException( std::string( "Parse error: unknown unary operation " ) + Operation::tostring( oper ) + "." );
-}
-
-
 
 // Evaluate the amplitude at the given point, with the current values of its parameters.
 std::complex< double > Amplitude::evaluate( const PhaseSpace& ps,
@@ -206,7 +167,7 @@ std::complex< double > Amplitude::evaluate( const PhaseSpace& ps,
         x = values.top();
         values.pop();
 
-        values.push( operate( x, y, *ops++ ) );
+        values.push( Operation::operate( x, y, *ops++ ) );
       }
       else if ( *ch == 'u' ) // Unary operation with complex numbers.
       {
@@ -215,7 +176,7 @@ std::complex< double > Amplitude::evaluate( const PhaseSpace& ps,
         x = values.top();
         values.pop();
 
-        values.push( operate( x, *ops++ ) );
+        values.push( Operation::operate( x, *ops++ ) );
       }
       else
         throw PdfException( std::string( "Parse error: unknown operation " ) + *ch + "." );
