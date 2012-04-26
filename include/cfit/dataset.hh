@@ -1,6 +1,7 @@
 #ifndef __DATASET_HH__
 #define __DATASET_HH__
 
+#include <string>
 #include <map>
 #include <vector>
 #include <utility>
