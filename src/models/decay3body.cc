@@ -17,13 +17,15 @@ Decay3Body::Decay3Body( const Variable&   mSq12,
 void Decay3Body::cache()
 {
   // Compute the value of _norm.
-  _norm = 0;
+  _norm = 0.0;
 
   // Define the properties of the integration method.
-  int    nBins = 400;
-  double min   = pow( _ps.m1()      + _ps.m2(), 2 );
-  double max   = pow( _ps.mMother() - _ps.m3(), 2 );
-  double step  = ( max - min ) / double( nBins );
+  const int    nBins = 400;
+  const double min   = pow( _ps.m1()      + _ps.m2(), 2 );
+  const double max   = pow( _ps.mMother() - _ps.m3(), 2 );
+  const double step  = ( max - min ) / double( nBins );
+
+  const double mSqSum = _ps.mSqMother() + _ps.mSq1() + _ps.mSq2() + _ps.mSq3();
 
   // Define the variables at each bin.
   double mSq12;
@@ -36,11 +38,11 @@ void Decay3Body::cache()
     {
       mSq12 = min + step * ( binX + .5 );
       mSq13 = min + step * ( binY + .5 );
-      mSq23 = _ps.mSqMother() + _ps.mSq1() + + _ps.mSq2() + _ps.mSq3() - mSq12 - mSq13;
+      mSq23 = mSqSum - mSq12 - mSq13;
 
       // Proceed only if the point lies inside the kinematically allowed Dalitz region.
       // std::norm returns the squared modulus of the complex number, not its norm.
-      if ( _ps.contains( mSq12, mSq13, mSq13 ) )
+      if ( _ps.contains( mSq12, mSq13, mSq23 ) )
         _norm += std::norm( _amp.evaluate( _ps, mSq12, mSq13, mSq23 ) );
     }
 
