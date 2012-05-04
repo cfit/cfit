@@ -52,17 +52,21 @@ FunctionMinimum MinimizerExpr::minimize() const
 
   // Set the Minuit parameters' name, value and uncertainty.
   for ( pIter par = _parMap.begin(); par != _parMap.end(); ++par )
+  {
     upar.add( par->first.c_str(), par->second.value(), par->second.error() );
 
-  // Fix the parameters that are set to be fixed.
-  for ( pIter par = _parMap.begin(); par != _parMap.end(); ++par )
+    // Fix the parameters that are set to be fixed.
     if ( par->second.isFixed() )
       upar.fix( par->first.c_str() );
 
-  // Set the limits for those parameters that have some.
-  for ( pIter par = _parMap.begin(); par != _parMap.end(); ++par )
+    // Set the blinding if requested.
+    if ( par->second.isBlind() )
+      upar.blind( par->first.c_str() );
+
+    // Set the limits for those parameters that have some.
     if ( par->second.hasLimits() )
       upar.setLimits( par->first.c_str(), par->second.lower(), par->second.upper() );
+  }
 
   MnMigrad migrad( *this, upar );
 

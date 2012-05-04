@@ -1,5 +1,4 @@
 
-#include <iostream>
 #include <vector>
 
 #include <Minuit/MnMigrad.h>
@@ -18,18 +17,23 @@ FunctionMinimum Minimizer::minimize() const
 
   // Set the Minuit parameters' name, value and uncertainty.
   const std::map< std::string, Parameter >& pars = _pdf.getParameters();
+
   for ( pIter par = pars.begin(); par != pars.end(); ++par )
+  {
     upar.add( par->first.c_str(), par->second.value(), par->second.error() );
 
-  // Fix the parameters that are set to be fixed.
-  for ( pIter par = pars.begin(); par != pars.end(); ++par )
+    // Fix the parameters that are set to be fixed.
     if ( par->second.isFixed() )
       upar.fix( par->first.c_str() );
 
-  // Set the limits for those parameters that have some.
-  for ( pIter par = pars.begin(); par != pars.end(); ++par )
+    // Set the blinding if requested.
+    if ( par->second.isBlind() )
+      upar.blind( par->first.c_str() );
+
+    // Set the limits for those parameters that have some.
     if ( par->second.hasLimits() )
       upar.setLimits( par->first.c_str(), par->second.lower(), par->second.upper() );
+  }
 
   MnMigrad migrad( *this, upar );
 

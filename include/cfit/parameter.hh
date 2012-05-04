@@ -16,6 +16,7 @@ private:
   double      _value; // Should contain the initial value.
   double      _error; // Should contain the initial error.
   bool        _isFixed;
+  bool        _isBlind;
   double      _lower;
   double      _upper;
   bool        _hasLimits;
@@ -24,7 +25,8 @@ public:
   Parameter() {}
 
   Parameter( std::string name, double value = 0., double error = 0. )
-    : _name( name ), _value( value ), _error( error ), _isFixed( false ),
+    : _name( name ), _value( value ), _error( error ),
+      _isFixed( false ), _isBlind( false ),
       _lower( 0. ), _upper( 0. ), _hasLimits( false )
   {}
 
@@ -39,6 +41,8 @@ public:
   void setError( double error ) { _error   = error; }
   void fix()                    { _isFixed = true;  }
   void release()                { _isFixed = false; }
+  void blind()                  { _isBlind = true;  }
+  void unblind()                { _isBlind = false; }
   void setLimits( double lower, double upper )
   {
     _lower     = lower;
@@ -52,6 +56,7 @@ public:
   double      error()      const { return   _error;     }
   bool        isFixed()    const { return   _isFixed;   }
   bool        isReleased() const { return ! _isFixed;   }
+  bool        isBlind()    const { return   _isBlind;   }
   bool        hasLimits()  const { return   _hasLimits; }
   double      upper()      const { return   _upper;     }
   double      upperLimit() const { return   _upper;     }
