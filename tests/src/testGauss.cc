@@ -59,6 +59,8 @@ int main( int argc, char** argv )
 #ifdef MPI_ON
   MPI::Init( argc, argv );
   const int rank = MPI::COMM_WORLD.Get_rank();
+#else
+  const int rank = 0;
 #endif
 
   // Data container.
@@ -66,12 +68,10 @@ int main( int argc, char** argv )
 
   // Read the data. If working with MPI, only the root
   //    process reads the data, then it gets scattered.
-#ifdef MPI_ON
   if ( rank == 0 )
     readData( "data/gauss.dat", data );
+#ifdef MPI_ON
   data.scatter();
-#else
-  readData( "data/gauss.dat", data );
 #endif
 
   // Variables the model depends on.
@@ -103,13 +103,11 @@ int main( int argc, char** argv )
   FunctionMinimum min = chi2.minimize();
 
   // If working with MPI, only the root process outputs the result.
-#ifdef MPI_ON
   if ( rank == 0 )
     std::cout << min << std::endl;
 
+#ifdef MPI_ON
   MPI::Finalize();
-#else
-  std::cout << min << std::endl;
 #endif
 
   return 0;

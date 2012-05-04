@@ -32,6 +32,7 @@ void DecayModel::setPars( const std::vector< double >& pars ) throw( PdfExceptio
   _amp.setPars( _parMap );
 }
 
+
 void DecayModel::setPars( const std::map< std::string, Parameter >& pars ) throw( PdfException )
 {
   typedef std::map< std::string, Parameter >::iterator pIter;
