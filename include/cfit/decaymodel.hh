@@ -6,6 +6,9 @@
 #include <cfit/amplitude.hh>
 #include <cfit/phasespace.hh>
 
+#include <Minuit/FunctionMinimum.h>
+
+
 class DecayModel : public PdfModel
 {
 protected:
@@ -20,6 +23,7 @@ public:
 
   void setPars( const std::vector< double >& pars              ) throw( PdfException );
   void setPars( const std::map< std::string, Parameter >& pars ) throw( PdfException );
+  void setPars( const FunctionMinimum&                    pars ) throw( PdfException );
 
   double mSq12() const { return getVar( 0 ).value(); }
   double mSq13() const { return getVar( 1 ).value(); }

@@ -1,6 +1,9 @@
 
 #include <cfit/decaymodel.hh>
 
+#include <Minuit/MnUserParameters.h>
+#include <Minuit/MinuitParameter.h>
+
 DecayModel::DecayModel( const Variable&   mSq12,
                         const Variable&   mSq13,
                         const Variable&   mSq23,
@@ -28,6 +31,17 @@ void DecayModel::setPars( const std::vector< double >& pars ) throw( PdfExceptio
   int index = 0;
   for ( pIter par = _parMap.begin(); par != _parMap.end(); ++par )
     par->second.setValue( pars[ index++ ] );
+
+  _amp.setPars( _parMap );
+}
+
+
+void DecayModel::setPars( const FunctionMinimum& min ) throw( PdfException )
+{
+  const MnUserParameters& pars = min.userParameters();
+  typedef std::vector< MinuitParameter >::const_iterator pIter;
+  for( pIter par = pars.parameters().begin(); par != pars.parameters().end(); ++par )
+    _parMap[ par->name() ].set( par->value(), par->error() );
 
   _amp.setPars( _parMap );
 }
