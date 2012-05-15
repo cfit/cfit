@@ -42,7 +42,7 @@ double GounarisSakurai::gsh( const PhaseSpace& ps, const double& mSq12 ) const
   double m12 = std::sqrt(     mSq12 );
   double p12 = q        ( ps, mSq12 );
 
-  return ( 2. / M_PI ) * ( p12 / m12 ) * log( ( m12 + 2. * p12 ) / ( 2. * ps.m1() ) );
+  return ( 2. / M_PI ) * ( p12 / m12 ) * log( ( m12 + 2. * p12 ) / ( 2. * ps.m( _resoA ) ) );
 }
 
 double GounarisSakurai::gshprime( const PhaseSpace& ps, const double& mSq12 ) const
