@@ -4,6 +4,7 @@
 
 CrystalBall::CrystalBall( const Variable& x,
 			  const Parameter& mu, const Parameter& sigma, const Parameter& alpha, const Parameter& n )
+  : _hasLower( false ), _hasUpper( false ), _lower( 0.0 ), _upper( 0.0 )
 {
   push( x );
 
@@ -13,6 +14,48 @@ CrystalBall::CrystalBall( const Variable& x,
   push( n     );
 
   cache();
+}
+
+
+void CrystalBall::setLowerLimit( const double& lower )
+{
+  _hasLower = true;
+  _lower    = lower;
+}
+
+
+void CrystalBall::setUpperLimit( const double& upper )
+{
+  _hasUpper = true;
+  _upper    = upper;
+}
+
+
+void CrystalBall::setLimits( const double& lower, const double& upper )
+{
+  _hasLower = true;
+  _hasUpper = true;
+  _lower    = lower;
+  _upper    = upper;
+}
+
+
+void CrystalBall::unsetLowerLimit()
+{
+  _hasLower = false;
+}
+
+
+void CrystalBall::unsetUpperLimit()
+{
+  _hasUpper = false;
+}
+
+
+void CrystalBall::unsetLimits()
+{
+  _hasLower = false;
+  _hasUpper = false;
 }
 
 
@@ -40,27 +83,66 @@ double CrystalBall::n() const
 }
 
 
-double CrystalBall::evaluate() const throw( PdfException )
+const double CrystalBall::area( const double& x ) const
 {
-  return evaluate( getVar( 0 ).value() );
+  const double& vmu    = mu   ();
+  const double& vsigma = sigma();
+  const double& valpha = alpha();
+  const double& vn     = n    ();
+
+  const double& alphaSq = std::pow( valpha, 2 );
+
+  if ( x < vmu - valpha * vsigma )
+  {
+    // Tail piece.
+    const double& num = std::pow( vn, vn ) * std::exp( - alphaSq / 2.0 );
+    const double& den = std::pow( vn - alphaSq - valpha * ( x - vmu ) / vsigma, vn - 1.0 );
+    return vsigma / valpha / ( vn - 1.0 ) * num / den;
+  }
+  else
+  {
+    // Complete area of the tail.
+    const double& normTail = vsigma / valpha * vn / ( vn - 1.0 ) * std::exp( - alphaSq / 2.0 );
+
+    // Calculation of the area under the core (Gaussian) piece.
+    const double& sqrt2    = std::sqrt( 2.0 );
+    const double& sqrtpih  = std::sqrt( M_PI / 2.0 );
+    return normTail + vsigma * sqrtpih * ( Math::erf( ( x - vmu ) / ( vsigma * sqrt2 ) ) + Math::erf( valpha / sqrt2 ) );
+  }
 }
 
 
 void CrystalBall::cache()
 {
-  _normCore = sigma() * std::sqrt( 2.0 * M_PI ) * ( 1. + Math::erf( alpha() / std::sqrt( 2.0 ) ) ) / 2.0;
-  _normTail = sigma() / alpha() * n() / ( n() - 1.0 ) * std::exp( - std::pow( alpha(), 2 ) / 2.0 );
+  // Evaluate the area up to the lower limit (0 if it's -infinity).
+  double areaLo = 0.0;
+  if ( _hasLower )
+    areaLo = area( _lower );
 
-  _norm = _normCore + _normTail;
+  // Evaluate the area up to the upper limit (complete area if it's +infinity).
+  double areaUp = 0.0;
+  if ( _hasUpper )
+    areaUp = area( _upper );
+  else
+  {
+    const double& normCore = sigma() * std::sqrt( 2.0 * M_PI ) * ( 1. + Math::erf( alpha() / std::sqrt( 2.0 ) ) ) / 2.0;
+    const double& normTail = sigma() / alpha() * n() / ( n() - 1.0 ) * std::exp( - std::pow( alpha(), 2 ) / 2.0 );
+    areaUp = normCore + normTail;
+  }
+
+  // Assign the value of the norm as the difference of areas between the upper and lower limits.
+  _norm = areaUp - areaLo;
 }
 
 
+// Function to compute the value of the pdf at its core (Gaussian) part.
 const double CrystalBall::core( const double& x ) const
 {
   return std::exp( - std::pow( x - mu(), 2 ) / ( 2.0 * std::pow( sigma(), 2 ) ) ) / _norm;
 }
 
 
+// Function to compute the value of the pdf at its tail.
 const double CrystalBall::tail( const double& x ) const
 {
   const double& vmu    = mu   ();
@@ -77,6 +159,7 @@ const double CrystalBall::tail( const double& x ) const
 }
 
 
+// Evaluate the function at a given point.
 double CrystalBall::evaluate( double x ) const throw( PdfException )
 {
   if ( x > mu() - alpha() * sigma() )
@@ -89,4 +172,10 @@ double CrystalBall::evaluate( double x ) const throw( PdfException )
 double CrystalBall::evaluate( const std::vector< double >& vars ) const throw( PdfException )
 {
   return evaluate( vars[ 0 ] );
+}
+
+
+double CrystalBall::evaluate() const throw( PdfException )
+{
+  return evaluate( getVar( 0 ).value() );
 }
