@@ -82,8 +82,17 @@ const Pdf& Pdf::operator=( const PdfModel& right )
 const Pdf& Pdf::operator+=( const PdfModel& right ) throw( PdfException )
 {
   // Cannot add two pdfs that do not depend on exactly the same variables.
-  if ( this->varNames() != right.varNames() )
-    throw PdfException( "Cannot add two pdfs that do not depend on the same variables." );
+  if ( ! this->_expression.empty() )
+    if ( this->varNames() != right.varNames() )
+      throw PdfException( "Cannot add two pdfs that do not depend on the same variables." );
+
+  // If this is the first element to be appended to the expression,
+  //    it does not make sense to operate with previous elements.
+  if ( this->_expression.empty() )
+  {
+    append( right );
+    return *this;
+  }
 
   append( right           );
   append( Operation::plus );
@@ -112,8 +121,17 @@ const Pdf& Pdf::operator*=( const PdfModel& right ) throw( PdfException )
 const Pdf& Pdf::operator+=( const Pdf& right ) throw( PdfException )
 {
   // Cannot add two pdfs that do not depend on exactly the same variables.
-  if ( this->varNames() != right.varNames() )
-    throw PdfException( "Cannot add two pdfs that do not depend on the same variables." );
+  if ( ! _expression.empty() )
+    if ( this->varNames() != right.varNames() )
+      throw PdfException( "Cannot add two pdfs that do not depend on the same variables." );
+
+  // If this is the first element to be appended to the expression,
+  //    it does not make sense to operate with previous elements.
+  if ( this->_expression.empty() )
+  {
+    append( right );
+    return *this;
+  }
 
   append( right           );
   append( Operation::plus );
