@@ -40,61 +40,53 @@ void GenArgus::setLowerLimit( const double& lower )
 
   _hasLower = true;
   _lower    = lower;
+
+  cache();
 }
 
 
 void GenArgus::setUpperLimit( const double& upper )
 {
-  // Make sure that parameter c cannot take values below the maximum value of the variable.
-  const Parameter& c = getPar( 0 );
-  const std::string& msg = "Cannot set the upper limit of the generalized Argus distribution to ";
-  if ( c.isFixed() )
-  {
-    if ( upper > c.value() )
-      throw PdfException( msg + "anything smaller than " + c.name() + "." );
-  }
-  else
-    if ( ( ! c.hasLimits() ) || ( upper > c.lower() ) )
-      throw PdfException( msg + "a value that may exceed " + c.name() + "." );
+  if ( upper < 0.0 );
+    throw PdfException( "Cannot set the upper limit of the generalized Argus distribution to anything smaller than 0." );
 
   _hasUpper = true;
   _upper    = upper;
+
+  cache();
 }
 
 
 void GenArgus::setLimits( const double& lower, const double& upper )
 {
-  if ( lower < 0 )
+  if ( lower < 0.0 )
     throw PdfException( "Cannot set the lower limit of the generalized Argus distribution to anything smaller than 0." );
 
-  // Make sure that parameter c cannot take values below the maximum value of the variable.
-  const Parameter& c = getPar( 0 );
-  const std::string& msg = "Cannot set the upper limit of the generalized Argus distribution to ";
-  if ( c.isFixed() )
-  {
-    if ( upper > c.value() )
-      throw PdfException( msg + "anything smaller than " + c.name() + "." );
-  }
-  else
-    if ( ( ! c.hasLimits() ) || ( upper > c.lower() ) )
-      throw PdfException( msg + "a value that may exceed " + c.name() + "." );
+  if ( upper < 0.0 )
+    throw PdfException( "Cannot set the upper limit of the generalized Argus distribution to anything smaller than 0." );
 
   _hasLower = true;
   _hasUpper = true;
   _lower    = lower;
   _upper    = upper;
+
+  cache();
 }
 
 
 void GenArgus::unsetLowerLimit()
 {
   _hasLower = false;
+
+  cache();
 }
 
 
 void GenArgus::unsetUpperLimit()
 {
   _hasUpper = false;
+
+  cache();
 }
 
 
@@ -102,6 +94,8 @@ void GenArgus::unsetLimits()
 {
   _hasLower = false;
   _hasUpper = false;
+
+  cache();
 }
 
 
@@ -111,7 +105,7 @@ void GenArgus::cache()
   const double& chiSq  = std::pow( chi(), 2 );
   const double& pPlus1 = p() + 1.0;
 
-  // For the specific case when chi = 0, the norm is c^2/3.
+  // For the specific case when chi = 0, the norm is c^2 / ( 2 ( p + 1 ) ).
   if ( chiSq == 0.0 )
   {
     _norm = cSq / ( 2.0 * ( pPlus1 ) );
@@ -122,12 +116,18 @@ void GenArgus::cache()
   double argmin = 0.0;
 
   if ( _hasLower )
-    argmax = chiSq * ( 1.0 - std::pow( _lower, 2 ) / cSq );
+  {
+    const double& lowerlimit = std::max( _lower, 0.0 );
+    argmax = chiSq * ( 1.0 - std::pow( lowerlimit, 2 ) / cSq );
+  }
 
   if ( _hasUpper )
-    argmin = chiSq * ( 1.0 - std::pow( _upper, 2 ) / cSq );
+  {
+    const double& upperlimit = std::min( _upper, c() );
+    argmin = chiSq * ( 1.0 - std::pow( upperlimit, 2 ) / cSq );
+  }
 
-  const double& chiPow = std::pow( chi(), pPlus1 );
+  const double& chiPow = std::pow( chiSq, pPlus1 );
 
   // Since gamma_p( a, x ) is normalized to Gamma( a ), multiply by sqrt( pi / 2 ),
   //    which is Gamma( 3/2 ).
@@ -141,6 +141,12 @@ double GenArgus::evaluate( double x ) const throw( PdfException )
   const double& vc   = c();
   const double& vchi = chi();
 
+  if ( _hasLower && ( x < _lower ) )
+    return 0.0;
+
+  if ( _hasUpper && ( x > _upper ) )
+    return 0.0;
+
   if ( ( x < 0.0 ) || ( x > vc ) )
     return 0.0;
 
@@ -151,7 +157,7 @@ double GenArgus::evaluate( double x ) const throw( PdfException )
 
   const double& diff = 1.0 - xSq / cSq;
 
-  return 1.0 / _norm * x * std::pow( diff, p() ) * std::exp( - chiSq * diff );
+  return x * std::pow( diff, p() ) * std::exp( - chiSq * diff ) / _norm;
 }
 
 

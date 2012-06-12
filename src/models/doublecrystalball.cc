@@ -25,6 +25,8 @@ void DoubleCrystalBall::setLowerLimit( const double& lower )
 {
   _hasLower = true;
   _lower    = lower;
+
+  cache();
 }
 
 
@@ -32,6 +34,8 @@ void DoubleCrystalBall::setUpperLimit( const double& upper )
 {
   _hasUpper = true;
   _upper    = upper;
+
+  cache();
 }
 
 
@@ -41,18 +45,24 @@ void DoubleCrystalBall::setLimits( const double& lower, const double& upper )
   _hasUpper = true;
   _lower    = lower;
   _upper    = upper;
+
+  cache();
 }
 
 
 void DoubleCrystalBall::unsetLowerLimit()
 {
   _hasLower = false;
+
+  cache();
 }
 
 
 void DoubleCrystalBall::unsetUpperLimit()
 {
   _hasUpper = false;
+
+  cache();
 }
 
 
@@ -60,6 +70,8 @@ void DoubleCrystalBall::unsetLimits()
 {
   _hasLower = false;
   _hasUpper = false;
+
+  cache();
 }
 
 

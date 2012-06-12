@@ -21,6 +21,8 @@ void CrystalBall::setLowerLimit( const double& lower )
 {
   _hasLower = true;
   _lower    = lower;
+
+  cache();
 }
 
 
@@ -28,6 +30,8 @@ void CrystalBall::setUpperLimit( const double& upper )
 {
   _hasUpper = true;
   _upper    = upper;
+
+  cache();
 }
 
 
@@ -37,18 +41,24 @@ void CrystalBall::setLimits( const double& lower, const double& upper )
   _hasUpper = true;
   _lower    = lower;
   _upper    = upper;
+
+  cache();
 }
 
 
 void CrystalBall::unsetLowerLimit()
 {
   _hasLower = false;
+
+  cache();
 }
 
 
 void CrystalBall::unsetUpperLimit()
 {
   _hasUpper = false;
+
+  cache();
 }
 
 
@@ -56,6 +66,8 @@ void CrystalBall::unsetLimits()
 {
   _hasLower = false;
   _hasUpper = false;
+
+  cache();
 }
 
 

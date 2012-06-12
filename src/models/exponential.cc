@@ -22,66 +22,46 @@ double Exponential::gamma()  const
 
 void Exponential::setLowerLimit( const double& lower )
 {
-  if ( lower < 0 )
-    throw PdfException( "Cannot set the lower limit of the generalized Argus distribution to anything smaller than 0." );
-
   _hasLower = true;
   _lower    = lower;
+
+  cache();
 }
 
 
 void Exponential::setUpperLimit( const double& upper )
 {
-  // Make sure that parameter c cannot take values below the maximum value of the variable.
-  const Parameter& c = getPar( 0 );
-  const std::string& msg = "Cannot set the upper limit of the generalized Argus distribution to ";
-  if ( c.isFixed() )
-  {
-    if ( upper > c.value() )
-      throw PdfException( msg + "anything smaller than " + c.name() + "." );
-  }
-  else
-    if ( ( ! c.hasLimits() ) || ( upper > c.lower() ) )
-      throw PdfException( msg + "a value that may exceed " + c.name() + "." );
-
   _hasUpper = true;
   _upper    = upper;
+
+  cache();
 }
 
 
 void Exponential::setLimits( const double& lower, const double& upper )
 {
-  if ( lower < 0 )
-    throw PdfException( "Cannot set the lower limit of the generalized Argus distribution to anything smaller than 0." );
-
-  // Make sure that parameter c cannot take values below the maximum value of the variable.
-  const Parameter& c = getPar( 0 );
-  const std::string& msg = "Cannot set the upper limit of the generalized Argus distribution to ";
-  if ( c.isFixed() )
-  {
-    if ( upper > c.value() )
-      throw PdfException( msg + "anything smaller than " + c.name() + "." );
-  }
-  else
-    if ( ( ! c.hasLimits() ) || ( upper > c.lower() ) )
-      throw PdfException( msg + "a value that may exceed " + c.name() + "." );
-
   _hasLower = true;
   _hasUpper = true;
   _lower    = lower;
   _upper    = upper;
+
+  cache();
 }
 
 
 void Exponential::unsetLowerLimit()
 {
   _hasLower = false;
+
+  cache();
 }
 
 
 void Exponential::unsetUpperLimit()
 {
   _hasUpper = false;
+
+  cache();
 }
 
 
@@ -89,6 +69,8 @@ void Exponential::unsetLimits()
 {
   _hasLower = false;
   _hasUpper = false;
+
+  cache();
 }
 
 

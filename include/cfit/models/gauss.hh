@@ -17,6 +17,8 @@ private:
   double _lower;
   double _upper;
 
+  double _norm;
+
 public:
   Gauss( const Variable& x, const Parameter& mu, const Parameter& sigma );
 
@@ -30,6 +32,8 @@ public:
   void unsetLowerLimit();
   void unsetUpperLimit();
   void unsetLimits    ();
+
+  void cache();
 
   double evaluate(                                   ) const throw( PdfException );
   double evaluate( double x                          ) const throw( PdfException );
