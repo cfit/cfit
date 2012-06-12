@@ -511,7 +511,7 @@ const double Math::erf( const double& x )
 
   absx = std::fabs( x );
   s = ( x != 0 ) ? x / absx : 0.0; // Sign of x.
-  if( x < 0.5 )
+  if( absx < 0.5 )
   {
     xsq = x*x;
     p = 0.007547728033418631287834;
@@ -530,11 +530,11 @@ const double Math::erf( const double& x )
     q = 80437.3630960840172826266+xsq*q;
     return s*1.1283791670955125738961589031 * absx * p / q;
   }
-  if( x >= 10.0 )
+  if( absx >= 10.0 )
   {
     return s;
   }
-  return s * ( 1.0 - erfc( x ) );
+  return s * ( 1.0 - erfc( absx ) );
 }
 
 
