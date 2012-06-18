@@ -164,15 +164,6 @@ public:
   friend const CoefExpr operator*( const CoefExpr&      left, const ParameterExpr& right );
   friend const CoefExpr operator/( const CoefExpr&      left, const ParameterExpr& right );
 
-
-
-  // Operations of objects with themselves.
-  friend const CoefExpr operator+( const Coef&      left, const Coef&      right );
-  friend const CoefExpr operator-( const Coef&      left, const Coef&      right );
-  friend const CoefExpr operator*( const Coef&      left, const Coef&      right );
-  friend const CoefExpr operator/( const Coef&      left, const Coef&      right );
-
-
   // Operations of constants and coefficients.
   friend const CoefExpr operator+( const double&    left, const Coef&      right );
   friend const CoefExpr operator-( const double&    left, const Coef&      right );
@@ -183,25 +174,6 @@ public:
   friend const CoefExpr operator-( const Coef&      left, const double&    right );
   friend const CoefExpr operator*( const Coef&      left, const double&    right );
   friend const CoefExpr operator/( const Coef&      left, const double&    right );
-
-
-
-  // Operations of objects with themselves.
-  friend const CoefExpr operator+( const CoefExpr&  left, const Coef&      right );
-  friend const CoefExpr operator-( const CoefExpr&  left, const Coef&      right );
-  friend const CoefExpr operator*( const CoefExpr&  left, const Coef&      right );
-  friend const CoefExpr operator/( const CoefExpr&  left, const Coef&      right );
-
-  friend const CoefExpr operator+( const Coef&      left, const CoefExpr&  right );
-  friend const CoefExpr operator-( const Coef&      left, const CoefExpr&  right );
-  friend const CoefExpr operator*( const Coef&      left, const CoefExpr&  right );
-  friend const CoefExpr operator/( const Coef&      left, const CoefExpr&  right );
-
-  friend const CoefExpr operator+( const CoefExpr&  left, const CoefExpr&  right );
-  friend const CoefExpr operator-( const CoefExpr&  left, const CoefExpr&  right );
-  friend const CoefExpr operator*( const CoefExpr&  left, const CoefExpr&  right );
-  friend const CoefExpr operator/( const CoefExpr&  left, const CoefExpr&  right );
-
 
   // Operations of constants and coefficients.
   friend const CoefExpr operator+( const double&    left, const CoefExpr&  right );
