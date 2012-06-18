@@ -10,12 +10,23 @@
 #include <cfit/pdf.hh>
 #include <cfit/operation.hh>
 
+
+Pdf::~Pdf()
+{
+  // Delete all the pointers to pdf models, since they have been allocated
+  //    by each copy() function of each pdf model.
+  typedef std::vector< PdfModel* >::iterator mIter;
+  for ( mIter model = _pdfs.begin(); model != _pdfs.end(); ++model )
+    delete *model;
+}
+
+
 // Append a model.
 void Pdf::append( const PdfModel& model )
 {
   _varMap.insert( model._varMap.begin(), model._varMap.end() );
   _parMap.insert( model._parMap.begin(), model._parMap.end() );
-  _pdfs.push_back( const_cast<PdfModel*>( &model ) );
+  _pdfs.push_back( model.copy() );
 
   _expression += "m"; // m = model.
 }
@@ -28,7 +39,9 @@ void Pdf::append( const Pdf& pdf )
   _opers .insert( _opers.end(), pdf._opers .begin(), pdf._opers  .end() );
   _ctnts .insert( _ctnts.end(), pdf._ctnts .begin(), pdf._ctnts  .end() );
   _parms .insert( _parms.end(), pdf._parms .begin(), pdf._parms  .end() );
-  _pdfs  .insert( _pdfs .end(), pdf._pdfs  .begin(), pdf._pdfs   .end() );
+
+  std::transform( pdf._pdfs.begin(), pdf._pdfs.end(),
+                  std::back_inserter( _pdfs ), std::mem_fun( &PdfModel::copy ) );
 
   _expression += pdf._expression;
 }

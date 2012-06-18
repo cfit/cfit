@@ -41,6 +41,7 @@ private:
 
 public:
   Pdf() {};
+  ~Pdf();
   Pdf( const PdfModel& model )
   {
     append( model );
