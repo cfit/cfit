@@ -41,11 +41,14 @@ private:
 
 public:
   Pdf() {};
-  ~Pdf();
   Pdf( const PdfModel& model )
   {
     append( model );
   }
+
+  Pdf( const Pdf& right );
+
+  ~Pdf();
 
   void setVar( const std::string& name, const double& val, const double& err = -1. ) throw( PdfException );
   void setPar( const std::string& name, const double& val, const double& err = -1. ) throw( PdfException );

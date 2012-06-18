@@ -11,6 +11,22 @@
 #include <cfit/operation.hh>
 
 
+
+Pdf::Pdf( const Pdf& right )
+{
+  _varMap = right._varMap;
+  _parMap = right._parMap;
+
+  _expression  = right._expression;
+  _opers       = right._opers;
+  _ctnts       = right._ctnts;
+  _parms       = right._parms;
+
+  std::transform( right._pdfs.begin(), right._pdfs.end(),
+                  std::back_inserter( _pdfs ), std::mem_fun( &PdfModel::copy ) );
+}
+
+
 Pdf::~Pdf()
 {
   // Delete all the pointers to pdf models, since they have been allocated
