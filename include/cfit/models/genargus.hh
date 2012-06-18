@@ -22,6 +22,8 @@ private:
 public:
   GenArgus( const Variable& x, const Parameter& c, const Parameter& chi, const Parameter& p );
 
+  GenArgus* copy() const;
+
   // Getters.
   double c()   const;
   double chi() const;

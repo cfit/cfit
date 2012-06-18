@@ -22,6 +22,8 @@ private:
 public:
   Exponential( const Variable& x, const Parameter& gamma );
 
+  Exponential* copy() const;
+
   // Getters.
   double gamma() const;
 

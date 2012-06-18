@@ -27,6 +27,8 @@ private:
 public:
   CrystalBall( const Variable& x, const Parameter& mu, const Parameter& sigma, const Parameter& alpha, const Parameter& n );
 
+  CrystalBall* copy() const;
+
   // Getters.
   double mu()    const;
   double sigma() const;

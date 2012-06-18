@@ -22,6 +22,8 @@ private:
 public:
   Argus( const Variable& x, const Parameter& c, const Parameter& chi );
 
+  Argus* copy() const;
+
   // Getters.
   double c()   const;
   double chi() const;

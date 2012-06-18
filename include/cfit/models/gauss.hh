@@ -22,6 +22,8 @@ private:
 public:
   Gauss( const Variable& x, const Parameter& mu, const Parameter& sigma );
 
+  Gauss* copy() const;
+
   // Getters.
   double mu()    const;
   double sigma() const;

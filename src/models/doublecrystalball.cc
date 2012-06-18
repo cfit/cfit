@@ -21,6 +21,13 @@ DoubleCrystalBall::DoubleCrystalBall( const Variable& x,
 }
 
 
+
+DoubleCrystalBall* DoubleCrystalBall::copy() const
+{
+  return new DoubleCrystalBall( *this );
+}
+
+
 void DoubleCrystalBall::setLowerLimit( const double& lower )
 {
   _hasLower = true;

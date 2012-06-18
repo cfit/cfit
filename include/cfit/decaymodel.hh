@@ -21,6 +21,8 @@ public:
               const Amplitude&  amp  ,
               const PhaseSpace& ps    );
 
+  virtual DecayModel* copy() const = 0;
+
   void setPars( const std::vector< double >& pars              ) throw( PdfException );
   void setPars( const std::map< std::string, Parameter >& pars ) throw( PdfException );
   void setPars( const FunctionMinimum&                    pars ) throw( PdfException );

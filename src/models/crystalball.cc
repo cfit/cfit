@@ -17,6 +17,12 @@ CrystalBall::CrystalBall( const Variable& x,
 }
 
 
+CrystalBall* CrystalBall::copy() const
+{
+  return new CrystalBall( *this );
+}
+
+
 void CrystalBall::setLowerLimit( const double& lower )
 {
   _hasLower = true;

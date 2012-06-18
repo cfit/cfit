@@ -15,6 +15,12 @@ Gauss::Gauss( const Variable& x, const Parameter& mu, const Parameter& sigma )
 }
 
 
+Gauss* Gauss::copy() const
+{
+  return new Gauss( *this );
+}
+
+
 double Gauss::mu()  const
 {
   return getPar( 0 ).value();

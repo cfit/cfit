@@ -26,6 +26,8 @@ protected:
   const Parameter& getPar( int index ) const;
 
 public:
+  virtual PdfModel* copy() const = 0;
+
   void setVar ( const std::string& name, const double& val, const double& err = -1. ) throw( PdfException );
   void setPar ( const std::string& name, const double& val, const double& err = -1. ) throw( PdfException );
 

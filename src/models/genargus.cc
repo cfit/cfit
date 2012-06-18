@@ -15,6 +15,12 @@ GenArgus::GenArgus( const Variable& x, const Parameter& c, const Parameter& chi,
 }
 
 
+GenArgus* GenArgus::copy() const
+{
+  return new GenArgus( *this );
+}
+
+
 double GenArgus::c()  const
 {
   return getPar( 0 ).value();

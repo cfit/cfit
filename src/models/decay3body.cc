@@ -14,6 +14,12 @@ Decay3Body::Decay3Body( const Variable&   mSq12,
 }
 
 
+Decay3Body* Decay3Body::copy() const
+{
+  return new Decay3Body( *this );
+}
+
+
 void Decay3Body::cache()
 {
   // Compute the value of _norm.

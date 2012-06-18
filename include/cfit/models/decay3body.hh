@@ -20,6 +20,8 @@ public:
 	      const Amplitude&  amp  ,
 	      const PhaseSpace& ps     );
 
+  Decay3Body* copy() const;
+
   void cache();
   double evaluate(                                   ) const throw( PdfException );
   double evaluate( const std::vector< double >& vars ) const throw( PdfException );

@@ -14,6 +14,12 @@ Exponential::Exponential( const Variable& x, const Parameter& gamma )
 }
 
 
+Exponential* Exponential::copy() const
+{
+  return new Exponential( *this );
+}
+
+
 double Exponential::gamma()  const
 {
   return getPar( 0 ).value();

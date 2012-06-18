@@ -14,6 +14,12 @@ Argus::Argus( const Variable& x, const Parameter& c, const Parameter& chi )
 }
 
 
+Argus* Argus::copy() const
+{
+  return new Argus( *this );
+}
+
+
 double Argus::c()  const
 {
   return getPar( 0 ).value();

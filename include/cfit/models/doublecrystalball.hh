@@ -30,6 +30,8 @@ public:
                      const Parameter& alpha, const Parameter& n,
                      const Parameter& beta , const Parameter& m );
 
+  DoubleCrystalBall* copy() const;
+
   // Getters.
   double mu()    const;
   double sigma() const;
