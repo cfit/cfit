@@ -24,9 +24,10 @@ private:
   std::string                  _expression;
   std::vector< Operation::Op > _opers;
 
-  void append( const double&        val  );
-  void append( const Parameter&     par  );
+  void append( const double&        ctnt );
+  void append( const Parameter&     parm );
   void append( const ParameterExpr& expr );
+  void append( const Operation::Op& oper );
 
   template< class L, class R >
   ParameterExpr( const L& left, const R& right, const Operation::Op& oper )
@@ -49,6 +50,21 @@ private:
 
 public:
   ParameterExpr() {};
+
+  const ParameterExpr& operator+=( const ParameterExpr& right );
+  const ParameterExpr& operator-=( const ParameterExpr& right );
+  const ParameterExpr& operator*=( const ParameterExpr& right );
+  const ParameterExpr& operator/=( const ParameterExpr& right );
+
+  const ParameterExpr& operator+=( const Parameter&     right );
+  const ParameterExpr& operator-=( const Parameter&     right );
+  const ParameterExpr& operator*=( const Parameter&     right );
+  const ParameterExpr& operator/=( const Parameter&     right );
+
+  const ParameterExpr& operator+=( const double&        right );
+  const ParameterExpr& operator-=( const double&        right );
+  const ParameterExpr& operator*=( const double&        right );
+  const ParameterExpr& operator/=( const double&        right );
 
   // Binary arithmetic operators.
   friend const ParameterExpr operator+( const Parameter&     left, const Parameter&     right );

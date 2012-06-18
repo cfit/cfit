@@ -23,3 +23,178 @@ void ParameterExpr::append( const ParameterExpr& expr )
   _expression += expr._expression;
 }
 
+void ParameterExpr::append( const Operation::Op& oper )
+{
+  _opers.push_back( oper );
+  _expression += "b"; // b = binary operation.
+}
+
+
+const ParameterExpr& ParameterExpr::operator+=( const ParameterExpr& right )
+{
+  if ( _expression.empty() )
+  {
+    append( right );
+    return *this;
+  }
+
+  append( right           );
+  append( Operation::plus );
+
+  return *this;
+}
+
+
+const ParameterExpr& ParameterExpr::operator-=( const ParameterExpr& right )
+{
+  if ( _expression.empty() )
+  {
+    append( right );
+    _opers.push_back( Operation::minus );
+    _expression += "u"; // u = unary operation.
+    return *this;
+  }
+
+  append( right            );
+  append( Operation::minus );
+
+  return *this;
+}
+
+
+const ParameterExpr& ParameterExpr::operator*=( const ParameterExpr& right )
+{
+  if ( _expression.empty() )
+    return *this;
+
+  append( right           );
+  append( Operation::mult );
+
+  return *this;
+}
+
+
+const ParameterExpr& ParameterExpr::operator/=( const ParameterExpr& right )
+{
+  if ( _expression.empty() )
+    return *this;
+
+  append( right          );
+  append( Operation::div );
+
+  return *this;
+}
+
+
+
+const ParameterExpr& ParameterExpr::operator+=( const Parameter& right )
+{
+  if ( _expression.empty() )
+  {
+    append( right );
+    return *this;
+  }
+
+  append( right           );
+  append( Operation::plus );
+
+  return *this;
+}
+
+
+const ParameterExpr& ParameterExpr::operator-=( const Parameter& right )
+{
+  if ( _expression.empty() )
+  {
+    append( right );
+    _opers.push_back( Operation::minus );
+    _expression += "u"; // u = unary operation.
+    return *this;
+  }
+
+  append( right            );
+  append( Operation::minus );
+
+  return *this;
+}
+
+
+const ParameterExpr& ParameterExpr::operator*=( const Parameter& right )
+{
+  if ( _expression.empty() )
+    return *this;
+
+  append( right           );
+  append( Operation::mult );
+
+  return *this;
+}
+
+
+const ParameterExpr& ParameterExpr::operator/=( const Parameter& right )
+{
+  if ( _expression.empty() )
+    return *this;
+
+  append( right          );
+  append( Operation::div );
+
+  return *this;
+}
+
+
+
+const ParameterExpr& ParameterExpr::operator+=( const double& right )
+{
+  if ( _expression.empty() )
+  {
+    append( right );
+    return *this;
+  }
+
+  append( right           );
+  append( Operation::plus );
+
+  return *this;
+}
+
+
+const ParameterExpr& ParameterExpr::operator-=( const double& right )
+{
+  if ( _expression.empty() )
+  {
+    append( right );
+    _opers.push_back( Operation::minus );
+    _expression += "u"; // u = unary operation.
+    return *this;
+  }
+
+  append( right            );
+  append( Operation::minus );
+
+  return *this;
+}
+
+
+const ParameterExpr& ParameterExpr::operator*=( const double& right )
+{
+  if ( _expression.empty() )
+    return *this;
+
+  append( right           );
+  append( Operation::mult );
+
+  return *this;
+}
+
+
+const ParameterExpr& ParameterExpr::operator/=( const double& right )
+{
+  if ( _expression.empty() )
+    return *this;
+
+  append( right          );
+  append( Operation::div );
+
+  return *this;
+}
