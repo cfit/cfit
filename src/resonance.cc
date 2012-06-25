@@ -186,5 +186,17 @@ std::complex< double > Resonance::evaluate( const PhaseSpace& ps,
   const double& mSqAC = m2AC( mSq12, mSq13, mSq23 );
   const double& mSqBC = m2BC( mSq12, mSq13, mSq23 );
 
+//  std::cout << "DEBUG prop:   " << propagator         ( ps, mSqAB               ) << std::endl;
+//  std::cout << "DEBUG B-W':   " << blattWeisskopfPrime( ps, mSqAB               ) << std::endl;
+ std::cout << "DEBUG zemach: " << zemach             ( ps, mSqAB, mSqAC, mSqBC ) << std::endl;
+
+  std::complex< double > prop = propagator( ps, mSqAB );
+
+//  std::cout << "DEBUG amp 0:  " << prop                                                                        << std::endl;
+//  std::cout << "DEBUG amp 2:  " << prop * blattWeisskopfPrime( ps, mSqAB )                                     << std::endl;
+ std::cout << "DEBUG amp 3:  " << prop * blattWeisskopfPrime( ps, mSqAB ) * zemach( ps, mSqAB, mSqAC, mSqBC ) << std::endl;
+
+ std::cout << "-------------------------------------------------------" << std::endl;
+
   return propagator( ps, mSqAB ) * zemach( ps, mSqAB, mSqAC, mSqBC ) * blattWeisskopfPrime( ps, mSqAB );
 }

@@ -25,6 +25,10 @@ void Decay3Body::cache()
   // Compute the value of _norm.
   _norm = 0.0;
 
+  // TEMPORAL.
+  _norm = 1.0;
+  return;
+
   // Define the properties of the integration method.
   const int    nBins = 400;
   const double min   = pow( _ps.m1()      + _ps.m2(), 2 );

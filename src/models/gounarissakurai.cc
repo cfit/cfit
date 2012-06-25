@@ -5,6 +5,8 @@
 
 std::complex< double > GounarisSakurai::propagator( const PhaseSpace& ps, const double& mSqAB ) const
 {
+  std::cout << "GS ";
+
   const std::complex< double > I( 0., 1. );
 
   double gsd = ( 3. / M_PI ) * ( ps.mSq( _resoA ) / qSq( ps, mSq() ) );
@@ -15,6 +17,13 @@ std::complex< double > GounarisSakurai::propagator( const PhaseSpace& ps, const 
 
 //prop *= 1. / ( std::pow( mass(), 2 ) - mSqAB + gsf( ps, mSqAB ) - I * mass() * runningWidth( ps, mSqAB ) );
   prop *= 1. / ( std::pow( mass(), 2 ) - mSqAB + gsf( ps, mSqAB ) - I * std::sqrt( mSqAB ) * runningWidth( ps, mSqAB ) );
+
+//  std::cout << "DEBUG gs ....................." << std::endl;
+//   std::cout << gsd << std::endl;
+//   std::cout << gsf( ps, mSqAB ) << std::endl;
+//   std::cout << gsh( ps, mSqAB ) << std::endl;
+//   std::cout << gshprime( ps, mSq() ) << std::endl;
+//   std::cout << "........................." << std::endl;
 
   return prop;
 }
