@@ -6,6 +6,8 @@
 class PdfModel;
 class Pdf;
 class ParameterExpr;
+class Variable;
+class Function;
 
 class Parameter
 {
@@ -103,6 +105,33 @@ public:
   friend const ParameterExpr operator-( const Parameter&     left, const ParameterExpr& right );
   friend const ParameterExpr operator*( const Parameter&     left, const ParameterExpr& right );
   friend const ParameterExpr operator/( const Parameter&     left, const ParameterExpr& right );
+
+
+  // Operations with variables as the left operand.
+  friend const Function operator+( const Variable&      left, const Parameter&     right );
+  friend const Function operator-( const Variable&      left, const Parameter&     right );
+  friend const Function operator*( const Variable&      left, const Parameter&     right );
+  friend const Function operator/( const Variable&      left, const Parameter&     right );
+
+  // Operations with variables as the right operand.
+  friend const Function operator+( const Parameter&     left, const Variable&      right );
+  friend const Function operator-( const Parameter&     left, const Variable&      right );
+  friend const Function operator*( const Parameter&     left, const Variable&      right );
+  friend const Function operator/( const Parameter&     left, const Variable&      right );
+
+
+  // Operations with functions as the left operand.
+  friend const Function operator+( const Function&      left, const Parameter&     right );
+  friend const Function operator-( const Function&      left, const Parameter&     right );
+  friend const Function operator*( const Function&      left, const Parameter&     right );
+  friend const Function operator/( const Function&      left, const Parameter&     right );
+
+  // Operations with functions as the right operand.
+  friend const Function operator+( const Parameter&     left, const Function&      right );
+  friend const Function operator-( const Parameter&     left, const Function&      right );
+  friend const Function operator*( const Parameter&     left, const Function&      right );
+  friend const Function operator/( const Parameter&     left, const Function&      right );
+
 
   friend const ParameterExpr pow      ( const Parameter&     left, const double&        right );
   friend const ParameterExpr pow      ( const ParameterExpr& left, const double&        right );

@@ -12,11 +12,13 @@
 class PdfModel;
 class Pdf;
 class CoefExpr;
+class Function;
 
 class ParameterExpr
 {
   friend class CoefExpr;
   friend class Pdf;
+  friend class Function;
 
 private:
   std::vector< double >        _ctnts;
@@ -145,6 +147,31 @@ public:
   friend const Pdf           operator*( const ParameterExpr& left, const Pdf&           right );
   friend const Pdf           operator*( const Pdf&           left, const ParameterExpr& right );
   friend const Pdf           operator/( const Pdf&           left, const ParameterExpr& right );
+
+
+  // Operations with variables as the left operand.
+  friend const Function operator+( const Variable&      left, const ParameterExpr& right );
+  friend const Function operator-( const Variable&      left, const ParameterExpr& right );
+  friend const Function operator*( const Variable&      left, const ParameterExpr& right );
+  friend const Function operator/( const Variable&      left, const ParameterExpr& right );
+
+  // Operations with variables as the right operand.
+  friend const Function operator+( const ParameterExpr& left, const Variable&      right );
+  friend const Function operator-( const ParameterExpr& left, const Variable&      right );
+  friend const Function operator*( const ParameterExpr& left, const Variable&      right );
+  friend const Function operator/( const ParameterExpr& left, const Variable&      right );
+
+  // Operations with functions as the left operand.
+  friend const Function operator+( const Function&      left, const ParameterExpr& right );
+  friend const Function operator-( const Function&      left, const ParameterExpr& right );
+  friend const Function operator*( const Function&      left, const ParameterExpr& right );
+  friend const Function operator/( const Function&      left, const ParameterExpr& right );
+
+  // Operations with functions as the right operand.
+  friend const Function operator+( const ParameterExpr& left, const Function&      right );
+  friend const Function operator-( const ParameterExpr& left, const Function&      right );
+  friend const Function operator*( const ParameterExpr& left, const Function&      right );
+  friend const Function operator/( const ParameterExpr& left, const Function&      right );
 
 };
 
