@@ -9,6 +9,7 @@
 #include <cfit/amplitude.hh>
 #include <cfit/phasespace.hh>
 #include <cfit/matrix.hh>
+#include <cfit/function.hh>
 
 #include <cfit/models/decay3body.hh>
 #include <cfit/models/relbreitwigner.hh>
@@ -291,7 +292,14 @@ int main( int argc, char** argv )
 
   Decay3Body decayModel( mSq12, mSq13, mSq23, amp, ps );
 
-  std::cout << "DEBUG: "                                                        << std::endl;
+  Parameter a00( "a00", 1.0 );
+  Parameter a01( "a01", 2.0 );
+  Parameter a10( "a10", 3.0 );
+
+  Function eff = a00 + a01 * mSq12 * mSq12 + a10 * mSq13 * mSq13;
+  decayModel *= eff;
+
+  std::cout << "DEBUG testResos: "                                              << std::endl;
   std::cout << amp.evaluate( ps, 1.0, 1.5, .5 ) << " " << decayModel.evaluate() << std::endl;
   decayModel.setVar( "mSq23", .6 );
   std::cout << amp.evaluate( ps, 1.0, 1.5, .6 ) << " " << decayModel.evaluate() << std::endl;
