@@ -1,5 +1,6 @@
 
 #include <cfit/models/decay3body.hh>
+#include <cfit/function.hh>
 
 Decay3Body::Decay3Body( const Variable&   mSq12,
 			const Variable&   mSq13,
@@ -18,6 +19,89 @@ Decay3Body* Decay3Body::copy() const
 {
   return new Decay3Body( *this );
 }
+
+
+
+// Need to overwrite setters defined in PdfModel, since function variables may need to be set.
+void Decay3Body::setVars( const std::map< std::string, Variable >& vars ) throw( PdfException )
+{
+  typedef std::map< const std::string, Variable >::iterator vIter;
+  for ( vIter var = _varMap.begin(); var != _varMap.end(); ++var )
+    var->second.setValue( vars.find( var->first )->second.value() );
+
+  typedef std::vector< Function >::iterator fIter;
+  for ( fIter func = _funcs.begin(); func != _funcs.end(); ++func )
+    func->setVars( _varMap );
+}
+
+
+
+
+// Set the parameters to those given as argument.
+// They must be sorted alphabetically, since it's how MnUserParameters are passed
+//    in the minimize function of the minimizers. It must be so, because pushing
+//    two parameters with the same name would create confusion otherwise.
+void Decay3Body::setPars( const std::vector< double >& pars ) throw( PdfException )
+{
+  if ( _parMap.size() != pars.size() )
+    throw PdfException( "Number of arguments passed does not match number of required arguments." );
+
+  typedef std::map< std::string, Parameter >::iterator pIter;
+  int index = 0;
+  for ( pIter par = _parMap.begin(); par != _parMap.end(); par++ )
+    par->second.setValue( pars[ index++ ] );
+
+  typedef std::vector< Function >::iterator fIter;
+  for ( fIter func = _funcs.begin(); func != _funcs.end(); ++func )
+    func->setPars( _parMap );
+}
+
+
+// Need to overwrite setters defined in PdfModel, since function parameters may need to be set.
+void Decay3Body::setPars( const std::map< std::string, Parameter >& pars ) throw( PdfException )
+{
+  typedef std::map< const std::string, Parameter >::iterator pIter;
+  for ( pIter par = _parMap.begin(); par != _parMap.end(); ++par )
+    par->second.setValue( pars.find( par->first )->second.value() );
+
+  typedef std::vector< Function >::iterator fIter;
+  for ( fIter func = _funcs.begin(); func != _funcs.end(); ++func )
+    func->setPars( _parMap );
+}
+
+
+
+
+const double Decay3Body::evaluateFuncs( const double& mSq12, const double& mSq13, const double& mSq23 )
+{
+  double value = 1.0;
+
+  typedef std::vector< Function >::iterator fIter;
+  for ( fIter func = _funcs.begin(); func != _funcs.end(); ++func )
+  {
+    func->setVar( getVar( 0 ).name(), mSq12 );
+    func->setVar( getVar( 1 ).name(), mSq13 );
+    func->setVar( getVar( 2 ).name(), mSq23 );
+
+    value *= func->evaluate();
+  }
+
+  return value;
+}
+
+
+// The values of the variables must be set with setVars before using this function.
+const double Decay3Body::evaluateFuncs() const
+{
+  double value = 1.0;
+
+  typedef std::vector< Function >::const_iterator fIter;
+  for ( fIter func = _funcs.begin(); func != _funcs.end(); ++func )
+    value *= func->evaluate();
+
+  return value;
+}
+
 
 
 void Decay3Body::cache()
@@ -49,7 +133,7 @@ void Decay3Body::cache()
       // Proceed only if the point lies inside the kinematically allowed Dalitz region.
       // std::norm returns the squared modulus of the complex number, not its norm.
       if ( _ps.contains( mSq12, mSq13, mSq23 ) )
-        _norm += std::norm( _amp.evaluate( _ps, mSq12, mSq13, mSq23 ) );
+        _norm += std::norm( _amp.evaluate( _ps, mSq12, mSq13, mSq23 ) ) * evaluateFuncs( mSq12, mSq13, mSq23 );
     }
 
   _norm *= pow( step, 2 );
@@ -64,12 +148,72 @@ double Decay3Body::evaluate() const throw( PdfException )
   std::complex< double > amp = _amp.evaluate( _ps, mSq12(), mSq13(), mSq23() );
 
   // std::norm returns the squared modulus of the complex number, not its norm.
-  return std::norm( amp ) / _norm;
+  const double& ampSq = std::norm( amp ) / _norm;
+
+  return ampSq * evaluateFuncs();
 }
 
 
 double Decay3Body::evaluate( const std::vector< double >& vars ) const throw( PdfException )
 {
   throw PdfException( "Do not use evaluate( vars ) in decay3body" );
+}
+
+
+// No need to append an operator, since it can only be multiplication.
+const Decay3Body& Decay3Body::operator*=( const Function& right ) throw( PdfException )
+{
+  // Check that the function does not depend on any variables that the model does not.
+  const std::map< std::string, Variable >& varMap = right.getVarMap();
+  for ( std::map< std::string, Variable >::const_iterator var = varMap.begin(); var != varMap.end(); ++var )
+    if ( ! _varMap.count( var->second.name() ) )
+      throw PdfException( "Cannot multiply a Decay3Body pdf model by a function that depends on other variables." );
+
+  // Consider the function parameters as own ones.
+  const std::map< std::string, Parameter >& parMap = right.getParMap();
+  _parMap.insert( parMap.begin(), parMap.end() );
+
+  // Append the function to the functions vector.
+  _funcs.push_back( right );
+
+  return *this;
+}
+
+
+
+const Decay3Body operator*( Decay3Body left, const Function& right )
+{
+  // Check that the function does not depend on any variables that the model does not.
+  const std::map< std::string, Variable >& varMap = right.getVarMap();
+  for ( std::map< std::string, Variable >::const_iterator var = varMap.begin(); var != varMap.end(); ++var )
+    if ( ! left._varMap.count( var->second.name() ) )
+      throw PdfException( "Cannot multiply a Decay3Body pdf model by a function that depends on other variables." );
+
+  // Consider the function parameters as own ones.
+  const std::map< std::string, Parameter >& parMap = right.getParMap();
+  left._parMap.insert( parMap.begin(), parMap.end() );
+
+  left._funcs.push_back( right );
+
+  return left;
+}
+
+
+
+const Decay3Body operator*( const Function& left, Decay3Body right )
+{
+  // Check that the function does not depend on any variables that the model does not.
+  const std::map< std::string, Variable >& varMap = left.getVarMap();
+  for ( std::map< std::string, Variable >::const_iterator var = varMap.begin(); var != varMap.end(); ++var )
+    if ( ! right._varMap.count( var->second.name() ) )
+      throw PdfException( "Cannot multiply a Decay3Body pdf model by a function that depends on other variables." );
+
+  // Consider the function parameters as own ones.
+  const std::map< std::string, Parameter >& parMap = left.getParMap();
+  right._parMap.insert( parMap.begin(), parMap.end() );
+
+  right._funcs.push_back( left );
+
+  return right;
 }
 
