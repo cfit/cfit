@@ -24,6 +24,9 @@ private:
   std::vector< Parameter     > _parms;
   std::vector< PdfModel*     > _pdfs;
 
+  // Clean up the content of all the Pdf containers.
+  void clear();
+
   void append( const PdfModel&      model );
   void append( const Pdf&           pdf   );
   void append( const Parameter&     par   );

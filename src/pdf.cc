@@ -37,6 +37,26 @@ Pdf::~Pdf()
 }
 
 
+void Pdf::clear()
+{
+  _varMap.clear();
+  _parMap.clear();
+  _opers .clear();
+  _ctnts .clear();
+  _parms .clear();
+
+  // Delete all the pointers to pdf models, since they have been allocated
+  //    by each copy() function of each pdf model.
+  typedef std::vector< PdfModel* >::iterator mIter;
+  for ( mIter model = _pdfs.begin(); model != _pdfs.end(); ++model )
+    delete *model;
+
+  _pdfs.clear();
+
+  _expression.clear();
+}
+
+
 // Append a model.
 void Pdf::append( const PdfModel& model )
 {
@@ -103,6 +123,8 @@ void Pdf::append( const Operation::Op& oper )
 // Assignment operation.
 const Pdf& Pdf::operator=( const PdfModel& right )
 {
+  clear();
+
   append( right );
   return *this;
 }
@@ -364,7 +386,7 @@ double Pdf::evaluate() const throw( PdfException )
       }
 
   if ( values.size() != 1 )
-    throw PdfException( "Parse error: too many values have been supplied." );
+    throw PdfException( "Pdf parse error: too many values have been supplied." );
 
   return values.top();
 }
@@ -436,7 +458,7 @@ double Pdf::evaluate( const std::vector< double >& vars ) const throw( PdfExcept
       }
 
   if ( values.size() != 1 )
-    throw PdfException( "Parse error: too many values have been supplied." );
+    throw PdfException( "Pdf parse error: too many values have been supplied." );
 
   return values.top();
 }

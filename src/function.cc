@@ -14,6 +14,20 @@
 #include <cfit/operation.hh>
 
 
+void Function::clear()
+{
+  _varMap.clear();
+  _parMap.clear();
+
+  _expression.clear();
+
+  _opers.clear();
+  _ctnts.clear();
+  _varbs.clear();
+  _parms.clear();
+}
+
+
 // Append a constant.
 void Function::append( const double& ctnt )
 {
@@ -159,7 +173,7 @@ double Function::evaluate() const throw( PdfException )
     }
 
   if ( values.size() != 1 )
-    throw PdfException( "Parse error: too many values have been supplied." );
+    throw PdfException( "Function parse error: too many values have been supplied." );
 
   return values.top();
 }

@@ -183,28 +183,48 @@ std::complex< double > Amplitude::evaluate( const PhaseSpace& ps,
     }
 
   if ( values.size() != 1 )
-    throw PdfException( "Parse error: too many values have been supplied." );
+    throw PdfException( "Amplitude parse error: too many values have been supplied." );
 
   return values.top();
 }
 
 
+void Amplitude::clear()
+{
+  _parMap.clear();
+
+  _ctnts.clear();
+  _parms.clear();
+  _coefs.clear();
+  _resos.clear();
+  _fvecs.clear();
+  _opers.clear();
+
+  _expression.clear();
+}
+
 
 // Assignment operations.
 const Amplitude& Amplitude::operator=( const Resonance& right )
 {
+  clear();
+
   append( right );
   return *this;
 }
 
 const Amplitude& Amplitude::operator=( const Fvector& right )
 {
+  clear();
+
   append( right );
   return *this;
 }
 
 const Amplitude& Amplitude::operator=( const Amplitude& right )
 {
+  clear();
+
   append( right );
   return *this;
 }

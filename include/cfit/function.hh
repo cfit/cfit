@@ -33,6 +33,8 @@ private:
   void append( const ParameterExpr& expr );
   void append( const Function&      func );
 
+  void clear();
+
   template< class L, class R >
   Function( const L& left, const R& right, const Operation::Op& oper )
   {
@@ -69,7 +71,9 @@ public:
   template< class T >
   inline const Function& operator=( const T& arg )
   {
+    clear();
     append( arg );
+
     return *this;
   }
 

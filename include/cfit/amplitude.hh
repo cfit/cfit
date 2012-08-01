@@ -28,6 +28,9 @@ private:
   std::vector< Operation::Op          > _opers;
   std::string                           _expression;
 
+  // Clean up the content of the Amplitude containers.
+  void clear();
+
   void append( const double&                 ctnt );
   void append( const std::complex< double >& ctnt );
   void append( const Parameter&              parm );

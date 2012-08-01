@@ -1,7 +1,7 @@
 #ifndef __MATRIX_HH__
 #define __MATRIX_HH__
 
-#include <iostream> // TEMPORAL
+#include <iostream> // TEMPORAL.
 
 #include <cmath>
 #include <vector>
@@ -223,14 +223,27 @@ template <class T> Matrix< T > Matrix< T >::inverse() const
 template < class T >
 const Matrix< T >& Matrix< T >::operator=( const Matrix< T >& mat )
 {
-  _range = mat._range;
-
-  // Allocate elements with the given matrix range.
-  if ( _range )
+  // Deallocate and reallocate if origin and destination matrix have different ranges.
+  if ( _range != mat._range )
   {
-    _mat = new T*[ _range ];
-    for ( int row = 0; row < _range; ++row )
-      _mat[ row ] = new T[ _range ];
+    // If this was already allocated, deallocate it.
+    if ( _range )
+    {
+      for( int row = 0; row < _range; ++row )
+        delete[] _mat[ row ];
+      delete[] _mat;
+    }
+
+    // Change the range to the origin's one.
+    _range = mat._range;
+
+    // Allocate elements with the given matrix range, if necessary.
+    if ( _range )
+    {
+      _mat = new T*[ _range ];
+      for ( int row = 0; row < _range; ++row )
+        _mat[ row ] = new T[ _range ];
+    }
   }
 
   // Set the matrix elements to the elements at the original matrix.

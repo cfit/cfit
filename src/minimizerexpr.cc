@@ -88,6 +88,7 @@ MinimizerExpr& MinimizerExpr::operator=( const Minimizer& right )
   _parMap = right.pdf().getParameters();
 
   // Append the given minimizer.
+  _minimizers.clear();
   _minimizers.push_back( &right );
 
   return *this;
