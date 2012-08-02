@@ -28,7 +28,7 @@ double MinimizerExpr::operator()( const std::vector< double >& pars ) const thro
   double total = 0.;
   for ( mIter mmzr = _minimizers.begin(); mmzr != _minimizers.end(); ++mmzr )
   {
-    const std::map< std::string, Parameter >& mParMap = (*mmzr)->pdf().getParameters();
+    const std::map< std::string, Parameter >& mParMap = (*mmzr)->pdf().getPars();
     std::vector< double > mPars;
     for ( pIter par = mParMap.begin(); par != mParMap.end(); ++par )
       mPars.push_back( parMap.find( par->first )->second.value() );
@@ -85,7 +85,7 @@ MinimizerExpr& MinimizerExpr::operator=( const Minimizer& right )
   _up = right.up();
 
   // Append all the parameters to the local _parMap container.
-  _parMap = right.pdf().getParameters();
+  _parMap = right.pdf().getPars();
 
   // Append the given minimizer.
   _minimizers.clear();
@@ -105,7 +105,7 @@ MinimizerExpr& MinimizerExpr::operator+=( const Minimizer& right )
   if ( _minimizers.empty() )
     _up = right.up();
 
-  const std::map< std::string, Parameter >& rPars = right.pdf().getParameters();
+  const std::map< std::string, Parameter >& rPars = right.pdf().getPars();
 
   // Append all the parameters to the local _parMap container.
   _parMap.insert( rPars.begin(), rPars.end() );
@@ -150,8 +150,8 @@ MinimizerExpr operator+( const Minimizer& left, const Minimizer& right )
   total._up = left.up();
 
   // Find the parameters that the given arguments depend on.
-  const std::map< std::string, Parameter >& lPars = left .pdf().getParameters();
-  const std::map< std::string, Parameter >& rPars = right.pdf().getParameters();
+  const std::map< std::string, Parameter >& lPars = left .pdf().getPars();
+  const std::map< std::string, Parameter >& rPars = right.pdf().getPars();
 
   // Append all the parameters to the local _parMap container.
   total._parMap.insert( lPars.begin(), lPars.end() );

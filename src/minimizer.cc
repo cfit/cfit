@@ -16,7 +16,7 @@ FunctionMinimum Minimizer::minimize() const
   typedef std::map< std::string, Parameter >::const_iterator pIter;
 
   // Set the Minuit parameters' name, value and uncertainty.
-  const std::map< std::string, Parameter >& pars = _pdf.getParameters();
+  const std::map< std::string, Parameter >& pars = _pdf.getPars();
 
   for ( pIter par = pars.begin(); par != pars.end(); ++par )
   {

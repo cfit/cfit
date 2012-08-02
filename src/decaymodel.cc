@@ -11,7 +11,7 @@ DecayModel::DecayModel( const Variable&   mSq12,
                         const PhaseSpace& ps    )
   : _amp( amp ), _ps( ps )
 {
-  const std::map< std::string, Parameter >& pars = _amp.getParameters();
+  const std::map< std::string, Parameter >& pars = _amp.getPars();
   typedef std::map< const std::string, Parameter >::const_iterator pIter;
   for ( pIter par = pars.begin(); par != pars.end(); ++par )
     push( par->second );

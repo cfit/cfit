@@ -76,7 +76,7 @@ public:
       delete *res;
   }
 
-  const std::map< std::string, Parameter >& getParameters() const { return _parMap; };
+  const std::map< std::string, Parameter >& getPars() const { return _parMap; };
   void setPars( const std::map< std::string, Parameter >& pars );
 
   std::complex< double > evaluate( const PhaseSpace& ps,
