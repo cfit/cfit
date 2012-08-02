@@ -23,9 +23,9 @@ public:
 
   virtual DecayModel* copy() const = 0;
 
-  void setPars( const std::vector< double >& pars              ) throw( PdfException );
-  void setPars( const std::map< std::string, Parameter >& pars ) throw( PdfException );
-  void setPars( const FunctionMinimum&                    pars ) throw( PdfException );
+  virtual void setPars( const std::vector< double >& pars              ) throw( PdfException );
+  virtual void setPars( const std::map< std::string, Parameter >& pars ) throw( PdfException );
+  virtual void setPars( const FunctionMinimum&                    pars ) throw( PdfException );
 
   double mSq12() const { return getVar( 0 ).value(); }
   double mSq13() const { return getVar( 1 ).value(); }

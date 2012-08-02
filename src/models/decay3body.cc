@@ -51,6 +51,8 @@ void Decay3Body::setPars( const std::vector< double >& pars ) throw( PdfExceptio
   for ( pIter par = _parMap.begin(); par != _parMap.end(); par++ )
     par->second.setValue( pars[ index++ ] );
 
+  _amp.setPars( _parMap );
+
   typedef std::vector< Function >::iterator fIter;
   for ( fIter func = _funcs.begin(); func != _funcs.end(); ++func )
     func->setPars( _parMap );
@@ -64,11 +66,28 @@ void Decay3Body::setPars( const std::map< std::string, Parameter >& pars ) throw
   for ( pIter par = _parMap.begin(); par != _parMap.end(); ++par )
     par->second.setValue( pars.find( par->first )->second.value() );
 
+  _amp.setPars( _parMap );
+
   typedef std::vector< Function >::iterator fIter;
   for ( fIter func = _funcs.begin(); func != _funcs.end(); ++func )
     func->setPars( _parMap );
 }
 
+
+// Need to overwrite setters defined in PdfModel, since function parameters may need to be set.
+void Decay3Body::setPars( const FunctionMinimum& min ) throw( PdfException )
+{
+  const MnUserParameters& pars = min.userParameters();
+  typedef std::vector< MinuitParameter >::const_iterator pIter;
+  for( pIter par = pars.parameters().begin(); par != pars.parameters().end(); ++par )
+    _parMap[ par->name() ].set( par->value(), par->error() );
+
+  _amp.setPars( _parMap );
+
+  typedef std::vector< Function >::iterator fIter;
+  for ( fIter func = _funcs.begin(); func != _funcs.end(); ++func )
+    func->setPars( _parMap );
+}
 
 
 
@@ -79,9 +98,13 @@ const double Decay3Body::evaluateFuncs( const double& mSq12, const double& mSq13
   typedef std::vector< Function >::iterator fIter;
   for ( fIter func = _funcs.begin(); func != _funcs.end(); ++func )
   {
-    func->setVar( getVar( 0 ).name(), mSq12 );
-    func->setVar( getVar( 1 ).name(), mSq13 );
-    func->setVar( getVar( 2 ).name(), mSq23 );
+    const std::string& name0 = getVar( 0 ).name(); // mSq12
+    const std::string& name1 = getVar( 1 ).name(); // mSq13
+    const std::string& name2 = getVar( 2 ).name(); // mSq23
+
+    if ( func->dependsOn( name0 ) ) func->setVar( name0, mSq12 );
+    if ( func->dependsOn( name1 ) ) func->setVar( name1, mSq13 );
+    if ( func->dependsOn( name2 ) ) func->setVar( name2, mSq23 );
 
     value *= func->evaluate();
   }

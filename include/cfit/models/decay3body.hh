@@ -1,5 +1,5 @@
-#ifndef __DECAYMIXING3BODY_HH__
-#define __DECAYMIXING3BODY_HH__
+#ifndef __DECAY3BODY_HH__
+#define __DECAY3BODY_HH__
 
 #include <vector>
 
@@ -8,6 +8,9 @@
 #include <cfit/amplitude.hh>
 #include <cfit/phasespace.hh>
 #include <cfit/function.hh>
+
+#include <Minuit/FunctionMinimum.h>
+
 
 class Decay3Body : public DecayModel
 {
@@ -32,14 +35,15 @@ public:
   void setVars( const std::map< std::string, Variable >&  vars ) throw( PdfException );
   void setPars( const std::vector< double >&              pars ) throw( PdfException );
   void setPars( const std::map< std::string, Parameter >& pars ) throw( PdfException );
+  void setPars( const FunctionMinimum&                    min  ) throw( PdfException );
 
   void cache();
   double evaluate(                                   ) const throw( PdfException );
   double evaluate( const std::vector< double >& vars ) const throw( PdfException );
 
-  friend const Decay3Body operator*(       Decay3Body left, const Function&  right );
-  friend const Decay3Body operator*( const Function&  left,       Decay3Body right );
-  const Decay3Body& operator*=( const Function& right ) throw( PdfException );
+  friend const Decay3Body  operator* (       Decay3Body left, const Function&  right );
+  friend const Decay3Body  operator* ( const Function&  left,       Decay3Body right );
+  const        Decay3Body& operator*=( const Function& right ) throw( PdfException );
 };
 
 #endif
