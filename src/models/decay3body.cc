@@ -21,6 +21,22 @@ Decay3Body* Decay3Body::copy() const
 }
 
 
+// Need to overwrite setters defined in PdfModel, since function variables may need to be set.
+void Decay3Body::setVars( const std::vector< double >& vars ) throw( PdfException )
+{
+  if ( _varMap.size() != vars.size() )
+    throw PdfException( "Number of arguments passed does not match number of required arguments." );
+
+  typedef std::map< std::string, Variable >::iterator vIter;
+  int index = 0;
+  for ( vIter var = _varMap.begin(); var != _varMap.end(); ++var )
+    var->second.setValue( vars[ index++ ] );
+
+  typedef std::vector< Function >::iterator fIter;
+  for ( fIter func = _funcs.begin(); func != _funcs.end(); ++func )
+    func->setVars( _varMap );
+}
+
 
 // Need to overwrite setters defined in PdfModel, since function variables may need to be set.
 void Decay3Body::setVars( const std::map< std::string, Variable >& vars ) throw( PdfException )
@@ -48,7 +64,7 @@ void Decay3Body::setPars( const std::vector< double >& pars ) throw( PdfExceptio
 
   typedef std::map< std::string, Parameter >::iterator pIter;
   int index = 0;
-  for ( pIter par = _parMap.begin(); par != _parMap.end(); par++ )
+  for ( pIter par = _parMap.begin(); par != _parMap.end(); ++par )
     par->second.setValue( pars[ index++ ] );
 
   _amp.setPars( _parMap );
