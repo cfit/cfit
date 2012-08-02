@@ -88,6 +88,7 @@ public:
   const std::map< std::string, Variable  >& getVarMap() const { return _varMap; }
   const std::map< std::string, Parameter >& getParMap() const { return _parMap; }
 
+  const bool dependsOn( const std::string& varName ) const { return _varMap.count( varName ); };
 
   double evaluate() const throw( PdfException );
 
