@@ -187,9 +187,7 @@ double Decay3Body::evaluate() const throw( PdfException )
   std::complex< double > amp = _amp.evaluate( _ps, mSq12(), mSq13(), mSq23() );
 
   // std::norm returns the squared modulus of the complex number, not its norm.
-  const double& ampSq = std::norm( amp ) / _norm;
-
-  return ampSq * evaluateFuncs();
+  return std::norm( amp ) * evaluateFuncs() / _norm;
 }
 
 
@@ -215,6 +213,9 @@ const Decay3Body& Decay3Body::operator*=( const Function& right ) throw( PdfExce
   // Append the function to the functions vector.
   _funcs.push_back( right );
 
+  // Recompute the norm, since the pdf shape has changed under this operation.
+  cache();
+
   return *this;
 }
 
@@ -232,7 +233,11 @@ const Decay3Body operator*( Decay3Body left, const Function& right )
   const std::map< std::string, Parameter >& parMap = right.getParMap();
   left._parMap.insert( parMap.begin(), parMap.end() );
 
+  // Append the function to the functions vector.
   left._funcs.push_back( right );
+
+  // Recompute the norm, since the pdf shape has changed under this operation.
+  left.cache();
 
   return left;
 }
@@ -251,7 +256,11 @@ const Decay3Body operator*( const Function& left, Decay3Body right )
   const std::map< std::string, Parameter >& parMap = left.getParMap();
   right._parMap.insert( parMap.begin(), parMap.end() );
 
+  // Append the function to the functions vector.
   right._funcs.push_back( left );
+
+  // Recompute the norm, since the pdf shape has changed under this operation.
+  right.cache();
 
   return right;
 }
