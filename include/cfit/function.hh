@@ -60,7 +60,7 @@ public:
   // Constructor from other objects.
   // arg could be a variable, parameter, parameter expression, or constant
   template< class T >
-  Function( const T& arg )
+  explicit Function( const T& arg )
   {
     append( arg );
   }
