@@ -51,6 +51,18 @@ void Decay3Body::setVars( const std::map< std::string, Variable >& vars ) throw(
 }
 
 
+void Decay3Body::setVars( const std::map< std::string, double >& vars ) throw( PdfException )
+{
+  typedef std::map< const std::string, Variable >::iterator vIter;
+  for ( vIter var = _varMap.begin(); var != _varMap.end(); ++var )
+    var->second.setValue( vars.find( var->first )->second );
+
+  typedef std::vector< Function >::iterator fIter;
+  for ( fIter func = _funcs.begin(); func != _funcs.end(); ++func )
+    func->setVars( _varMap );
+}
+
+
 
 
 // Set the parameters to those given as argument.

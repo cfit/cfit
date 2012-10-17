@@ -92,6 +92,17 @@ void PdfModel::setPars( const std::vector< double >& pars ) throw( PdfException 
 
 // The function must be virtual to allow the derived decay model classes to use their
 //    own setPars function.
+void PdfModel::setVars( const std::map< std::string, Variable >& vars ) throw( PdfException )
+{
+  typedef std::map< const std::string, Variable >::iterator vIter;
+  for ( vIter var = _varMap.begin(); var != _varMap.end(); ++var )
+    var->second.setValue( vars.find( var->first )->second.value() );
+}
+
+
+
+// The function must be virtual to allow the derived decay model classes to use their
+//    own setPars function.
 void PdfModel::setPars( const std::map< std::string, Parameter >& pars ) throw( PdfException )
 {
   typedef std::map< const std::string, Parameter >::iterator pIter;

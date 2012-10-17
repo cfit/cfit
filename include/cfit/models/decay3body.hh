@@ -34,6 +34,7 @@ public:
   // Need to define own setters, since function variables and parameters may need to be set, too.
   void setVars( const std::vector< double >&              vars ) throw( PdfException );
   void setVars( const std::map< std::string, Variable >&  vars ) throw( PdfException );
+  void setVars( const std::map< std::string, double >&    vars ) throw( PdfException );
   void setPars( const std::vector< double >&              pars ) throw( PdfException );
   void setPars( const std::map< std::string, Parameter >& pars ) throw( PdfException );
   void setPars( const FunctionMinimum&                    min  ) throw( PdfException );
