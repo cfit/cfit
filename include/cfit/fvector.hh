@@ -35,8 +35,6 @@ protected:
   std::vector< std::pair< std::string, std::string > > _fPr;  // Name of fPr elements.
   std::string                                          _s0pr; // Name of s0pr.
 
-  static const double& _mPi;
-
   std::map< const std::string, Parameter > _parMap;
   std::vector< std::string >               _parOrder;
 
@@ -45,15 +43,15 @@ protected:
   std::complex< double > rho   ( const int& index , const double& mSqAB ) const;
 
   double getPar( const std::string& name ) const
-    {
-      return _parMap.find( name )->second.value();
-    }
+  {
+    return _parMap.find( name )->second.value();
+  }
 
   std::complex< double > getCoef( const std::pair< std::string, std::string >& name ) const
-    {
-      return std::complex< double >( _parMap.find( name.first  )->second.value(),
-                                     _parMap.find( name.second )->second.value() );
-    }
+  {
+    return std::complex< double >( _parMap.find( name.first  )->second.value(),
+                                   _parMap.find( name.second )->second.value() );
+  }
 
 public:
   template <class T>

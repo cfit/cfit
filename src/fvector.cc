@@ -3,9 +3,6 @@
 #include <cfit/phasespace.hh>
 
 
-const double& Fvector::_mPi = 0.139570;
-
-
 
 void Fvector::pushBeta( const std::vector< Coef >& beta )
 {
@@ -207,7 +204,7 @@ std::complex< double > Fvector::propagator( const PhaseSpace& ps, const double& 
   K += _fSc * ( 1. - _s0sc ) / ( mSqAB - _s0sc );
 
   // Adler term.
-  K *= ( 1. - _s0A ) / ( mSqAB - _s0A ) * ( mSqAB - _sA * std::pow( _mPi, 2 ) / 2. );
+  K *= ( 1. - _s0A ) / ( mSqAB - _s0A ) * ( mSqAB - _sA * ps.m( _resoA ) * ps.m( _resoB ) / 2. );
 
   Matrix< std::complex< double > > M( 5 );
   const std::complex< double > I( 0., 1. );
