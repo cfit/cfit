@@ -123,13 +123,13 @@ const double Decay3Body::evaluateFuncs( const double& mSq12, const double& mSq13
 {
   double value = 1.0;
 
+  const std::string& name0 = getVar( 0 ).name(); // mSq12
+  const std::string& name1 = getVar( 1 ).name(); // mSq13
+  const std::string& name2 = getVar( 2 ).name(); // mSq23
+
   typedef std::vector< Function >::iterator fIter;
   for ( fIter func = _funcs.begin(); func != _funcs.end(); ++func )
   {
-    const std::string& name0 = getVar( 0 ).name(); // mSq12
-    const std::string& name1 = getVar( 1 ).name(); // mSq13
-    const std::string& name2 = getVar( 2 ).name(); // mSq23
-
     if ( func->dependsOn( name0 ) ) func->setVar( name0, mSq12 );
     if ( func->dependsOn( name1 ) ) func->setVar( name1, mSq13 );
     if ( func->dependsOn( name2 ) ) func->setVar( name2, mSq23 );
@@ -162,8 +162,8 @@ void Decay3Body::cache()
 
   // Define the properties of the integration method.
   const int    nBins = 400;
-  const double min   = pow( _ps.m1()      + _ps.m2(), 2 );
-  const double max   = pow( _ps.mMother() - _ps.m3(), 2 );
+  const double min   = std::pow( _ps.m1()      + _ps.m2(), 2 );
+  const double max   = std::pow( _ps.mMother() - _ps.m3(), 2 );
   const double step  = ( max - min ) / double( nBins );
 
   const double mSqSum = _ps.mSqMother() + _ps.mSq1() + _ps.mSq2() + _ps.mSq3();
@@ -187,7 +187,7 @@ void Decay3Body::cache()
         _norm += std::norm( _amp.evaluate( _ps, mSq12, mSq13, mSq23 ) ) * evaluateFuncs( mSq12, mSq13, mSq23 );
     }
 
-  _norm *= pow( step, 2 );
+  _norm *= std::pow( step, 2 );
 
   return;
 }
