@@ -52,6 +52,27 @@ private:
 
 public:
   Amplitude() {};
+
+  Amplitude( const double& ctnt )
+  {
+    append( ctnt );
+  }
+
+  Amplitude( const std::complex< double >& ctnt )
+  {
+    append( ctnt );
+  }
+
+  Amplitude( const Coef& coef )
+  {
+    append( coef );
+  }
+
+  Amplitude( const CoefExpr& expr )
+  {
+    append( expr );
+  }
+
   Amplitude( const Resonance& reso )
   {
     append( reso );
@@ -85,6 +106,11 @@ public:
 				   const double&     mSq23 ) const throw( PdfException );
 
   // Assignment operations.
+  const Amplitude& operator= ( const double&                 ctnt );
+  const Amplitude& operator= ( const std::complex< double >& ctnt );
+  const Amplitude& operator= ( const Coef&                   coef );
+  const Amplitude& operator= ( const CoefExpr&               expr );
+
   const Amplitude& operator= ( const Resonance&              right );
   const Amplitude& operator= ( const Fvector&                right );
   const Amplitude& operator= ( const Amplitude&              right );

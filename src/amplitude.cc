@@ -205,6 +205,38 @@ void Amplitude::clear()
 
 
 // Assignment operations.
+const Amplitude& Amplitude::operator=( const double& right )
+{
+  clear();
+
+  append( right );
+  return *this;
+}
+
+const Amplitude& Amplitude::operator=( const std::complex< double >& right )
+{
+  clear();
+
+  append( right );
+  return *this;
+}
+
+const Amplitude& Amplitude::operator=( const Coef& right )
+{
+  clear();
+
+  append( right );
+  return *this;
+}
+
+const Amplitude& Amplitude::operator=( const CoefExpr& right )
+{
+  clear();
+
+  append( right );
+  return *this;
+}
+
 const Amplitude& Amplitude::operator=( const Resonance& right )
 {
   clear();
