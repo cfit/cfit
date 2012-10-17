@@ -179,6 +179,16 @@ double Function::evaluate() const throw( PdfException )
 }
 
 
+const Function pow( const Function& left, const double& right )
+{
+  return Function( left, right, Operation::pow );
+}
+
+const Function pow( const Variable& left, const double& right )
+{
+  return Function( left, right, Operation::pow );
+}
+
 
 // Operations with variables with themselves.
 const Function operator+( const Variable& left, const Variable& right )

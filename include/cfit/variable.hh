@@ -38,6 +38,8 @@ public:
 
 
   // Binary operations that need access to this class.
+  friend const Function pow( const Variable& left, const double& right );
+
   // Operations with variables with themselves.
   friend const Function operator+( const Variable&      left, const Variable&      right );
   friend const Function operator-( const Variable&      left, const Variable&      right );

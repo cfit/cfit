@@ -98,6 +98,9 @@ public:
   template< class T > const Function& operator*=( const T& arg );
   template< class T > const Function& operator/=( const T& arg );
 
+  friend const Function pow( const Function& left, const double& right );
+  friend const Function pow( const Variable& left, const double& right );
+
   // Binary operations that need access to this class.
   // Operations with variables with themselves.
   friend const Function operator+( const Variable&      left, const Variable&      right );
