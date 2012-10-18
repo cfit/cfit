@@ -1,0 +1,43 @@
+#ifndef __POLYNOMIAL_HH__
+#define __POLYNOMIAL_HH__
+
+#include <vector>
+#include <cmath>
+
+#include <cfit/variable.hh>
+#include <cfit/parameter.hh>
+#include <cfit/pdfmodel.hh>
+
+
+class Polynomial : public PdfModel
+{
+private:
+  bool   _hasLower;
+  bool   _hasUpper;
+  double _lower;
+  double _upper;
+
+  double _norm;
+
+public:
+  Polynomial( const Variable& x, const Parameter& c1 );
+  Polynomial( const Variable& x, const Parameter& c1, const Parameter& c2 );
+  Polynomial( const Variable& x, const std::vector< Parameter >& coefs );
+
+  Polynomial* copy() const;
+
+  // Getters.
+  double coef( const unsigned& index ) const;
+
+  void setLowerLimit  ( const double& lower );
+  void setUpperLimit  ( const double& upper );
+  void setLimits      ( const double& lower, const double& upper );
+
+  void cache();
+
+  double evaluate(                                   ) const throw( PdfException );
+  double evaluate( double x                          ) const throw( PdfException );
+  double evaluate( const std::vector< double >& vars ) const throw( PdfException );
+};
+
+#endif
