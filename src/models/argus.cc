@@ -39,6 +39,8 @@ void Argus::setLowerLimit( const double& lower )
 
   _hasLower = true;
   _lower    = lower;
+
+  cache();
 }
 
 
@@ -49,6 +51,8 @@ void Argus::setUpperLimit( const double& upper )
 
   _hasUpper = true;
   _upper    = upper;
+
+  cache();
 }
 
 
@@ -64,18 +68,24 @@ void Argus::setLimits( const double& lower, const double& upper )
   _hasUpper = true;
   _lower    = lower;
   _upper    = upper;
+
+  cache();
 }
 
 
 void Argus::unsetLowerLimit()
 {
   _hasLower = false;
+
+  cache();
 }
 
 
 void Argus::unsetUpperLimit()
 {
   _hasUpper = false;
+
+  cache();
 }
 
 
@@ -83,6 +93,8 @@ void Argus::unsetLimits()
 {
   _hasLower = false;
   _hasUpper = false;
+
+  cache();
 }
 
 
