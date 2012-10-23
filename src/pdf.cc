@@ -4,6 +4,10 @@
 #include <stack>
 #include <cmath>
 
+#include <Minuit/FunctionMinimum.h>
+#include <Minuit/MnUserParameters.h>
+#include <Minuit/MinuitParameter.h>
+
 #include <cfit/parameter.hh>
 #include <cfit/parameterexpr.hh>
 #include <cfit/pdfmodel.hh>
@@ -313,6 +317,26 @@ void Pdf::setPars( const std::vector< double >& pars ) throw( PdfException )
   int index = 0;
   for ( pIter par = _parMap.begin(); par != _parMap.end(); ++par )
     par->second.setValue( pars[ index++ ] );
+
+  // Propagate the values to the list of pdfs.
+  typedef std::vector< PdfModel* >::const_iterator pdfIter;
+  for ( pdfIter pdf = _pdfs.begin(); pdf != _pdfs.end(); ++pdf )
+    (*pdf)->setPars( _parMap );
+}
+
+
+void Pdf::setPars( const FunctionMinimum& min ) throw( PdfException )
+{
+  const MnUserParameters& pars = min.userParameters();
+  const std::vector< MinuitParameter >& parVec = pars.parameters();
+
+  if ( _parMap.size() != parVec.size() )
+    throw PdfException( "Number of arguments passed does not match number of required arguments." );
+
+  // Set the local values of the parameters.
+  typedef std::vector< MinuitParameter >::const_iterator pIter;
+  for ( pIter par = parVec.begin(); par != parVec.end(); ++par )
+    _parMap[ par->name() ].set( par->value(), par->error() );
 
   // Propagate the values to the list of pdfs.
   typedef std::vector< PdfModel* >::const_iterator pdfIter;

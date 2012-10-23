@@ -15,6 +15,8 @@
 #include <cfit/operation.hh>
 
 
+class FunctionMinimum;
+
 class Pdf : public PdfBase
 {
 private:
@@ -58,6 +60,7 @@ public:
 
   void setVars( const std::vector< double >& vars ) throw( PdfException );
   void setPars( const std::vector< double >& pars ) throw( PdfException );
+  void setPars( const FunctionMinimum& min )        throw( PdfException );
 
   void   cache();
   const double evaluate()                                    const throw( PdfException );
