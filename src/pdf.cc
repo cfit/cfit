@@ -28,6 +28,9 @@ Pdf::Pdf( const Pdf& right )
 
   std::transform( right._pdfs.begin(), right._pdfs.end(),
                   std::back_inserter( _pdfs ), std::mem_fun( &PdfModel::copy ) );
+
+  _limits = right._limits;
+  _scale  = right._scale;
 }
 
 
@@ -374,6 +377,19 @@ void Pdf::cache()
 //    To avoid the risk of forgetting it, run Pdf::evaluate( vars ).
 const double Pdf::evaluate() const throw( PdfException )
 {
+  // Return 0 if any of the variables is off limits.
+  typedef std::map< std::string, std::pair< double, double > >::const_iterator lIter;
+  for ( lIter limit = _limits.begin(); limit != _limits.end(); ++limit )
+  {
+    std::map< std::string, Variable >::const_iterator var = _varMap.find( limit->first );
+    if ( var != _varMap.end() )
+    {
+      double value = var->second.value();
+      if ( ( value < limit->second.first ) || ( value > limit->second.second ) )
+        return 0.0;
+    }
+  }
+
   std::stack< double > values;
 
   double x;
@@ -385,6 +401,7 @@ const double Pdf::evaluate() const throw( PdfException )
 
   typedef std::string::const_iterator eIter;
   for ( eIter ch = _expression.begin(); ch != _expression.end(); ++ch )
+  {
     if ( *ch == 'm' )
       values.push( (*pdf++)->evaluate() );
     else if ( *ch == 'p' )
@@ -392,33 +409,34 @@ const double Pdf::evaluate() const throw( PdfException )
     else if ( *ch == 'c' )
       values.push( *ctt++ );
     else
+    {
+      if ( *ch == 'b' )
       {
-	if ( *ch == 'b' )
-	  {
-	    if ( values.size() < 2 )
-	      throw PdfException( "Parse error: not enough values in the stack." );
-	    y = values.top();
-	    values.pop();
-	    x = values.top();
-	    values.pop();
-	    values.push( Operation::operate( x, y, *ops++ ) );
-	  }
-	else if ( *ch == 'u' )
-	  {
-	    if ( values.empty() )
-	      throw PdfException( "Parse error: not enough values in the stack." );
-	    x = values.top();
-	    values.pop();
-	    values.push( Operation::operate( x, *ops++ ) );
-	  }
-	else
-	  throw PdfException( std::string( "Parse error: unknown operation " ) + *ch + "." );
+        if ( values.size() < 2 )
+          throw PdfException( "Parse error: not enough values in the stack." );
+        y = values.top();
+        values.pop();
+        x = values.top();
+        values.pop();
+        values.push( Operation::operate( x, y, *ops++ ) );
       }
+      else if ( *ch == 'u' )
+      {
+        if ( values.empty() )
+          throw PdfException( "Parse error: not enough values in the stack." );
+        x = values.top();
+        values.pop();
+        values.push( Operation::operate( x, *ops++ ) );
+      }
+      else
+        throw PdfException( std::string( "Parse error: unknown operation " ) + *ch + "." );
+    }
+  }
 
   if ( values.size() != 1 )
     throw PdfException( "Pdf parse error: too many values have been supplied." );
 
-  return values.top();
+  return _scale * values.top();
 }
 
 
@@ -494,6 +512,26 @@ const double Pdf::evaluate( const std::vector< double >& vars ) const throw( Pdf
 }
 
 
+void Pdf::setLimits( const Variable& var, const double& min, const double& max )
+{
+  const double& totalArea = this->area();
+  const double& limitArea = this->area( var.name(), min, max );
+
+  _scale *= totalArea / limitArea;
+  _limits[ var.name() ] = std::make_pair( min, max );
+}
+
+
+void Pdf::setLimits( const std::string& var, const double& min, const double& max )
+{
+  const double& totalArea = this->area();
+  const double& limitArea = this->area( var, min, max );
+
+  _scale *= totalArea / limitArea;
+  _limits[ var ] = std::make_pair( min, max );
+}
+
+
 
 // Get a vector with the names of the variables common in all the
 //    products of pdfs. This is the list of variables that can be
@@ -517,32 +555,34 @@ std::vector< std::string > Pdf::commonVars() const throw( PdfException )
   typedef std::string::const_iterator eIter;
   std::vector< std::string > varNames;
   for ( eIter ch = _expression.begin(); ch != _expression.end(); ++ch )
+  {
     if ( *ch == 'm' )
-      {
-	std::map< std::string, Variable >& vars = (*models++)->_varMap;
-	std::transform( vars.begin(), vars.end(), std::back_inserter( varNames ), Select1st() );
-	calcs.push( varNames );
-      }
+    {
+      std::map< std::string, Variable >& vars = (*models++)->_varMap;
+      std::transform( vars.begin(), vars.end(), std::back_inserter( varNames ), Select1st() );
+      calcs.push( varNames );
+    }
     else if ( *ch == 'p' )
       calcs.push( voidVec );
     else
       if ( calcs.size() < 2 )
-	throw PdfException( "Parse error computing convolution: not enough values in the stack." );
+        throw PdfException( "Parse error computing convolution: not enough values in the stack." );
       else
-	{
-	  x = calcs.top();
-	  calcs.pop();
-	  y = calcs.top();
-	  calcs.pop();
-	  z.clear();
+      {
+        x = calcs.top();
+        calcs.pop();
+        y = calcs.top();
+        calcs.pop();
+        z.clear();
 
-	  if ( *ch == '+' )
-	    std::set_intersection( x.begin(), x.end(), y.begin(), y.end(), std::back_inserter( z ) );
-	  else if ( *ch == '*' )
-	    std::set_union       ( x.begin(), x.end(), y.begin(), y.end(), std::back_inserter( z ) );
+        if ( *ch == '+' )
+          std::set_intersection( x.begin(), x.end(), y.begin(), y.end(), std::back_inserter( z ) );
+        else if ( *ch == '*' )
+          std::set_union       ( x.begin(), x.end(), y.begin(), y.end(), std::back_inserter( z ) );
 
-	  calcs.push( z );
-	}
+        calcs.push( z );
+      }
+  }
 
   if ( calcs.size() != 1 )
     throw PdfException( "Parse error computing convolution: too many values have been supplied." );
@@ -550,3 +590,110 @@ std::vector< std::string > Pdf::commonVars() const throw( PdfException )
   return calcs.top();
 }
 
+
+
+double Pdf::area( const std::string& var, const double& min, const double& max ) const throw( PdfException )
+{
+  std::stack< double > values;
+
+  double x;
+  double y;
+  std::vector< PdfModel*     >::const_iterator pdf = _pdfs .begin();
+  std::vector< Parameter     >::const_iterator par = _parms.begin();
+  std::vector< double        >::const_iterator ctt = _ctnts.begin();
+  std::vector< Operation::Op >::const_iterator ops = _opers.begin();
+
+  typedef std::string::const_iterator eIter;
+  for ( eIter ch = _expression.begin(); ch != _expression.end(); ++ch )
+    if ( *ch == 'm' )
+    {
+      if ( (*pdf)->dependsOn( var ) )
+        values.push( (*pdf++)->area( min, max ) );
+      else
+      {
+        values.push( 1.0 );
+        pdf++;
+      }
+    }
+    else if ( *ch == 'p' )
+      values.push( _parMap.find( par++->name() )->second.value() );
+    else if ( *ch == 'c' )
+      values.push( *ctt++ );
+    else
+    {
+      if ( *ch == 'b' )
+      {
+        if ( values.size() < 2 )
+          throw PdfException( "Parse error: not enough values in the stack." );
+        y = values.top();
+        values.pop();
+        x = values.top();
+        values.pop();
+        values.push( Operation::operate( x, y, *ops++ ) );
+      }
+      else if ( *ch == 'u' )
+      {
+        if ( values.empty() )
+          throw PdfException( "Parse error: not enough values in the stack." );
+        x = values.top();
+        values.pop();
+        values.push( Operation::operate( x, *ops++ ) );
+      }
+      else
+        throw PdfException( std::string( "Parse error: unknown operation " ) + *ch + "." );
+    }
+
+  if ( values.size() != 1 )
+    throw PdfException( "Pdf parse error: too many values have been supplied." );
+
+  return values.top();
+}
+
+
+double Pdf::area() const throw( PdfException )
+{
+  std::stack< double > values;
+
+  double x;
+  double y;
+  std::vector< Parameter     >::const_iterator par = _parms.begin();
+  std::vector< double        >::const_iterator ctt = _ctnts.begin();
+  std::vector< Operation::Op >::const_iterator ops = _opers.begin();
+
+  typedef std::string::const_iterator eIter;
+  for ( eIter ch = _expression.begin(); ch != _expression.end(); ++ch )
+    if ( *ch == 'm' )
+      values.push( 1.0 );
+    else if ( *ch == 'p' )
+      values.push( _parMap.find( par++->name() )->second.value() );
+    else if ( *ch == 'c' )
+      values.push( *ctt++ );
+    else
+    {
+      if ( *ch == 'b' )
+      {
+        if ( values.size() < 2 )
+          throw PdfException( "Parse error: not enough values in the stack." );
+        y = values.top();
+        values.pop();
+        x = values.top();
+        values.pop();
+        values.push( Operation::operate( x, y, *ops++ ) );
+      }
+      else if ( *ch == 'u' )
+      {
+        if ( values.empty() )
+          throw PdfException( "Parse error: not enough values in the stack." );
+        x = values.top();
+        values.pop();
+        values.push( Operation::operate( x, *ops++ ) );
+      }
+      else
+        throw PdfException( std::string( "Parse error: unknown operation " ) + *ch + "." );
+    }
+
+  if ( values.size() != 1 )
+    throw PdfException( "Pdf parse error: too many values have been supplied." );
+
+  return values.top();
+}

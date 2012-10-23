@@ -26,6 +26,9 @@ private:
   std::vector< Parameter     > _parms;
   std::vector< PdfModel*     > _pdfs;
 
+  std::map< std::string, std::pair< double, double > > _limits;
+  double _scale;
+
   // Clean up the content of all the Pdf containers.
   void clear();
 
@@ -38,6 +41,7 @@ private:
 
   template< class L, class R >
   Pdf( const L& left, const R& right, const Operation::Op& oper )
+    : _scale( 1.0 )
   {
     append( left  );
     append( right );
@@ -45,8 +49,9 @@ private:
   }
 
 public:
-  Pdf() {};
+  Pdf() : _scale( 1.0 ) {};
   Pdf( const PdfModel& model )
+    : _scale( 1.0 )
   {
     append( model );
   }
@@ -66,6 +71,13 @@ public:
   void   cache();
   const double evaluate()                                    const throw( PdfException );
   const double evaluate( const std::vector< double >& vars ) const throw( PdfException );
+
+  // Not sure if this is a dirty hack.
+  void setLimits( const Variable&    var, const double& min, const double& max );
+  void setLimits( const std::string& var, const double& min, const double& max );
+
+  double area()                                                               const throw( PdfException );
+  double area( const std::string& var, const double& min, const double& max ) const throw( PdfException );
 
   // Assignment operator.
   const Pdf& operator= ( const PdfModel&      right );
