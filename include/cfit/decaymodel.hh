@@ -6,8 +6,8 @@
 #include <cfit/amplitude.hh>
 #include <cfit/phasespace.hh>
 
-#include <Minuit/FunctionMinimum.h>
 
+class FunctionMinimum;
 
 class DecayModel : public PdfModel
 {

@@ -1,6 +1,7 @@
 
 #include <cfit/decaymodel.hh>
 
+#include <Minuit/FunctionMinimum.h>
 #include <Minuit/MnUserParameters.h>
 #include <Minuit/MinuitParameter.h>
 
