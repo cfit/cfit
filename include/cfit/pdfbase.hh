@@ -41,6 +41,12 @@ public:
 
   virtual const double evaluate()                                    const throw( PdfException ) = 0;
   virtual const double evaluate( const std::vector< double >& vars ) const throw( PdfException ) = 0;
+
+  const bool dependsOn( const std::string& var ) const
+  {
+    const std::vector< std::string >& vars = varNames();
+    return std::find( vars.begin(), vars.end(), var ) != vars.end();
+  }
 };
 
 #endif
