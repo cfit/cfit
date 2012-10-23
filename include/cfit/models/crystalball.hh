@@ -19,7 +19,7 @@ private:
 
   double _norm;
 
-  const double area( const double& x ) const;
+  const double cumulativeNorm( const double& x ) const;
 
   const double core( const double& x ) const;
   const double tail( const double& x ) const;
@@ -47,6 +47,8 @@ public:
   const double evaluate(                                   ) const throw( PdfException );
   const double evaluate( const double& x                   ) const throw( PdfException );
   const double evaluate( const std::vector< double >& vars ) const throw( PdfException );
+
+  const double area    ( const double& min, const double& max ) const throw( PdfException );
 };
 
 #endif

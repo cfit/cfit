@@ -25,6 +25,8 @@ protected:
   const Variable&  getVar( int index ) const;
   const Parameter& getPar( int index ) const;
 
+  virtual const double area( const double& min, const double& max ) const throw( PdfException );
+
 public:
   virtual PdfModel* copy() const = 0;
 

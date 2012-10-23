@@ -118,7 +118,9 @@ double DoubleCrystalBall::m() const
 }
 
 
-const double DoubleCrystalBall::area( const double& x ) const
+// Compute the area of the unnormalized pdf up to given value x.
+// Kind of an unnormalized cdf.
+const double DoubleCrystalBall::cumulativeNorm( const double& x ) const
 {
   const double& vmu    = mu   ();
   const double& vsigma = sigma();
@@ -170,12 +172,12 @@ void DoubleCrystalBall::cache()
   // Evaluate the area up to the lower limit (0 if it's -infinity).
   double areaLo = 0.0;
   if ( _hasLower )
-    areaLo = area( _lower );
+    areaLo = cumulativeNorm( _lower );
 
   // Evaluate the area up to the upper limit (complete area if it's +infinity).
   double areaUp = 0.0;
   if ( _hasUpper )
-    areaUp = area( _upper );
+    areaUp = cumulativeNorm( _upper );
   else
   {
     const double& vsigma = sigma();
@@ -264,5 +266,11 @@ const double DoubleCrystalBall::evaluate( const std::vector< double >& vars ) co
 const double DoubleCrystalBall::evaluate() const throw( PdfException )
 {
   return evaluate( getVar( 0 ).value() );
+}
+
+
+const double DoubleCrystalBall::area( const double& min, const double& max ) const throw( PdfException )
+{
+  return ( cumulativeNorm( max ) - cumulativeNorm( min ) ) / _norm;
 }
 

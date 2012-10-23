@@ -123,3 +123,18 @@ const double Polynomial::evaluate( const std::vector< double >& vars ) const thr
 {
   return evaluate( vars[ 0 ] );
 }
+
+
+const double Polynomial::area( const double& min, const double& max ) const throw( PdfException )
+{
+  if ( ! _hasLower || ! _hasUpper )
+    throw PdfException( "Cannot evaluate polynomial without upper and lower limits defined." );
+
+  unsigned order = _parOrder.size();
+
+  double retval = ( max - min );
+  for ( unsigned ord = 0; ord < order; ++ord )
+    retval += coef( ord ) * ( std::pow( max, ord + 2 ) - std::pow( min, ord + 2 ) ) / ( ord + 2 );
+
+  return retval / _norm;
+}

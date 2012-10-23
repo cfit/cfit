@@ -2,6 +2,26 @@
 #include <cfit/models/exponential.hh>
 #include <cfit/math.hh>
 
+/*
+           1
+  E(x) = ----- exp( -gamma x ) step( x - _lower )
+         _norm
+
+                          lower
+          exp( - gamma x )
+                          upper
+  _norm = ---------------------
+               gamma
+
+             1                      _lower
+  cdf = ----------- exp( - gamma x )
+        gamma _norm                 x
+
+              1                      max( xmin, _lower )
+  area = ----------- exp( - gamma x )
+         gamma _norm                 min( xmax, _upper )
+*/
+
 
 Exponential::Exponential( const Variable& x, const Parameter& gamma )
   : _hasLower( false ), _hasUpper( false ), _lower( 0.0 ), _upper( 0.0 )
@@ -126,5 +146,21 @@ const double Exponential::evaluate() const throw( PdfException )
 const double Exponential::evaluate( const std::vector< double >& vars ) const throw( PdfException )
 {
   return evaluate( vars[ 0 ] );
+}
+
+
+const double Exponential::area( const double& min, const double& max ) const throw( PdfException )
+{
+  // Compute the norm as ( exp( - gamma x_min ) - exp( - gamma x_max ) ) / gamma.
+  // Within the standard range ( 0, +infinity ), the norm is 1/gamma.
+  const double& vgamma = gamma();
+
+  const double& xmin = _hasLower ? std::max( min, _lower ) : min;
+  const double& xmax = _hasUpper ? std::min( max, _upper ) : max;
+
+  const double& expmin = std::exp( - vgamma * xmin );
+  const double& expmax = std::exp( - vgamma * xmax );
+
+  return ( expmin - expmax ) / ( vgamma * _norm );
 }
 

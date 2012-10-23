@@ -88,29 +88,22 @@ void Argus::unsetLimits()
 
 void Argus::cache()
 {
+  const double& vc    = c();
   const double& cSq   = std::pow( c()  , 2 );
   const double& chiSq = std::pow( chi(), 2 );
 
-  // For the specific case when chi = 0, the norm is c^2/3.
+  const double& lower = _hasLower ? std::max( _lower, 0.0 ) : 0.0;
+  const double& upper = _hasUpper ? std::min( _upper, vc  ) : vc;
+
+  const double& argmax = _hasLower ? 1.0 - std::pow( lower / vc, 2 ) : 1.0;
+  const double& argmin = _hasUpper ? 1.0 - std::pow( upper / vc, 2 ) : 0.0;
+
+  // For the specific case when chi = 0, the norm is
+  //    c^2/3 ( 1 - x^2 / c^2 )^(3/2) between upper and lower.
   if ( chiSq == 0.0 )
   {
-    _norm = cSq / 3.0;
+    _norm = cSq / 3.0 * ( std::pow( argmax, 1.5 ) - std::pow( argmin, 1.5 ) );
     return;
-  }
-
-  double argmax = chiSq;
-  double argmin = 0.0;
-
-  if ( _hasLower )
-  {
-    const double& lowerlimit = std::max( _lower, 0.0 );
-    argmax = chiSq * ( 1.0 - std::pow( lowerlimit, 2 ) / cSq );
-  }
-
-  if ( _hasUpper )
-  {
-    const double& upperlimit = std::min( _upper, c() );
-    argmin = chiSq * ( 1.0 - std::pow( upperlimit, 2 ) / cSq );
   }
 
   const double& chi3 = std::pow( chi(), 3 );
@@ -118,7 +111,7 @@ void Argus::cache()
   // Since gamma_p( a, x ) is normalized to Gamma( a ), multiply by sqrt( pi / 2 ),
   //    which is Gamma( 3/2 ).
   _norm  = cSq / ( 2.0 * chi3 ) * std::sqrt( M_PI / 2.0 );
-  _norm *= ( Math::gamma_p( 1.5, argmax ) - Math::gamma_p( 1.5, argmin ) );
+  _norm *= ( Math::gamma_p( 1.5, chiSq * argmax ) - Math::gamma_p( 1.5, chiSq * argmin ) );
 }
 
 
@@ -156,5 +149,36 @@ const double Argus::evaluate() const throw( PdfException )
 const double Argus::evaluate( const std::vector< double >& vars ) const throw( PdfException )
 {
   return evaluate( vars[ 0 ] );
+}
+
+
+const double Argus::area( const double& min, const double& max ) const throw( PdfException )
+{
+  const double& vc    = c();
+  const double& cSq   = std::pow( c()  , 2 );
+  const double& chiSq = std::pow( chi(), 2 );
+
+  const double& lower = _hasLower ? std::max( _lower, 0.0 ) : 0.0;
+  const double& upper = _hasUpper ? std::min( _upper, vc  ) : vc;
+
+  const double& xmin = std::max( min, lower );
+  const double& xmax = std::min( max, upper );
+
+  const double& argmax = _hasLower ? 1.0 - std::pow( xmin / vc, 2 ) : 1.0;
+  const double& argmin = _hasUpper ? 1.0 - std::pow( xmax / vc, 2 ) : 0.0;
+
+  // For the specific case when chi = 0, the norm is
+  //    c^2/3 ( 1 - x^2 / c^2 )^(3/2) between upper and lower.
+  if ( chiSq == 0.0 )
+    return cSq / 3.0 * ( std::pow( argmax, 1.5 ) - std::pow( argmin, 1.5 ) ) / _norm;
+
+  const double& chi3 = std::pow( chi(), 3 );
+
+  // Since gamma_p( a, x ) is normalized to Gamma( a ), multiply by sqrt( pi / 2 ),
+  //    which is Gamma( 3/2 ).
+  double retval = cSq / ( 2.0 * chi3 ) * std::sqrt( M_PI / 2.0 );
+  retval *= ( Math::gamma_p( 1.5, chiSq * argmax ) - Math::gamma_p( 1.5, chiSq * argmin ) ) / _norm;
+
+  return retval;
 }
 

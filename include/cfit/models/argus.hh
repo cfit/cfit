@@ -40,6 +40,8 @@ public:
   const double evaluate(                                   ) const throw( PdfException );
   const double evaluate( const double& x                   ) const throw( PdfException );
   const double evaluate( const std::vector< double >& vars ) const throw( PdfException );
+
+  const double area( const double& min, const double& max ) const throw( PdfException );
 };
 
 #endif

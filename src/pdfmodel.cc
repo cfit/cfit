@@ -109,3 +109,9 @@ void PdfModel::setPars( const std::map< std::string, Parameter >& pars ) throw( 
   for ( pIter par = _parMap.begin(); par != _parMap.end(); ++par )
     par->second.setValue( pars.find( par->first )->second.value() );
 }
+
+
+const double PdfModel::area( const double& min, const double& max ) const throw( PdfException )
+{
+  throw PdfException( "You are trying to find the area of a model that does not have this property." );
+}

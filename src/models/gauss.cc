@@ -2,6 +2,29 @@
 #include <cfit/models/gauss.hh>
 #include <cfit/math.hh>
 
+/*
+  Definitions of several functions based on the definition of the norm.
+                          1       (   ( x - mu )^2  )
+  G(x)               = ------- exp( - ------------  )
+                        _norm     (     2 sigma^2   )
+
+                                 ____                         upper
+                                / pi           (   x - mu    )
+  _norm              = sigma   / ----       erf( ---------_  )
+                             \/   2            (  sigma \/2  )
+                                                              lower
+                                 ____
+                       sigma    / pi  [        (  x - mu    ) ]
+  cdf                = -----   / ---- [ 1 + erf( ---------_ ) ]
+                       _norm \/   2   [        (  sigma \/2 ) ]
+
+                                 ____                        min( xmax, upper )
+                       sigma    / pi           (  x - mu    )
+  area( xmin, xmax ) = -----   / ----       erf( ---------_ )
+                       _norm \/   2            (  sigma \/2 )
+                                                             max( xmin, lower )
+*/
+
 
 Gauss::Gauss( const Variable& x, const Parameter& mu, const Parameter& sigma )
   : _hasLower( false ), _hasUpper( false ), _lower( 0.0 ), _upper( 0.0 )
@@ -121,5 +144,22 @@ const double Gauss::evaluate() const throw( PdfException )
 const double Gauss::evaluate( const std::vector< double >& vars ) const throw( PdfException )
 {
   return evaluate( vars[ 0 ] );
+}
+
+
+const double Gauss::area( const double& min, const double& max ) const throw( PdfException )
+{
+  const double& vmu    = mu();
+  const double& vsigma = sigma();
+  const double& sqrt2  = std::sqrt( 2.0 );
+
+  const double& xmin = _hasLower ? std::max( min, _lower ) : min;
+  const double& xmax = _hasUpper ? std::min( max, _upper ) : max;
+
+  const double& argmin = Math::erf( ( xmin - vmu ) / ( vsigma * sqrt2 ) );
+  const double& argmax = Math::erf( ( xmax - vmu ) / ( vsigma * sqrt2 ) );
+
+  const double& factor = vsigma * std::sqrt( M_PI / 2.0 );
+  return ( argmax - argmin ) * factor / _norm;
 }
 
