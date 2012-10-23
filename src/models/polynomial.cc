@@ -30,8 +30,6 @@ Polynomial::Polynomial( const Variable& x, const std::vector< Parameter >& coefs
 {
   push( x );
 
-//   std::for_each( coefs.begin(), coefs.end(), std::bind1st( std::mem_fun_ref( &Polynomial::push ), this ) );
-
   typedef std::vector< Parameter >::const_iterator pIter;
   for ( pIter par = coefs.begin(); par != coefs.end(); ++par )
     push( *par );

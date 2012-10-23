@@ -53,7 +53,7 @@ void GenArgus::setLowerLimit( const double& lower )
 
 void GenArgus::setUpperLimit( const double& upper )
 {
-  if ( upper < 0.0 );
+  if ( upper < 0.0 )
     throw PdfException( "Cannot set the upper limit of the generalized Argus distribution to anything smaller than 0." );
 
   _hasUpper = true;
