@@ -178,7 +178,7 @@ const double CrystalBall::tail( const double& x ) const
 
 
 // Evaluate the function at a given point.
-double CrystalBall::evaluate( double x ) const throw( PdfException )
+const double CrystalBall::evaluate( const double& x ) const throw( PdfException )
 {
   if ( x > mu() - alpha() * sigma() )
     return core( x );
@@ -187,13 +187,14 @@ double CrystalBall::evaluate( double x ) const throw( PdfException )
 }
 
 
-double CrystalBall::evaluate( const std::vector< double >& vars ) const throw( PdfException )
+const double CrystalBall::evaluate( const std::vector< double >& vars ) const throw( PdfException )
 {
   return evaluate( vars[ 0 ] );
 }
 
 
-double CrystalBall::evaluate() const throw( PdfException )
+const double CrystalBall::evaluate() const throw( PdfException )
 {
   return evaluate( getVar( 0 ).value() );
 }
+

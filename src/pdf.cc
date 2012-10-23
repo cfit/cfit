@@ -334,7 +334,7 @@ void Pdf::cache()
 
 // Before running this function, the Pdf::setVars( vars ) function must be called.
 //    To avoid the risk of forgetting it, run Pdf::evaluate( vars ).
-double Pdf::evaluate() const throw( PdfException )
+const double Pdf::evaluate() const throw( PdfException )
 {
   std::stack< double > values;
 
@@ -384,7 +384,7 @@ double Pdf::evaluate() const throw( PdfException )
 }
 
 
-double Pdf::evaluate( const std::vector< double >& vars ) const throw( PdfException )
+const double Pdf::evaluate( const std::vector< double >& vars ) const throw( PdfException )
 {
   if ( _varMap.size() != vars.size() )
     throw PdfException( "Number of arguments passed does not match number of required arguments." );

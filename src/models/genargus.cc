@@ -142,7 +142,7 @@ void GenArgus::cache()
 }
 
 
-double GenArgus::evaluate( double x ) const throw( PdfException )
+const double GenArgus::evaluate( const double& x ) const throw( PdfException )
 {
   const double& vc   = c();
   const double& vchi = chi();
@@ -167,13 +167,14 @@ double GenArgus::evaluate( double x ) const throw( PdfException )
 }
 
 
-double GenArgus::evaluate() const throw( PdfException )
+const double GenArgus::evaluate() const throw( PdfException )
 {
   return evaluate( getVar( 0 ).value() );
 }
 
 
-double GenArgus::evaluate( const std::vector< double >& vars ) const throw( PdfException )
+const double GenArgus::evaluate( const std::vector< double >& vars ) const throw( PdfException )
 {
   return evaluate( vars[ 0 ] );
 }
+

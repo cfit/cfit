@@ -36,9 +36,9 @@ public:
   virtual void setVars( const std::map< std::string, Variable  >& vars ) throw( PdfException );
   virtual void setPars( const std::map< std::string, Parameter >& pars ) throw( PdfException );
 
-  virtual void   cache() {};
-  virtual double evaluate()                                    const throw( PdfException ) = 0;
-  virtual double evaluate( const std::vector< double >& vars ) const throw( PdfException ) = 0;
+  virtual       void   cache() {};
+  virtual const double evaluate()                                    const throw( PdfException ) = 0;
+  virtual const double evaluate( const std::vector< double >& vars ) const throw( PdfException ) = 0;
 
   // ALERTA AMB ELS OPERADORS. NO S'HAURIA DE PODER FER gauss1 += gauss2, O HAURIA D'ESTAR BEN CONTROLAT.
   friend const Pdf operator+( const PdfModel&      left, const PdfModel&      right );

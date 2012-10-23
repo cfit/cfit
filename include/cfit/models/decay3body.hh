@@ -40,8 +40,8 @@ public:
   void setPars( const FunctionMinimum&                    min  ) throw( PdfException );
 
   void cache();
-  double evaluate(                                   ) const throw( PdfException );
-  double evaluate( const std::vector< double >& vars ) const throw( PdfException );
+  const double evaluate(                                   ) const throw( PdfException );
+  const double evaluate( const std::vector< double >& vars ) const throw( PdfException );
 
   friend const Decay3Body  operator* (       Decay3Body left, const Function&  right );
   friend const Decay3Body  operator* ( const Function&  left,       Decay3Body right );

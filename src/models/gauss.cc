@@ -106,19 +106,20 @@ void Gauss::cache()
 }
 
 
-double Gauss::evaluate( double x ) const throw( PdfException )
+const double Gauss::evaluate( const double& x ) const throw( PdfException )
 {
   return std::exp( - 0.5 * pow( x - mu(), 2 ) / pow( sigma(), 2 ) ) / _norm;
 }
 
 
-double Gauss::evaluate() const throw( PdfException )
+const double Gauss::evaluate() const throw( PdfException )
 {
   return evaluate( getVar( 0 ).value() );
 }
 
 
-double Gauss::evaluate( const std::vector< double >& vars ) const throw( PdfException )
+const double Gauss::evaluate( const std::vector< double >& vars ) const throw( PdfException )
 {
   return evaluate( vars[ 0 ] );
 }
+

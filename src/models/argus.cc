@@ -122,7 +122,7 @@ void Argus::cache()
 }
 
 
-double Argus::evaluate( double x ) const throw( PdfException )
+const double Argus::evaluate( const double& x ) const throw( PdfException )
 {
   const double& vc   = c();
   const double& vchi = chi();
@@ -147,13 +147,14 @@ double Argus::evaluate( double x ) const throw( PdfException )
 }
 
 
-double Argus::evaluate() const throw( PdfException )
+const double Argus::evaluate() const throw( PdfException )
 {
   return evaluate( getVar( 0 ).value() );
 }
 
 
-double Argus::evaluate( const std::vector< double >& vars ) const throw( PdfException )
+const double Argus::evaluate( const std::vector< double >& vars ) const throw( PdfException )
 {
   return evaluate( vars[ 0 ] );
 }
+

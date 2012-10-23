@@ -60,8 +60,8 @@ public:
   void setPars( const std::vector< double >& pars ) throw( PdfException );
 
   void   cache();
-  double evaluate()                                    const throw( PdfException );
-  double evaluate( const std::vector< double >& vars ) const throw( PdfException );
+  const double evaluate()                                    const throw( PdfException );
+  const double evaluate( const std::vector< double >& vars ) const throw( PdfException );
 
   // Assignment operator.
   const Pdf& operator= ( const PdfModel&      right );

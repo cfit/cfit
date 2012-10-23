@@ -244,7 +244,7 @@ const double DoubleCrystalBall::tailUp( const double& x ) const
 
 
 // Evaluate the function at a given point.
-double DoubleCrystalBall::evaluate( double x ) const throw( PdfException )
+const double DoubleCrystalBall::evaluate( const double& x ) const throw( PdfException )
 {
   if ( x < mu() - alpha() * sigma() )
     return tailLo( x );
@@ -255,13 +255,14 @@ double DoubleCrystalBall::evaluate( double x ) const throw( PdfException )
 }
 
 
-double DoubleCrystalBall::evaluate( const std::vector< double >& vars ) const throw( PdfException )
+const double DoubleCrystalBall::evaluate( const std::vector< double >& vars ) const throw( PdfException )
 {
   return evaluate( vars[ 0 ] );
 }
 
 
-double DoubleCrystalBall::evaluate() const throw( PdfException )
+const double DoubleCrystalBall::evaluate() const throw( PdfException )
 {
   return evaluate( getVar( 0 ).value() );
 }
+

@@ -193,7 +193,7 @@ void Decay3Body::cache()
 }
 
 
-double Decay3Body::evaluate() const throw( PdfException )
+const double Decay3Body::evaluate() const throw( PdfException )
 {
   // Phase space amplitude of the decay of the particle.
   std::complex< double > amp = _amp.evaluate( _ps, mSq12(), mSq13(), mSq23() );
@@ -203,7 +203,7 @@ double Decay3Body::evaluate() const throw( PdfException )
 }
 
 
-double Decay3Body::evaluate( const std::vector< double >& vars ) const throw( PdfException )
+const double Decay3Body::evaluate( const std::vector< double >& vars ) const throw( PdfException )
 {
   throw PdfException( "Do not use evaluate( vars ) in decay3body" );
 }

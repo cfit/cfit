@@ -97,7 +97,7 @@ void Polynomial::cache()
 }
 
 
-double Polynomial::evaluate( double x ) const throw( PdfException )
+const double Polynomial::evaluate( const double& x ) const throw( PdfException )
 {
   if ( ! _hasLower || ! _hasUpper )
     throw PdfException( "Cannot evaluate polynomial without upper and lower limits defined." );
@@ -113,13 +113,13 @@ double Polynomial::evaluate( double x ) const throw( PdfException )
 }
 
 
-double Polynomial::evaluate() const throw( PdfException )
+const double Polynomial::evaluate() const throw( PdfException )
 {
   return evaluate( getVar( 0 ).value() );
 }
 
 
-double Polynomial::evaluate( const std::vector< double >& vars ) const throw( PdfException )
+const double Polynomial::evaluate( const std::vector< double >& vars ) const throw( PdfException )
 {
   return evaluate( vars[ 0 ] );
 }

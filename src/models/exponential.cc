@@ -98,7 +98,7 @@ void Exponential::cache()
 }
 
 
-double Exponential::evaluate( double x ) const throw( PdfException )
+const double Exponential::evaluate( const double& x ) const throw( PdfException )
 {
   // Return 0 if x is outside the upper or lower limits.
   if ( _hasLower )
@@ -117,13 +117,14 @@ double Exponential::evaluate( double x ) const throw( PdfException )
 }
 
 
-double Exponential::evaluate() const throw( PdfException )
+const double Exponential::evaluate() const throw( PdfException )
 {
   return evaluate( getVar( 0 ).value() );
 }
 
 
-double Exponential::evaluate( const std::vector< double >& vars ) const throw( PdfException )
+const double Exponential::evaluate( const std::vector< double >& vars ) const throw( PdfException )
 {
   return evaluate( vars[ 0 ] );
 }
+

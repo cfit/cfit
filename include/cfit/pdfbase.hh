@@ -39,8 +39,8 @@ public:
   //    all points (usually compute the norm).
   virtual void cache() = 0;
 
-  virtual double evaluate()                                    const throw( PdfException ) = 0;
-  virtual double evaluate( const std::vector< double >& vars ) const throw( PdfException ) = 0;
+  virtual const double evaluate()                                    const throw( PdfException ) = 0;
+  virtual const double evaluate( const std::vector< double >& vars ) const throw( PdfException ) = 0;
 };
 
 #endif
