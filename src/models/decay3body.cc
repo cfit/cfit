@@ -137,7 +137,8 @@ const double Decay3Body::evaluateFuncs( const double& mSq12, const double& mSq13
     value *= func->evaluate();
   }
 
-  return value;
+  // Always return a non-negative value. Default to zero.
+  return std::max( value, 0.0 );
 }
 
 
@@ -150,7 +151,8 @@ const double Decay3Body::evaluateFuncs() const
   for ( fIter func = _funcs.begin(); func != _funcs.end(); ++func )
     value *= func->evaluate();
 
-  return value;
+  // Always return a non-negative value. Default to zero.
+  return std::max( value, 0.0 );
 }
 
 
