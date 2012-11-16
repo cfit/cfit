@@ -11,6 +11,8 @@
 #include <cfit/pdf.hh>
 
 
+class FunctionMinimum;
+
 class PdfModel : public PdfBase
 {
   friend class Pdf;
@@ -37,6 +39,7 @@ public:
   virtual void setPars( const std::vector< double >&              pars ) throw( PdfException );
   virtual void setVars( const std::map< std::string, Variable  >& vars ) throw( PdfException );
   virtual void setPars( const std::map< std::string, Parameter >& pars ) throw( PdfException );
+  virtual void setPars( const FunctionMinimum&                    min  ) throw( PdfException );
 
   virtual       void   cache() {};
   virtual const double evaluate()                                    const throw( PdfException ) = 0;

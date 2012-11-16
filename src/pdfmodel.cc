@@ -3,6 +3,10 @@
 #include <algorithm>
 #include <functional>
 
+#include <Minuit/FunctionMinimum.h>
+#include <Minuit/MnUserParameters.h>
+#include <Minuit/MinuitParameter.h>
+
 #include <cfit/pdfexception.hh>
 #include <cfit/pdfmodel.hh>
 #include <cfit/functors.hh>
@@ -88,6 +92,21 @@ void PdfModel::setPars( const std::vector< double >& pars ) throw( PdfException 
   for ( pIter par = _parMap.begin(); par != _parMap.end(); par++ )
     par->second.setValue( pars[ index++ ] );
 }
+
+
+void PdfModel::setPars( const FunctionMinimum& min ) throw( PdfException )
+{
+  const MnUserParameters& pars = min.userParameters();
+  const std::vector< MinuitParameter >& parVec = pars.parameters();
+
+  if ( _parMap.size() != parVec.size() )
+    throw PdfException( "Number of arguments passed does not match number of required arguments." );
+
+  typedef std::vector< MinuitParameter >::const_iterator pIter;
+  for ( pIter par = parVec.begin(); par != parVec.end(); ++par )
+    _parMap[ par->name() ].set( par->value(), par->error() );
+}
+
 
 
 // The function must be virtual to allow the derived decay model classes to use their
