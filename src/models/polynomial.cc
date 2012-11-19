@@ -91,7 +91,7 @@ void Polynomial::cache()
 
   _norm = ( _upper - _lower );
   for ( unsigned ord = 0; ord < order; ++ord )
-    _norm += coef( ord ) * ( std::pow( _upper, ord + 2 ) - std::pow( _lower, ord + 2 ) ) / ( ord + 2 );
+    _norm += coef( ord ) * ( std::pow( _upper, ord + 2.0 ) - std::pow( _lower, ord + 2.0 ) ) / ( ord + 2.0 );
 }
 
 
@@ -105,7 +105,7 @@ const double Polynomial::evaluate( const double& x ) const throw( PdfException )
   // ( 1 + Sum( x^k ) ) / norm.
   double val = 1.0; // Constant term.
   for ( unsigned ord = 0; ord < order; ++ord )
-    val += coef( ord ) * std::pow( x, ord + 1 );
+    val += coef( ord ) * std::pow( x, ord + 1.0 );
 
   return val / _norm;
 }
@@ -132,7 +132,7 @@ const double Polynomial::area( const double& min, const double& max ) const thro
 
   double retval = ( max - min );
   for ( unsigned ord = 0; ord < order; ++ord )
-    retval += coef( ord ) * ( std::pow( max, ord + 2 ) - std::pow( min, ord + 2 ) ) / ( ord + 2 );
+    retval += coef( ord ) * ( std::pow( max, ord + 2.0 ) - std::pow( min, ord + 2.0 ) ) / ( ord + 2.0 );
 
   return retval / _norm;
 }
