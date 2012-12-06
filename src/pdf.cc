@@ -325,6 +325,20 @@ void Pdf::setPars( const std::vector< double >& pars ) throw( PdfException )
 }
 
 
+void Pdf::setPars( const std::map< std::string, Parameter >& pars ) throw( PdfException )
+{
+  // Set the local values of the parameters.
+  typedef std::map< std::string, Parameter >::const_iterator pIter;
+  for ( pIter par = pars.begin(); par != pars.end(); ++par )
+    _parMap[ par->first ].set( par->second.value(), par->second.error() );
+
+  // Propagate the values to the list of pdfs.
+  typedef std::vector< PdfModel* >::const_iterator pdfIter;
+  for ( pdfIter pdf = _pdfs.begin(); pdf != _pdfs.end(); ++pdf )
+    (*pdf)->setPars( _parMap );
+}
+
+
 void Pdf::setPars( const FunctionMinimum& min ) throw( PdfException )
 {
   const MnUserParameters& pars = min.userParameters();
