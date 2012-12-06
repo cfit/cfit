@@ -3,6 +3,22 @@
 
 #include <cfit/phasespace.hh>
 
+
+PhaseSpace::PhaseSpace()
+  : _mMother  ( 0.0 ), _m1  ( 0.0 ), _m2  ( 0.0 ), _m3  ( 0.0 ),
+    _mSqMother( 0.0 ), _mSq1( 0.0 ), _mSq2( 0.0 ), _mSq3( 0.0 ),
+    _mSqSum   ( 0.0 )
+{}
+
+
+
+PhaseSpace::PhaseSpace( const double& mMother, const double& m1, const double& m2, const double& m3 )
+  : _mMother  ( mMother           ), _m1  ( m1      ), _m2  ( m2      ), _m3  ( m3      ),
+    _mSqMother( mMother * mMother ), _mSq1( m1 * m1 ), _mSq2( m2 * m2 ), _mSq3( m3 * m3 ),
+    _mSqSum   ( _mSqMother + _mSq1 + _mSq2 + _mSq3 )
+{}
+
+
 const double PhaseSpace::kallen( const double& x, const double& y, const double& z )
 {
   double result = 0.;
@@ -95,3 +111,13 @@ bool PhaseSpace::contains( const double& mSq12, const double& mSq13, const doubl
          ( mSq23 > mSq23min( mSq12 ) ) && ( mSq23 < mSq23max( mSq12 ) );
 }
 
+
+
+// Check if the kinematically allowed region contains a given point.
+bool PhaseSpace::contains( const double& mSq12, const double& mSq13 ) const
+{
+  const double& mSq23 = _mSqSum - mSq12 - mSq13;
+
+  return ( mSq13 > mSq13min( mSq12 ) ) && ( mSq13 < mSq13max( mSq12 ) ) &&
+         ( mSq23 > mSq23min( mSq12 ) ) && ( mSq23 < mSq23max( mSq12 ) );
+}
