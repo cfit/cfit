@@ -43,6 +43,13 @@ public:
   const double m  ( unsigned index ) const;
   const double mSq( unsigned index ) const;
 
+  const double mSq12min() const { return std::pow( _m1      + _m2, 2 ); };
+  const double mSq12max() const { return std::pow( _mMother - _m3, 2 ); };
+  const double mSq13min() const { return std::pow( _m1      + _m3, 2 ); };
+  const double mSq13max() const { return std::pow( _mMother - _m2, 2 ); };
+  const double mSq23min() const { return std::pow( _m2      + _m3, 2 ); };
+  const double mSq23max() const { return std::pow( _mMother - _m1, 2 ); };
+
   // Check if the kinematically allowed region contains a given point.
   bool contains( const double& mSq12, const double& mSq13, const double& mSq23 ) const;
   bool contains( const double& mSq12, const double& mSq13                      ) const;
