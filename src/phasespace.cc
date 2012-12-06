@@ -22,9 +22,9 @@ PhaseSpace::PhaseSpace( const double& mMother, const double& m1, const double& m
 const double PhaseSpace::kallen( const double& x, const double& y, const double& z )
 {
   double result = 0.;
-  result += pow( x, 2 );
-  result += pow( y, 2 );
-  result += pow( z, 2 );
+  result += std::pow( x, 2 );
+  result += std::pow( y, 2 );
+  result += std::pow( z, 2 );
   result -= 2. * x * y;
   result -= 2. * x * z;
   result -= 2. * y * z;
@@ -35,41 +35,41 @@ const double PhaseSpace::kallen( const double& x, const double& y, const double&
 
 const double PhaseSpace::mSq13min( const double& mSq12 ) const
 {
-  double first  = pow( pow( _mMother, 2 ) + pow( _m1, 2 ) - pow( _m2, 2 ) - pow( _m3, 2 ), 2 );
-  double second = sqrt( kallen( mSq12, pow( _m1     , 2 ), pow( _m2, 2 ) ) );
-  double third  = sqrt( kallen( mSq12, pow( _mMother, 2 ), pow( _m3, 2 ) ) );
+  double first  = std::pow( _mSqMother + _mSq1 - _mSq2 - _mSq3, 2 );
+  double second = std::sqrt( kallen( mSq12, _mSq1     , _mSq2 ) );
+  double third  = std::sqrt( kallen( mSq12, _mSqMother, _mSq3 ) );
 
-  return ( first - pow( second + third, 2 ) ) / ( 4. * mSq12 );
+  return ( first - std::pow( second + third, 2 ) ) / ( 4. * mSq12 );
 }
 
 
 const double PhaseSpace::mSq13max( const double& mSq12 ) const
 {
-  double first  = pow( pow( _mMother, 2 ) + pow( _m1, 2 ) - pow( _m2, 2 ) - pow( _m3, 2 ), 2 );
-  double second = sqrt( kallen( mSq12, pow( _m1     , 2 ), pow( _m2, 2 ) ) );
-  double third  = sqrt( kallen( mSq12, pow( _mMother, 2 ), pow( _m3, 2 ) ) );
+  double first  = std::pow( _mSqMother + _mSq1 - _mSq2 - _mSq3, 2 );
+  double second = std::sqrt( kallen( mSq12, _mSq1     , _mSq2 ) );
+  double third  = std::sqrt( kallen( mSq12, _mSqMother, _mSq3 ) );
 
-  return ( first - pow( second - third, 2 ) ) / ( 4. * mSq12 );
+  return ( first - std::pow( second - third, 2 ) ) / ( 4. * mSq12 );
 }
 
 
 const double PhaseSpace::mSq23min( const double& mSq12 ) const
 {
-  double first  = pow( pow( _mMother, 2 ) - pow( _m1, 2 ) + pow( _m2, 2 ) - pow( _m3, 2 ), 2 );
-  double second = sqrt( kallen( mSq12, pow( _m1     , 2 ), pow( _m2, 2 ) ) );
-  double third  = sqrt( kallen( mSq12, pow( _mMother, 2 ), pow( _m3, 2 ) ) );
+  double first  = std::pow( _mSqMother - _mSq1 + _mSq2 - _mSq3, 2 );
+  double second = std::sqrt( kallen( mSq12, _mSq1     , _mSq2 ) );
+  double third  = std::sqrt( kallen( mSq12, _mSqMother, _mSq3 ) );
 
-  return ( first - pow( second + third, 2 ) ) / ( 4. * mSq12 );
+  return ( first - std::pow( second + third, 2 ) ) / ( 4. * mSq12 );
 }
 
 
 const double PhaseSpace::mSq23max( const double& mSq12 ) const
 {
-  double first  = pow( pow( _mMother, 2 ) - pow( _m1, 2 ) + pow( _m2, 2 ) - pow( _m3, 2 ), 2 );
-  double second = sqrt( kallen( mSq12, pow( _m1     , 2 ), pow( _m2, 2 ) ) );
-  double third  = sqrt( kallen( mSq12, pow( _mMother, 2 ), pow( _m3, 2 ) ) );
+  double first  = std::pow( _mSqMother - _mSq1 + _mSq2 - _mSq3, 2 );
+  double second = std::sqrt( kallen( mSq12, _mSq1     , _mSq2 ) );
+  double third  = std::sqrt( kallen( mSq12, _mSqMother, _mSq3 ) );
 
-  return ( first - pow( second - third, 2 ) ) / ( 4. * mSq12 );
+  return ( first - std::pow( second - third, 2 ) ) / ( 4. * mSq12 );
 }
 
 

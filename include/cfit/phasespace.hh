@@ -1,6 +1,8 @@
 #ifndef __PHASESPACE_HH__
 #define __PHASESPACE_HH__
 
+#include <cmath>
+
 class PhaseSpace
 {
 private:
