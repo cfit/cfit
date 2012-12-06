@@ -14,6 +14,7 @@
 #include <cfit/operation.hh>
 
 
+class FunctionMinimum;
 
 class Function
 {
@@ -82,7 +83,8 @@ public:
   void setPar( const std::string& name, const double& val, const double& err = -1. ) throw( PdfException );
 
   void setVars( const std::map< std::string, Variable  >& vars ) throw( PdfException );
-  void setPars( const std::map< std::string, Parameter >& vars ) throw( PdfException );
+  void setPars( const std::map< std::string, Parameter >& pars ) throw( PdfException );
+  void setPars( const FunctionMinimum&                    pars ) throw( PdfException );
 
   // Getters.
   const std::map< std::string, Variable  >& getVarMap() const { return _varMap; }

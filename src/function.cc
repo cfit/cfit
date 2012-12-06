@@ -6,6 +6,8 @@
 
 #include <algorithm>
 
+#include <Minuit/FunctionMinimum.h>
+
 #include <cfit/variable.hh>
 #include <cfit/parameter.hh>
 #include <cfit/parameterexpr.hh>
@@ -122,6 +124,17 @@ void Function::setPars( const std::map< std::string, Parameter >& pars ) throw( 
   typedef std::map< std::string, Parameter >::iterator pIter;
   for ( pIter par = _parMap.begin(); par != _parMap.end(); ++par )
     par->second.setValue( pars.find( par->first )->second.value() );
+}
+
+
+void Function::setPars( const FunctionMinimum& min ) throw( PdfException )
+{
+  const MnUserParameters& pars = min.userParameters();
+  const std::vector< MinuitParameter >& parVec = pars.parameters();
+
+  typedef std::vector< MinuitParameter >::const_iterator pIter;
+  for ( pIter par = parVec.begin(); par != parVec.end(); ++par )
+    _parMap[ par->name() ].set( par->value(), par->error() );
 }
 
 
