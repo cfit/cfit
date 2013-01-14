@@ -7,7 +7,7 @@
 #include <cfit/pdfbase.hh>
 #include <cfit/variable.hh>
 #include <cfit/dataset.hh>
-#include <cfit/pdfexception.hh>
+#include <cfit/exceptions.hh>
 
 class Chi2 : public Minimizer
 {

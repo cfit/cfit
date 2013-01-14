@@ -6,7 +6,7 @@
 #include <complex>
 
 #include <cfit/parameter.hh>
-#include <cfit/pdfexception.hh>
+#include <cfit/exceptions.hh>
 
 class Coef;
 class Amplitude;

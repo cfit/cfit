@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-#include <cfit/pdfexception.hh>
+#include <cfit/exceptions.hh>
 #include <cfit/variable.hh>
 #include <cfit/parameter.hh>
 #include <cfit/pdfbase.hh>

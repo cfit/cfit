@@ -7,7 +7,7 @@
 #include <Minuit/MnUserParameters.h>
 #include <Minuit/MinuitParameter.h>
 
-#include <cfit/pdfexception.hh>
+#include <cfit/exceptions.hh>
 #include <cfit/pdfmodel.hh>
 #include <cfit/functors.hh>
 

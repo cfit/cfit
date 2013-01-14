@@ -6,7 +6,7 @@
 #include <cfit/minimizer.hh>
 #include <cfit/pdfbase.hh>
 #include <cfit/dataset.hh>
-#include <cfit/pdfexception.hh>
+#include <cfit/exceptions.hh>
 
 class Nll : public Minimizer
 {

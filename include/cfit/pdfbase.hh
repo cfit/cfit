@@ -8,7 +8,7 @@
 
 #include <cfit/variable.hh>
 #include <cfit/parameter.hh>
-#include <cfit/pdfexception.hh>
+#include <cfit/exceptions.hh>
 #include <cfit/functors.hh>
 
 

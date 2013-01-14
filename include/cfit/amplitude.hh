@@ -7,7 +7,7 @@
 #include <map>
 
 #include <cfit/operation.hh>
-#include <cfit/pdfexception.hh>
+#include <cfit/exceptions.hh>
 #include <cfit/coef.hh>
 #include <cfit/coefexpr.hh>
 #include <cfit/resonance.hh>

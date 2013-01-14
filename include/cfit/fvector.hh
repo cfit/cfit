@@ -8,7 +8,7 @@
 
 #include <cfit/parameter.hh>
 #include <cfit/coef.hh>
-#include <cfit/pdfexception.hh>
+#include <cfit/exceptions.hh>
 #include <cfit/matrix.hh>
 
 class Coef;

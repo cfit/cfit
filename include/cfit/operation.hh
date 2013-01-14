@@ -4,7 +4,7 @@
 #include <string>
 #include <sstream>
 
-#include <cfit/pdfexception.hh>
+#include <cfit/exceptions.hh>
 
 class Operation
 {
