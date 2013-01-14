@@ -16,7 +16,9 @@
 
 Chi2::Chi2( PdfBase& pdf, const Variable& y, const Dataset& data )
   : Minimizer( pdf, data ), _y( y )
-{}
+{
+  _up = 1.0;
+}
 
 
 double Chi2::operator()( const std::vector<double>& pars ) const throw( PdfException )

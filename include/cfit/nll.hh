@@ -13,7 +13,6 @@ class Nll : public Minimizer
 public:
   Nll( PdfBase& pdf, const Dataset& data );
 
-  double up() const { return 1.; }
   double operator()( const std::vector<double>& par ) const throw( PdfException );
 };
 

@@ -9,6 +9,15 @@
 #include <cfit/minimizerexpr.hh>
 
 
+double MinimizerExpr::up() const throw( MinimizerException )
+{
+  if ( _up < 0.0 )
+    throw MinimizerException( "The minimizer variation that specifies the sigma level of uncertainties must be positive." );
+
+  return _up;
+}
+
+
 double MinimizerExpr::operator()( const std::vector< double >& pars ) const throw( PdfException )
 {
   if ( pars.size() != _parMap.size() )

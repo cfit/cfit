@@ -16,7 +16,9 @@
 
 Nll::Nll( PdfBase& pdf, const Dataset& data )
   : Minimizer( pdf, data )
-{}
+{
+  _up = 1.0;
+}
 
 
 double Nll::operator()( const std::vector<double>& pars ) const throw( PdfException )

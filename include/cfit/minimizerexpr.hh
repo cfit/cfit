@@ -18,10 +18,14 @@ private:
 
 public:
   MinimizerExpr()
-    : _up( 0. )
+    : _up( -1.0 )
     {}
 
-  double up() const { return _up; }
+  // Getters.
+  double up() const throw( MinimizerException );
+
+  // Setters.
+  void setUp( const double& up ) { _up = up; }
 
   double operator()( const std::vector< double >& par ) const throw( PdfException );
 

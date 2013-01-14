@@ -39,3 +39,12 @@ FunctionMinimum Minimizer::minimize() const
 
   return migrad();
 }
+
+
+double Minimizer::up() const throw( MinimizerException )
+{
+  if ( _up < 0.0 )
+    throw MinimizerException( "The minimizer variation that specifies the sigma level of uncertainties must be positive." );
+
+  return _up;
+}
