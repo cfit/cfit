@@ -25,7 +25,7 @@ Decay3Body* Decay3Body::copy() const
 void Decay3Body::setVars( const std::vector< double >& vars ) throw( PdfException )
 {
   if ( _varMap.size() != vars.size() )
-    throw PdfException( "Number of arguments passed does not match number of required arguments." );
+    throw PdfException( "Decay3Body::setVars: Number of arguments passed does not match number of required arguments." );
 
   typedef std::map< std::string, Variable >::iterator vIter;
   int index = 0;
@@ -72,7 +72,7 @@ void Decay3Body::setVars( const std::map< std::string, double >& vars ) throw( P
 void Decay3Body::setPars( const std::vector< double >& pars ) throw( PdfException )
 {
   if ( _parMap.size() != pars.size() )
-    throw PdfException( "Number of arguments passed does not match number of required arguments." );
+    throw PdfException( "Decay3Body::setPars: Number of arguments passed does not match number of required arguments." );
 
   typedef std::map< std::string, Parameter >::iterator pIter;
   int index = 0;

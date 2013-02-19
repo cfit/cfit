@@ -292,7 +292,7 @@ void Pdf::setPar( const std::string& name, const double& val, const double& err 
 void Pdf::setVars( const std::vector< double >& vars ) throw( PdfException )
 {
   if ( _varMap.size() != vars.size() )
-    throw PdfException( "Number of arguments passed does not match number of required arguments." );
+    throw PdfException( "Pdf::setVars: Number of arguments passed does not match number of required arguments." );
 
   // Set the local values of the variables.
   typedef std::map< std::string, Variable >::iterator vIter;
@@ -310,7 +310,7 @@ void Pdf::setVars( const std::vector< double >& vars ) throw( PdfException )
 void Pdf::setPars( const std::vector< double >& pars ) throw( PdfException )
 {
   if ( _parMap.size() != pars.size() )
-    throw PdfException( "Number of arguments passed does not match number of required arguments." );
+    throw PdfException( "Pdf::setPars( vector ): Number of arguments passed does not match number of required arguments." );
 
   // Set the local values of the parameters.
   typedef std::map< std::string, Parameter >::iterator pIter;
@@ -345,7 +345,7 @@ void Pdf::setPars( const FunctionMinimum& min ) throw( PdfException )
   const std::vector< MinuitParameter >& parVec = pars.parameters();
 
   if ( _parMap.size() != parVec.size() )
-    throw PdfException( "Number of arguments passed does not match number of required arguments." );
+    throw PdfException( "Pdf::setPars( minimum ): Number of arguments passed does not match number of required arguments." );
 
   // Set the local values of the parameters.
   typedef std::vector< MinuitParameter >::const_iterator pIter;
@@ -425,7 +425,7 @@ const double Pdf::evaluate() const throw( PdfException )
 const double Pdf::evaluate( const std::vector< double >& vars ) const throw( PdfException )
 {
   if ( _varMap.size() != vars.size() )
-    throw PdfException( "Number of arguments passed does not match number of required arguments." );
+    throw PdfException( "Pdf::evaluate: Number of arguments passed does not match number of required arguments." );
 
   // Dictionary of the variable names with the values passed.
   std::map< std::string, double > localVars;

@@ -69,7 +69,7 @@ void PdfModel::setPar( const std::string& name, const double& val, const double&
 void PdfModel::setVars( const std::vector< double >& vars ) throw( PdfException )
 {
   if ( _varMap.size() != vars.size() )
-    throw PdfException( "Number of arguments passed does not match number of required arguments." );
+    throw PdfException( "PdfModel::setVars: Number of arguments passed does not match number of required arguments." );
 
   typedef std::map< std::string, Variable >::iterator vIter;
   int index = 0;
@@ -85,7 +85,7 @@ void PdfModel::setVars( const std::vector< double >& vars ) throw( PdfException 
 void PdfModel::setPars( const std::vector< double >& pars ) throw( PdfException )
 {
   if ( _parMap.size() != pars.size() )
-    throw PdfException( "Number of arguments passed does not match number of required arguments." );
+    throw PdfException( "PdfModel::setPars( vector ): Number of arguments passed does not match number of required arguments." );
 
   typedef std::map< std::string, Parameter >::iterator pIter;
   int index = 0;
@@ -100,7 +100,7 @@ void PdfModel::setPars( const FunctionMinimum& min ) throw( PdfException )
   const std::vector< MinuitParameter >& parVec = pars.parameters();
 
   if ( _parMap.size() != parVec.size() )
-    throw PdfException( "Number of arguments passed does not match number of required arguments." );
+    throw PdfException( "PdfModel::setPars( minimum ): Number of arguments passed does not match number of required arguments." );
 
   typedef std::vector< MinuitParameter >::const_iterator pIter;
   for ( pIter par = parVec.begin(); par != parVec.end(); ++par )

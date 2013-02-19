@@ -26,7 +26,7 @@ DecayModel::DecayModel( const Variable&   mSq12,
 void DecayModel::setPars( const std::vector< double >& pars ) throw( PdfException )
 {
   if ( _parMap.size() != pars.size() )
-    throw PdfException( "Number of arguments passed does not match number of required arguments." );
+    throw PdfException( "DecayModel::setPars: Number of arguments passed does not match number of required arguments." );
 
   typedef std::map< std::string, Parameter >::iterator pIter;
   int index = 0;
