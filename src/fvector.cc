@@ -218,8 +218,12 @@ std::complex< double > Fvector::propagator( const PhaseSpace& ps, const double& 
   Matrix< std::complex< double > > invM;
   invM = M.inverse();
 
+  // Decide if the slowly varying part should be used.
+  double svp = 1.0;
+  if ( _usePvecSvp )
+    svp = ( 1. - getPar( _s0pr ) ) / ( mSqAB - getPar( _s0pr ) ); // Slowly varying part.
+
   // Build the P vector.
-  double svp = ( 1. - getPar( _s0pr ) ) / ( mSqAB - getPar( _s0pr ) ); // Slowly varying part.
   std::vector< std::complex< double > > P;
   for ( int row = 0; row < 5; ++row )
   {

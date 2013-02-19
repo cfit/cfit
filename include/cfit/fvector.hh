@@ -31,6 +31,9 @@ protected:
   double                _s0A;  // Adler pole (typically outside the phase space).
   double                _sA;   // Adler parameter.
 
+  // Decide if the slowly varying part of the P-vector should be used.
+  bool                  _usePvecSvp;
+
   std::vector< std::pair< std::string, std::string > > _beta; // Names of real and imag parts.
   std::vector< std::pair< std::string, std::string > > _fPr;  // Name of fPr elements.
   std::string                                          _s0pr; // Name of s0pr.
@@ -61,7 +64,7 @@ public:
            const double&                s0A  , const double&           sA   ,
            const std::vector< Coef >&   beta ,
            const std::vector< Coef >&   fPr  , const Parameter&        s0pr  )
-    : _m0( m0 ), _g0( g0 ), _fSc( fSc ), _s0sc( s0sc ), _s0A( s0A ), _sA( sA )
+    : _m0( m0 ), _g0( g0 ), _fSc( fSc ), _s0sc( s0sc ), _s0A( s0A ), _sA( sA ), _usePvecSvp( true )
   {
     _resoA  = resoA;
     _resoB  = resoB;
@@ -71,6 +74,8 @@ public:
     pushfPr ( fPr  );
     pushS0pr( s0pr );
   }
+
+  void usePvecSvp( const bool& val = true ) { _usePvecSvp = val; }
 
   ~Fvector() {};
 
@@ -148,7 +153,7 @@ inline Fvector::Fvector( const char&                  resoA, const char&        
                          const double&                s0A  , const double&           sA   ,
                          const std::vector< Coef >&   beta ,
                          const std::vector< Coef >&   fPr  , const Parameter&        s0pr  )
-  : _m0( m0 ), _g0( g0 ), _fSc( fSc ), _s0sc( s0sc ), _s0A( s0A ), _sA( sA )
+  : _m0( m0 ), _g0( g0 ), _fSc( fSc ), _s0sc( s0sc ), _s0A( s0A ), _sA( sA ), _usePvecSvp( true )
 {
   _resoA  = std::tolower( resoA ) - 'a' + 1;
   _resoB  = std::tolower( resoB ) - 'a' + 1;
