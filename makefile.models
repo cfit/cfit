@@ -21,7 +21,7 @@ FILES_gauss =
 FILES_relbreitwigner =
 FILES_gounarissakurai =
 FILES_glass =
-FILES_decaymixing3body =
+FILES_decay3body =
 
 # FILES_dalitzD0mix = EvtComplex EvtCyclic3 EvtDalitzPlot EvtDalitzPoint	\
 # 			EvtDalitzReso EvtTwoBodyVertex EvtTwoBodyKine	\
@@ -50,8 +50,9 @@ endif
 HDRSTR = $(foreach dir,$(HDRDIRS),-I $(dir))
 LIBSTR = $(foreach dir,$(LIBDIRS),-L $(dir)) $(foreach lib,$(LIBLIST),-l$(lib))
 
-CFLAGS  = -g -O -Wall -fPIC $(HDRSTR)
-LFLAGS  = -g -O -Wall -fPIC $(LIBSTR)
+CFLAGS  = -g -O -Wall -fPIC -std=c++0x $(HDRSTR)
+DFLAGS  =                   -std=c++0x
+LFLAGS  = -g -O -Wall -fPIC -std=c++0x $(LIBSTR)
 
 ifdef MPI_ON
 CFLAGS  += -DMPI_ON
@@ -79,7 +80,7 @@ $(LIB): $(OFILES) $(MAKEFILE_LIST)
 $(DFILES): $(DDIR)/%.d: $(CDIR)/%.cc $(HDIR)/$(firstword $(subst /, ,$(PROJECT)))/%.hh $(MAKEFILE_LIST)
 	@ mkdir -p $(dir $@)
 	@ echo $(CXX) -MM -MF $@ -MT $$(echo $@ | sed "s/^$(DDIR)/$(ODIR)/g;s/\.d$$/\.o/g") $< -I $(HDIR)
-	@ $(CXX) -MM -MF $@ -MT $$(echo $@ | sed "s/^$(DDIR)/$(ODIR)/g;s/\.d$$/\.o/g") $< -I $(HDIR)
+	@ $(CXX) -MM -MF $@ -MT $$(echo $@ | sed "s/^$(DDIR)/$(ODIR)/g;s/\.d$$/\.o/g") $< $(DFLAGS) -I $(HDIR)
 
 # Rules for objects.
 $(OFILES): $(ODIR)/%.o: $(CDIR)/%.cc $(DDIR)/%.d $(MAKEFILE_LIST)

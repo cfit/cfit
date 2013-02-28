@@ -1,4 +1,6 @@
 
+#include <random>
+
 #include <cfit/models/decay3body.hh>
 #include <cfit/function.hh>
 
@@ -279,3 +281,64 @@ const Decay3Body operator*( const Function& left, Decay3Body right )
   return right;
 }
 
+
+const std::map< std::string, double > Decay3Body::generate()
+{
+  // Generate mSq12 and mSq13, and compute mSq23 from these.
+  const double& min12 = std::pow( _ps.m1()      + _ps.m2(), 2 );
+  const double& min13 = std::pow( _ps.m1()      + _ps.m3(), 2 );
+  const double& max12 = std::pow( _ps.mMother() - _ps.m3(), 2 );
+  const double& max13 = std::pow( _ps.mMother() - _ps.m2(), 2 );
+
+  const std::string& mSq12name = getVar( 0 ).name();
+  const std::string& mSq13name = getVar( 1 ).name();
+  const std::string& mSq23name = getVar( 2 ).name();
+
+  // Maximum value of the pdf.
+  const double& max = 14.0;
+
+  // Sum of squared invariant masses of all particles (mother and daughters).
+  const double& mSqSum = _ps.mSqMother() + _ps.mSq1() + _ps.mSq2() + _ps.mSq3();
+
+  // Generate uniform mSq12 and mSq13.
+  double mSq12 = 0.0;
+  double mSq13 = 0.0;
+
+  double pdfVal  = 0.0;
+  double uniform = 0.0;
+
+  // Attempts to generate an event.
+  int count = 10000;
+
+  std::uniform_real_distribution<double> flat( 0.0, 1.0 );
+
+  std::map< std::string, double > values;
+
+  while ( count-- )
+  {
+    mSq12 = min12 + ( max12 - min12 ) * flat( _generator );
+    mSq13 = min13 + ( max13 - min13 ) * flat( _generator );
+
+    values[ mSq12name ] = mSq12;
+    values[ mSq13name ] = mSq13;
+    values[ mSq23name ] = mSqSum - mSq12 - mSq13;
+
+    this->setVars( values );
+    pdfVal = this->evaluate();
+
+    if ( pdfVal > max )
+      std::cout << "Problem: " << pdfVal << " " << mSq12 << " " << mSq13 << " " << mSqSum - mSq12 - mSq13 << std::endl;
+
+    uniform = max * flat( _generator );
+
+    // Apply the accept-reject decision.
+    if ( uniform < pdfVal )
+      return values;
+  }
+
+  values[ mSq12name ] = 0.0;
+  values[ mSq13name ] = 0.0;
+  values[ mSq23name ] = 0.0;
+
+  return values;
+}

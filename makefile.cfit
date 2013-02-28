@@ -38,8 +38,8 @@ endif
 HDRSTR = $(foreach dir,$(HDRDIRS),-I $(dir))
 LIBSTR = $(foreach dir,$(LIBDIRS),-L $(dir)) $(foreach lib,$(LIBLIST),-l$(lib))
 
-CFLAGS  = -g -O -Wall -fPIC $(HDRSTR)
-LFLAGS  = -g -O -Wall -fPIC $(LIBSTR)
+CFLAGS  = -g -O -Wall -fPIC -std=c++0x $(HDRSTR)
+LFLAGS  = -g -O -Wall -fPIC -std=c++0x $(LIBSTR)
 
 ifdef MPI_ON
 CFLAGS  += -DMPI_ON
