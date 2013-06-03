@@ -2,6 +2,8 @@
 #include <cfit/models/gauss.hh>
 #include <cfit/math.hh>
 
+#include <cfit/random.hh>
+
 /*
   Definitions of several functions based on the definition of the norm.
                           1       (   ( x - mu )^2  )
@@ -161,5 +163,14 @@ const double Gauss::area( const double& min, const double& max ) const throw( Pd
 
   const double& factor = vsigma * std::sqrt( M_PI / 2.0 );
   return ( argmax - argmin ) * factor / _norm;
+}
+
+
+const std::map< std::string, double > Gauss::generate() const throw( PdfException )
+{
+  std::normal_distribution< double > dist( mu(), sigma() );
+  std::map< std::string, double > gen;
+  gen[ getVar( 0 ).name() ] = dist( Random::engine() );
+  return gen;
 }
 
