@@ -3,6 +3,7 @@
 #include <vector>
 #include <stack>
 #include <cmath>
+#include <random>
 
 #include <Minuit/FunctionMinimum.h>
 #include <Minuit/MnUserParameters.h>
@@ -14,6 +15,7 @@
 #include <cfit/pdf.hh>
 #include <cfit/operation.hh>
 
+#include <cfit/random.hh>
 
 
 Pdf::Pdf( const Pdf& right )
@@ -438,6 +440,140 @@ const double Pdf::evaluate() const throw( PdfException )
 
   return _scale * values.top();
 }
+
+
+
+
+const std::map< std::string, double > Pdf::generate() const throw( PdfException )
+{
+  std::stack< double >                                values;
+  std::stack< std::pair< std::size_t, std::size_t > > ranges;
+
+  std::pair< std::size_t, std::size_t > xrange;
+  std::pair< std::size_t, std::size_t > yrange;
+
+  double x;
+  double y;
+  std::vector< Parameter     >::const_iterator par = _parms.begin();
+  std::vector< double        >::const_iterator ctt = _ctnts.begin();
+  std::vector< Operation::Op >::const_iterator ops = _opers.begin();
+
+  std::vector< bool > keep( _pdfs.size(), true );
+
+  // Range of the current block of pdfs.
+  std::size_t first = 0;
+  std::size_t last  = 0;
+
+  std::default_random_engine& generator = Random::engine();
+  std::uniform_real_distribution< double > uniform( 0.0, 1.0 );
+  double rnd = 0.0;
+
+  Operation::Op op;
+
+  typedef std::string::const_iterator eIter;
+  for ( eIter ch = _expression.begin(); ch != _expression.end(); ++ch )
+  {
+    if ( *ch == 'm' )
+    {
+      values.push( 1.0 );
+      ranges.push( std::make_pair( first++, ++last ) );
+    }
+    else if ( *ch == 'p' )
+    {
+      values.push( _parMap.find( par++->name() )->second.value() );
+      ranges.push( std::make_pair( first, last ) );
+    }
+    else if ( *ch == 'c' )
+    {
+      values.push( *ctt++ );
+      ranges.push( std::make_pair( first, last ) );
+    }
+    else
+    {
+      if ( *ch == 'u' )
+      {
+        if ( values.empty() )
+          throw PdfException( "Parse error: not enough values in the stack." );
+        x = values.top();
+        values.pop();
+        values.push( Operation::operate( x, *ops++ ) );
+        xrange = ranges.top();
+        if ( xrange.first != xrange.second )
+          throw PdfException( "Generation error: trying to apply unary operation to a pdf expression." );
+      }
+      else if ( *ch == 'b' )
+      {
+        if ( values.size() < 2 )
+          throw PdfException( "Parse error: not enough values in the stack." );
+
+        op = *ops++;
+
+        y = values.top();
+        values.pop();
+        x = values.top();
+        values.pop();
+        values.push( Operation::operate( x, y, op ) );
+
+        yrange = ranges.top();
+        ranges.pop();
+        xrange = ranges.top();
+        ranges.pop();
+        if ( ( op == Operation::plus ) || ( op == Operation::minus ) )
+        {
+          if ( xrange == yrange )
+            ranges.push( xrange );
+          else
+          {
+            if ( xrange.first == xrange.second )
+              throw PdfException( "Generation error: this should have never happened." );
+
+            if ( op == Operation::plus )
+              if ( ( x < 0 ) || ( y < 0 ) )
+                throw PdfException( "Generation error: negative coefficient multiplying a pdf." );
+
+            if ( op == Operation::minus )
+              if ( ( x < 0 ) || ( y > 0 ) )
+                throw PdfException( "Generation error: negative coefficient multiplying a pdf." );
+
+            rnd = ( x + std::fabs( y ) ) * uniform( generator );
+
+            // Choose one of the two distributions.
+            if ( rnd < x )
+            {
+              ranges.push( xrange );
+              std::fill( keep.begin() + yrange.first, keep.begin() + yrange.second, false );
+            }
+            else
+            {
+              ranges.push( yrange );
+              std::fill( keep.begin() + xrange.first, keep.begin() + xrange.second, false );
+            }
+          }
+        }
+        else // Operations not plus or minus.
+          ranges.push( std::make_pair( xrange.first, yrange.second ) );
+      }
+      else
+        throw PdfException( std::string( "Parse error: unknown operation " ) + *ch + "." );
+    }
+  }
+
+  if ( values.size() != 1 )
+    throw PdfException( "Pdf parse error: too many values have been supplied." );
+
+  std::map< std::string, double > entry;
+  std::map< std::string, double > partial;
+  for ( unsigned pdf = 0; pdf < _pdfs.size(); ++pdf )
+    if ( keep[ pdf ] )
+    {
+      partial = _pdfs[ pdf ]->generate();
+      entry.insert( partial.begin(), partial.end() );
+    }
+
+  return entry;
+}
+
+
 
 
 const double Pdf::evaluate( const std::vector< double >& vars ) const throw( PdfException )
