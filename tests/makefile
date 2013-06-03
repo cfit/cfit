@@ -27,7 +27,7 @@ CXXL    = g++
 ifdef MPI_ON
 # Directory of the MPI implementation.
 MPIDIR	?= /afs/slac.stanford.edu/package/OpenMPI
-CXXL    = $(MPIDIR)/bin/mpic++
+CXXL     = $(MPIDIR)/bin/mpic++
 HDRDIRS += $(MPIDIR)/include $(MPIDIR)/include/openmpi
 LIBDIRS += $(MPIDIR)/lib
 LIBLIST += mpi
@@ -36,8 +36,9 @@ endif
 HDRSTR = $(foreach dir,$(HDRDIRS),-I $(dir))
 LIBSTR = $(foreach dir,$(LIBDIRS),-L $(dir)) $(foreach lib,$(LIBLIST),-l$(lib))
 
-CFLAGS  = -g -O -Wall -fPIC $(HDRSTR)
-LFLAGS  = -g -O -Wall -fPIC $(LIBSTR)
+CFLAGS  = -std=c++0x -g -O -Wall -fPIC $(HDRSTR)
+DFLAGS  = -std=c++0x
+LFLAGS  = -std=c++0x -g -O -Wall -fPIC $(LIBSTR)
 
 ifdef MPI_ON
 CFLAGS  += -DMPI_ON
@@ -65,7 +66,7 @@ $(ELVES): $(BDIR)/%: $(ODIR)/%.o $(MAKEFILE_LIST)
 $(DFILES): $(DDIR)/%.d: $(CDIR)/%.cc $(MAKEFILE_LIST)
 	@ mkdir -p $(dir $@)
 	@ echo $(CXX) -MM -MF $@ -MT $$(echo $@ | sed "s/^$(DDIR)/$(ODIR)/g;s/\.d$$/\.o/g") $< -I $(HDIR)
-	@ $(CXX) -MM -MF $@ -MT $$(echo $@ | sed "s/^$(DDIR)/$(ODIR)/g;s/\.d$$/\.o/g") $< -I $(HDIR)
+	@ $(CXX) -MM -MF $@ -MT $$(echo $@ | sed "s/^$(DDIR)/$(ODIR)/g;s/\.d$$/\.o/g") $< $(DFLAGS) -I $(HDIR)
 
 $(OFILES): $(ODIR)/%.o: $(CDIR)/%.cc $(DDIR)/%.d $(MAKEFILE_LIST)
 	@ mkdir -p $(dir $@)
