@@ -45,6 +45,11 @@ public:
   virtual const double evaluate()                                    const throw( PdfException ) = 0;
   virtual const double evaluate( const std::vector< double >& vars ) const throw( PdfException ) = 0;
 
+  virtual const std::map< std::string, double > generate()           const throw( PdfException )
+  {
+    throw PdfException( "Generate error: attempting to generate with a model without generate() implementation" );
+  }
+
   // ALERTA AMB ELS OPERADORS. NO S'HAURIA DE PODER FER gauss1 += gauss2, O HAURIA D'ESTAR BEN CONTROLAT.
   friend const Pdf operator+( const PdfModel&      left, const PdfModel&      right );
   friend const Pdf operator*( const PdfModel&      left, const PdfModel&      right );
