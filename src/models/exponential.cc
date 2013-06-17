@@ -2,6 +2,8 @@
 #include <cfit/models/exponential.hh>
 #include <cfit/math.hh>
 
+#include <cfit/random.hh>
+
 /*
            1
   E(x) = ----- exp( -gamma x ) step( x - _lower )
@@ -164,3 +166,19 @@ const double Exponential::area( const double& min, const double& max ) const thr
   return ( expmin - expmax ) / ( vgamma * _norm );
 }
 
+
+const std::map< std::string, double > Exponential::generate() const throw( PdfException )
+{
+  // Generate a flat random number.
+  std::uniform_real_distribution< double > dist( 0.0, 1.0 );
+  const double& unif = dist( Random::engine() );
+
+  const double& vgamma = gamma();
+
+  const double& expmin = _hasLower ? std::exp( - vgamma * _lower ) : 1.0;
+
+  std::map< std::string, double > gen;
+  gen[ getVar( 0 ).name() ] = - 1.0 / vgamma * std::log( expmin - _norm * vgamma * unif );
+
+  return gen;
+}
