@@ -2,6 +2,8 @@
 #include <cfit/math.hh>
 #include <cfit/models/crystalball.hh>
 
+#include <cfit/random.hh>
+
 CrystalBall::CrystalBall( const Variable& x,
 			  const Parameter& mu, const Parameter& sigma, const Parameter& alpha, const Parameter& n )
   : _hasLower( false ), _hasUpper( false ), _lower( 0.0 ), _upper( 0.0 )
@@ -211,3 +213,39 @@ const double CrystalBall::area( const double& min, const double& max ) const thr
 {
   return ( cumulativeNorm( std::min( max, _upper ) ) - cumulativeNorm( std::max( min, _lower ) ) ) / _norm;
 }
+
+
+const std::map< std::string, double > CrystalBall::generate() const throw( PdfException )
+{
+  const double& vn     = n();
+  const double& vnm1   = vn - 1.0;
+  const double& vsigma = sigma();
+  const double& valpha = alpha();
+  const double& sqrt2  = std::sqrt( 2.0 );
+
+  // Evaluate the area up to the lower limit (0 if it's -infinity).
+  double areaLo = 0.0;
+  if ( _hasLower )
+    areaLo = cumulativeNorm( _lower ) / _norm;
+
+  // Cumulative pdf evaluated at the tail-core threshold.
+  const double& areaTh = vsigma / ( valpha * _norm ) * vn / vnm1 * std::exp( - std::pow( valpha, 2 ) / 2.0 );
+
+  // Generate a flat random number.
+  std::uniform_real_distribution< double > dist( 0.0, 1.0 );
+  const double& unif = dist( Random::engine() ) + areaLo;
+
+  // If random number is below the tail-core threshold, generate the tail.
+  //    Otherwise, generate the (Gaussian) core.
+  double genVal = 0.0;
+  if ( unif < areaTh )
+    genVal = mu() - valpha * vsigma - vn * vsigma / valpha * ( std::pow( areaTh / unif, 1.0 / vnm1 ) - 1.0 );
+  else
+    genVal = mu() + vsigma * sqrt2 * Math::inverf( _norm / vsigma * sqrt( 2.0 / M_PI ) * ( unif - areaTh ) - std::erf( valpha / sqrt2 ) );
+
+  std::map< std::string, double > gen;
+  gen[ getVar( 0 ).name() ] = genVal;
+
+  return gen;
+}
+

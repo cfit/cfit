@@ -49,6 +49,8 @@ public:
   const double evaluate( const std::vector< double >& vars ) const throw( PdfException );
 
   const double area    ( const double& min, const double& max ) const throw( PdfException );
+
+  const std::map< std::string, double > generate() const throw( PdfException );
 };
 
 #endif
