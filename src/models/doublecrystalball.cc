@@ -248,12 +248,19 @@ const double DoubleCrystalBall::tailUp( const double& x ) const
 // Evaluate the function at a given point.
 const double DoubleCrystalBall::evaluate( const double& x ) const throw( PdfException )
 {
+  if ( _hasLower && ( x < _lower ) )
+    return 0.0;
+
+  if ( _hasUpper && ( x > _upper ) )
+    return 0.0;
+
   if ( x < mu() - alpha() * sigma() )
     return tailLo( x );
-  else if ( x < mu() + beta() * sigma() )
-    return core( x );
-  else
+
+  if ( x > mu() + beta() * sigma() )
     return tailUp( x );
+
+  return core( x );
 }
 
 

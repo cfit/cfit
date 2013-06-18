@@ -182,10 +182,16 @@ const double CrystalBall::tail( const double& x ) const
 // Evaluate the function at a given point.
 const double CrystalBall::evaluate( const double& x ) const throw( PdfException )
 {
-  if ( x > mu() - alpha() * sigma() )
-    return core( x );
-  else
+  if ( _hasLower && ( x < _lower ) )
+    return 0.0;
+
+  if ( _hasUpper && ( x > _upper ) )
+    return 0.0;
+
+  if ( x < mu() - alpha() * sigma() )
     return tail( x );
+
+  return core( x );
 }
 
 
