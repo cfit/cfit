@@ -14,6 +14,7 @@ public:
   static const double gamma     (       double  x );
   static const double gamma_p   ( const double& a, const double& x );
   static const double gamma_q   ( const double& a, const double& x );
+  static const double invgamma_q( const double& a, const double& y0 );
   static const double inverf    ( const double& x );
 };
 

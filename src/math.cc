@@ -63,18 +63,15 @@ const double Math::gamma_p( const double& a, const double& x )
 
   igammaepsilon = 0.000000000000001;
   if( ( x <= 0 ) || ( a <= 0 ) )
-  {
     return 0.0;
-  }
+
   if( ( x > 1 ) && ( x > a ) )
-  {
     return 1.0 - gamma_q( a, x );
-  }
+
   ax = a * std::log( x ) - x - lngamma( a );
   if( ax < -709.78271289338399 )
-  {
     return 0.0;
-  }
+
   ax = std::exp( ax );
   r = a;
   c = 1;
@@ -86,6 +83,7 @@ const double Math::gamma_p( const double& a, const double& x )
     ans = ans+c;
   }
   while( c/ans > igammaepsilon );
+
   return ans*ax/a;
 }
 
@@ -150,18 +148,15 @@ const double Math::gamma_q( const double& a, const double& x )
   igammabignumber = 4503599627370496.0;
   igammabignumberinv = 2.22044604925031308085*0.0000000000000001;
   if( (x <= 0.0 ) || ( a <= 0 ) )
-  {
     return 1.0;
-  }
+
   if( ( x < 1.0 ) || ( x < a ) )
-  {
     return 1.0 - gamma_p( a, x );
-  }
+
   ax = a * std::log( x ) - x - lngamma( a );
   if( ax < -709.78271289338399 )
-  {
     return 0.0;
-  }
+
   ax = std::exp( ax );
   y = 1-a;
   z = x+y+1;
@@ -755,6 +750,193 @@ const double Math::invnormal( const double& y0 )
 
   if( code )
     return -x;
+
+  return x;
+}
+
+
+
+
+/*************************************************************************
+Inverse of complemented imcomplete gamma integral
+
+Given p, the function finds x such that
+
+ igamc( a, x ) = p.
+
+Starting with the approximate value
+
+        3
+ x = a t
+
+ where
+
+ t = 1 - d - ndtri(p) sqrt(d)
+
+and
+
+ d = 1/9a,
+
+the routine performs up to 10 Newton iterations to find the
+root of igamc(a,x) - p = 0.
+
+ACCURACY:
+
+Tested at random a, p in the intervals indicated.
+
+               a        p                      Relative error:
+arithmetic   domain   domain     # trials      peak         rms
+   IEEE     0.5,100   0,0.5       100000       1.0e-14     1.7e-15
+   IEEE     0.01,0.5  0,0.5       100000       9.0e-14     3.4e-15
+   IEEE    0.5,10000  0,0.5        20000       2.3e-13     3.8e-14
+
+Cephes Math Library Release 2.8:  June, 2000
+Copyright 1984, 1987, 1995, 2000 by Stephen L. Moshier
+*************************************************************************/
+const double Math::invgamma_q( const double& a, const double& y0 )
+{
+  double igammaepsilon;
+  double iinvgammabignumber;
+  double x0;
+  double x1;
+  double x;
+  double yl;
+  double yh;
+  double y;
+  double d;
+  double lgm;
+  double dithresh;
+  int i;
+  int dir;
+
+  igammaepsilon = 0.000000000000001;
+  iinvgammabignumber = 4503599627370496.0;
+  x0 = iinvgammabignumber;
+  yl = 0;
+  x1 = 0;
+  yh = 1;
+  dithresh = 5.0 * igammaepsilon;
+  d = 1.0 / ( 9.0 * a );
+  y = 1.0 - d - invnormal( y0 ) * std::sqrt( d );
+  x = a*y*y*y;
+  lgm = lngamma( a );
+  i = 0;
+  while( i < 10 )
+  {
+    if( ( x > x0 ) || ( x < x1 ) )
+    {
+      d = 0.0625;
+      break;
+    }
+    y = gamma_q( a, x );
+    if( ( x < yl ) || ( y > yh ) )
+    {
+      d = 0.0625;
+      break;
+    }
+    if( y < y0 )
+    {
+      x0 = x;
+      yl = y;
+    }
+    else
+    {
+      x1 = x;
+      yh = y;
+    }
+    d = ( a - 1.0 ) * std::log( x ) - x - lgm;
+    if( d < -709.78271289338399 )
+    {
+      d = 0.0625;
+      break;
+    }
+    d = -std::exp( d );
+    d = (y-y0)/d;
+
+    if( std::fabs( d/x ) < igammaepsilon )
+      return x;
+
+    x = x-d;
+    i = i+1;
+  }
+  if( x0 == iinvgammabignumber )
+  {
+    if( x <= 0.0 )
+      x = 1;
+
+    while( x0 == iinvgammabignumber )
+    {
+      x = ( 1.0 + d ) * x;
+      y = gamma_q( a, x );
+      if( y < y0 )
+      {
+        x0 = x;
+        yl = y;
+        break;
+      }
+      d = d + d;
+    }
+  }
+  d = 0.5;
+  dir = 0;
+  i = 0;
+  while( i < 400 )
+  {
+    x = x1+d*(x0-x1);
+    y = gamma_q( a, x );
+    lgm = (x0-x1)/(x1+x0);
+    if( std::fabs( lgm ) < dithresh )
+      break;
+
+    lgm = (y-y0)/y0;
+    if( std::fabs( lgm ) < dithresh )
+      break;
+
+    if( x <= 0.0 )
+      break;
+
+    if( y >= y0 )
+    {
+      x1 = x;
+      yh = y;
+      if( dir < 0 )
+      {
+        dir = 0;
+        d = 0.5;
+      }
+      else
+      {
+        if( dir > 1 )
+        {
+          d = 0.5*d+0.5;
+        }
+        else
+        {
+          d = (y0-yl)/(yh-yl);
+        }
+      }
+      dir = dir+1;
+    }
+    else
+    {
+      x0 = x;
+      yl = y;
+      if( dir > 0 )
+      {
+        dir = 0.0;
+        d = 0.5;
+      }
+      else
+      {
+        if( dir < -1 )
+          d = 0.5*d;
+        else
+          d = (y0-yl)/(yh-yl);
+      }
+      dir = dir-1;
+    }
+    i = i+1;
+  }
 
   return x;
 }
