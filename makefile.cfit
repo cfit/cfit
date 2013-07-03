@@ -16,7 +16,7 @@ LIBDIRS = $(LDIR)
 LIBLIST = minuit
 
 OBJLIST = parameterexpr pdfbase pdfmodel pdf function operation dataset minimizer minimizerexpr \
-          nll chi2 phasespace resonance fvector coef coefexpr amplitude decaymodel math
+          nll chi2 phasespace resonance fvector coef coefexpr amplitude decaymodel math random
 
 
 #-------------------------------------------------------------------
