@@ -1,13 +1,11 @@
 
-// FALTA CONSTRUIR EL PARVECT QUAN S'OPERA SOBRE UN OBJECTE PDF.
-
 #include <sstream>
 #include <vector>
 #include <stack>
 #include <algorithm>
 
 #include <cfit/pdfmodel.hh>
-#include <cfit/pdf.hh>
+#include <cfit/pdfexpr.hh>
 
 #include <cfit/parameter.hh>
 #include <cfit/parameterexpr.hh>
@@ -893,16 +891,16 @@ const CoefExpr tan( const CoefExpr& coef )
 
 
 // Operations with two pdf models.
-const Pdf operator+( const PdfModel& left, const PdfModel& right )
+const PdfExpr operator+( const PdfModel& left, const PdfModel& right )
 {
   // Cannot add two pdfs that do not depend on exactly the same variables.
   if ( left.varNames() != right.varNames() )
     throw PdfException( "Cannot add two pdfs that do not depend on the same variables." );
 
-  return Pdf( left, right, Operation::plus );
+  return PdfExpr( left, right, Operation::plus );
 }
 
-const Pdf operator*( const PdfModel& left, const PdfModel& right )
+const PdfExpr operator*( const PdfModel& left, const PdfModel& right )
 {
   // Cannot multiply two pdfs that share some variable.
   std::vector< std::string > lVars = left. varNames();
@@ -915,20 +913,20 @@ const Pdf operator*( const PdfModel& left, const PdfModel& right )
   if ( ! intersect.empty() )
     throw PdfException( "Cannot multiply two pdfs that depend on some common variable." );
 
-  return Pdf( left, right, Operation::mult );
+  return PdfExpr( left, right, Operation::mult );
 }
 
 // Operations with a pdf model and a pdf expression.
-const Pdf operator+( const PdfModel& left, const Pdf& right )
+const PdfExpr operator+( const PdfModel& left, const PdfExpr& right )
 {
   // Cannot add two pdfs that do not depend on exactly the same variables.
   if ( left.varNames() != right.varNames() )
     throw PdfException( "Cannot add two pdfs that do not depend on the same variables." );
 
-  return Pdf( left, right, Operation::plus );
+  return PdfExpr( left, right, Operation::plus );
 }
 
-const Pdf operator*( const PdfModel& left, const Pdf& right )
+const PdfExpr operator*( const PdfModel& left, const PdfExpr& right )
 {
   // Cannot multiply two pdfs that share some variable.
   std::vector< std::string > lVars = left. varNames();
@@ -941,20 +939,20 @@ const Pdf operator*( const PdfModel& left, const Pdf& right )
   if ( ! intersect.empty() )
     throw PdfException( "Cannot multiply two pdfs that depend on some common variable." );
 
-  return Pdf( left, right, Operation::mult );
+  return PdfExpr( left, right, Operation::mult );
 }
 
 // Operations with a pdf expression and a pdf model.
-const Pdf operator+( const Pdf& left, const PdfModel& right )
+const PdfExpr operator+( const PdfExpr& left, const PdfModel& right )
 {
   // Cannot add two pdfs that do not depend on exactly the same variables.
   if ( left.varNames() != right.varNames() )
     throw PdfException( "Cannot add two pdfs that do not depend on the same variables." );
 
-  return Pdf( left, right, Operation::plus );
+  return PdfExpr( left, right, Operation::plus );
 }
 
-const Pdf operator*( const Pdf& left, const PdfModel& right )
+const PdfExpr operator*( const PdfExpr& left, const PdfModel& right )
 {
   // Cannot multiply two pdfs that share some variable.
   std::vector< std::string > lVars = left. varNames();
@@ -967,20 +965,20 @@ const Pdf operator*( const Pdf& left, const PdfModel& right )
   if ( ! intersect.empty() )
     throw PdfException( "Cannot multiply two pdfs that depend on some common variable." );
 
-  return Pdf( left, right, Operation::mult );
+  return PdfExpr( left, right, Operation::mult );
 }
 
 // Operations with two pdf expressions.
-const Pdf operator+( const Pdf& left, const Pdf& right )
+const PdfExpr operator+( const PdfExpr& left, const PdfExpr& right )
 {
   // Cannot add two pdfs that do not depend on exactly the same variables.
   if ( left.varNames() != right.varNames() )
     throw PdfException( "Cannot add two pdfs that do not depend on the same variables." );
 
-  return Pdf( left, right, Operation::plus );
+  return PdfExpr( left, right, Operation::plus );
 }
 
-const Pdf operator*( const Pdf& left, const Pdf& right )
+const PdfExpr operator*( const PdfExpr& left, const PdfExpr& right )
 {
   // Cannot multiply two pdfs that share some variable.
   std::vector< std::string > lVars = left. varNames();
@@ -993,113 +991,113 @@ const Pdf operator*( const Pdf& left, const Pdf& right )
   if ( ! intersect.empty() )
     throw PdfException( "Cannot multiply two pdfs that depend on some common variable." );
 
-  return Pdf( left, right, Operation::mult );
+  return PdfExpr( left, right, Operation::mult );
 }
 
 
 // Operations with a parameter and a model.
-const Pdf operator*( const Parameter& left, const PdfModel& right )
+const PdfExpr operator*( const Parameter& left, const PdfModel& right )
 {
-  return Pdf( left, right, Operation::mult );
+  return PdfExpr( left, right, Operation::mult );
 }
 
-const Pdf operator*( const PdfModel& left, const Parameter& right )
+const PdfExpr operator*( const PdfModel& left, const Parameter& right )
 {
-  return Pdf( left, right, Operation::mult );
+  return PdfExpr( left, right, Operation::mult );
 }
 
-const Pdf operator/( const PdfModel& left, const Parameter& right )
+const PdfExpr operator/( const PdfModel& left, const Parameter& right )
 {
-  return Pdf( left, right, Operation::div );
+  return PdfExpr( left, right, Operation::div );
 }
 
 
 // Operations with a parameter expression and a model.
-const Pdf operator*( const ParameterExpr& left, const PdfModel& right )
+const PdfExpr operator*( const ParameterExpr& left, const PdfModel& right )
 {
-  return Pdf( left, right, Operation::mult );
+  return PdfExpr( left, right, Operation::mult );
 }
 
-const Pdf operator*( const PdfModel& left, const ParameterExpr& right )
+const PdfExpr operator*( const PdfModel& left, const ParameterExpr& right )
 {
-  return Pdf( left, right, Operation::mult );
+  return PdfExpr( left, right, Operation::mult );
 }
 
-const Pdf operator/( const PdfModel& left, const ParameterExpr& right )
+const PdfExpr operator/( const PdfModel& left, const ParameterExpr& right )
 {
-  return Pdf( left, right, Operation::div );
+  return PdfExpr( left, right, Operation::div );
 }
 
 
 // Operations with a constant and a model.
-const Pdf operator*( const double& left, const PdfModel& right )
+const PdfExpr operator*( const double& left, const PdfModel& right )
 {
-  return Pdf( left, right, Operation::mult );
+  return PdfExpr( left, right, Operation::mult );
 }
 
-const Pdf operator*( const PdfModel& left, const double& right )
+const PdfExpr operator*( const PdfModel& left, const double& right )
 {
-  return Pdf( left, right, Operation::mult );
+  return PdfExpr( left, right, Operation::mult );
 }
 
-const Pdf operator/( const PdfModel& left, const double& right )
+const PdfExpr operator/( const PdfModel& left, const double& right )
 {
-  return Pdf( left, right, Operation::div );
+  return PdfExpr( left, right, Operation::div );
 }
 
 
 // Operations with a parameter and a pdf expression.
-const Pdf operator*( const Parameter& left, const Pdf& right )
+const PdfExpr operator*( const Parameter& left, const PdfExpr& right )
 {
-  return Pdf( left, right, Operation::mult );
+  return PdfExpr( left, right, Operation::mult );
 }
 
-const Pdf operator*( const Pdf& left, const Parameter& right )
+const PdfExpr operator*( const PdfExpr& left, const Parameter& right )
 {
-  return Pdf( left, right, Operation::mult );
+  return PdfExpr( left, right, Operation::mult );
 }
 
-const Pdf operator/( const Pdf& left, const Parameter& right )
+const PdfExpr operator/( const PdfExpr& left, const Parameter& right )
 {
-  return Pdf( left, right, Operation::div );
+  return PdfExpr( left, right, Operation::div );
 }
 
 
 // Operations with a parameter expression and a pdf expression.
-const Pdf operator*( const ParameterExpr& left, const Pdf& right )
+const PdfExpr operator*( const ParameterExpr& left, const PdfExpr& right )
 {
-  return Pdf( left, right, Operation::mult );
+  return PdfExpr( left, right, Operation::mult );
 }
 
-const Pdf operator*( const Pdf& left, const ParameterExpr& right )
+const PdfExpr operator*( const PdfExpr& left, const ParameterExpr& right )
 {
-  return Pdf( left, right, Operation::mult );
+  return PdfExpr( left, right, Operation::mult );
 }
 
-const Pdf operator/( const Pdf& left, const ParameterExpr& right )
+const PdfExpr operator/( const PdfExpr& left, const ParameterExpr& right )
 {
-  return Pdf( left, right, Operation::div );
+  return PdfExpr( left, right, Operation::div );
 }
 
 
 // Operations with a constant and a pdf expression.
-const Pdf operator*( const double& left, const Pdf& right )
+const PdfExpr operator*( const double& left, const PdfExpr& right )
 {
-  return Pdf( left, right, Operation::mult );
+  return PdfExpr( left, right, Operation::mult );
 }
 
-const Pdf operator*( const Pdf& left, const double& right )
+const PdfExpr operator*( const PdfExpr& left, const double& right )
 {
-  return Pdf( left, right, Operation::mult );
+  return PdfExpr( left, right, Operation::mult );
 }
 
-const Pdf operator/( const Pdf& left, const double& right )
+const PdfExpr operator/( const PdfExpr& left, const double& right )
 {
-  return Pdf( left, right, Operation::div );
+  return PdfExpr( left, right, Operation::div );
 }
 
 
-const Pdf operator^( const Pdf& left, const Pdf& right ) throw( PdfException )
+const PdfExpr operator^( const PdfExpr& left, const PdfExpr& right ) throw( PdfException )
 {
   // Find the sets of variables that are common in all the
   //    models of the left and the right.
@@ -1112,8 +1110,8 @@ const Pdf operator^( const Pdf& left, const Pdf& right ) throw( PdfException )
 			 commonRight.begin(), commonRight.end(),
 			 std::back_inserter( common ) );
 
-  const Pdf* resolution;
-  const Pdf* pdf;
+  const PdfExpr* resolution;
+  const PdfExpr* pdf;
 
   if ( common == commonLeft )
     {
@@ -1130,6 +1128,6 @@ const Pdf operator^( const Pdf& left, const Pdf& right ) throw( PdfException )
 
   // ALERTA: MANCA FER TOTA LA IMPLEMENTACIÓ DE LA CONVOLUCIÓ.
 
-  return *( new Pdf() );
+  return *( new PdfExpr() );
 }
 

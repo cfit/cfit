@@ -4,14 +4,14 @@
 #include <string>
 
 class PdfModel;
-class Pdf;
+class PdfExpr;
 class ParameterExpr;
 class Variable;
 class Function;
 
 class Parameter
 {
-  friend class Pdf;
+  friend class PdfExpr;
 
 private:
   std::string _name;
@@ -145,13 +145,13 @@ public:
   friend const ParameterExpr cos      ( const Parameter&     par );
   friend const ParameterExpr tan      ( const Parameter&     par );
 
-  friend const Pdf           operator*( const Parameter&     left, const PdfModel&      right );
-  friend const Pdf           operator*( const PdfModel&      left, const Parameter&     right );
-  friend const Pdf           operator/( const PdfModel&      left, const Parameter&     right );
+  friend const PdfExpr       operator*( const Parameter&     left, const PdfModel&      right );
+  friend const PdfExpr       operator*( const PdfModel&      left, const Parameter&     right );
+  friend const PdfExpr       operator/( const PdfModel&      left, const Parameter&     right );
 
-  friend const Pdf           operator*( const Parameter&     left, const Pdf&           right );
-  friend const Pdf           operator*( const Pdf&           left, const Parameter&     right );
-  friend const Pdf           operator/( const Pdf&           left, const Parameter&     right );
+  friend const PdfExpr       operator*( const Parameter&     left, const PdfExpr&       right );
+  friend const PdfExpr       operator*( const PdfExpr&       left, const Parameter&     right );
+  friend const PdfExpr       operator/( const PdfExpr&       left, const Parameter&     right );
 };
 
 #endif

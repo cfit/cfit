@@ -12,13 +12,13 @@
 #include <cfit/parameter.hh>
 #include <cfit/parameterexpr.hh>
 #include <cfit/pdfmodel.hh>
-#include <cfit/pdf.hh>
+#include <cfit/pdfexpr.hh>
 #include <cfit/operation.hh>
 
 #include <cfit/random.hh>
 
 
-Pdf::Pdf( const Pdf& right )
+PdfExpr::PdfExpr( const PdfExpr& right )
 {
   _varMap = right._varMap;
   _parMap = right._parMap;
@@ -36,7 +36,7 @@ Pdf::Pdf( const Pdf& right )
 }
 
 
-Pdf::~Pdf()
+PdfExpr::~PdfExpr()
 {
   // Delete all the pointers to pdf models, since they have been allocated
   //    by each copy() function of each pdf model.
@@ -46,7 +46,7 @@ Pdf::~Pdf()
 }
 
 
-void Pdf::clear()
+void PdfExpr::clear()
 {
   _varMap.clear();
   _parMap.clear();
@@ -67,7 +67,7 @@ void Pdf::clear()
 
 
 // Append a model.
-void Pdf::append( const PdfModel& model )
+void PdfExpr::append( const PdfModel& model )
 {
   _varMap.insert( model._varMap.begin(), model._varMap.end() );
   _parMap.insert( model._parMap.begin(), model._parMap.end() );
@@ -77,7 +77,7 @@ void Pdf::append( const PdfModel& model )
 }
 
 // Append a pdf expression.
-void Pdf::append( const Pdf& pdf )
+void PdfExpr::append( const PdfExpr& pdf )
 {
   _varMap.insert(               pdf._varMap.begin(), pdf._varMap .end() );
   _parMap.insert(               pdf._parMap.begin(), pdf._parMap .end() );
@@ -92,7 +92,7 @@ void Pdf::append( const Pdf& pdf )
 }
 
 // Append a parameter.
-void Pdf::append( const Parameter& par )
+void PdfExpr::append( const Parameter& par )
 {
   _parMap[ par.name() ] = par;
   _parms.push_back( par );
@@ -101,7 +101,7 @@ void Pdf::append( const Parameter& par )
 }
 
 // Append a parameter expression.
-void Pdf::append( const ParameterExpr& expr )
+void PdfExpr::append( const ParameterExpr& expr )
 {
   for ( std::vector< Parameter >::const_iterator par = expr._parms.begin(); par != expr._parms.end(); ++par )
     _parMap[ par->name() ] = *par;
@@ -113,7 +113,7 @@ void Pdf::append( const ParameterExpr& expr )
 }
 
 // Append a constant.
-void Pdf::append( const double& ctnt )
+void PdfExpr::append( const double& ctnt )
 {
   _ctnts.push_back( ctnt );
 
@@ -121,7 +121,7 @@ void Pdf::append( const double& ctnt )
 }
 
 // Append a binary operation. No unary operation should ever be appended.
-void Pdf::append( const Operation::Op& oper )
+void PdfExpr::append( const Operation::Op& oper )
 {
   _opers.push_back( oper );
 
@@ -130,7 +130,7 @@ void Pdf::append( const Operation::Op& oper )
 
 
 // Assignment operation.
-const Pdf& Pdf::operator=( const PdfModel& right )
+const PdfExpr& PdfExpr::operator=( const PdfModel& right )
 {
   clear();
 
@@ -139,7 +139,7 @@ const Pdf& Pdf::operator=( const PdfModel& right )
 }
 
 // Assignment operations with a pdf model.
-const Pdf& Pdf::operator+=( const PdfModel& right ) throw( PdfException )
+const PdfExpr& PdfExpr::operator+=( const PdfModel& right ) throw( PdfException )
 {
   // Cannot add two pdfs that do not depend on exactly the same variables.
   if ( ! this->_expression.empty() )
@@ -159,7 +159,7 @@ const Pdf& Pdf::operator+=( const PdfModel& right ) throw( PdfException )
   return *this;
 }
 
-const Pdf& Pdf::operator*=( const PdfModel& right ) throw( PdfException )
+const PdfExpr& PdfExpr::operator*=( const PdfModel& right ) throw( PdfException )
 {
   // Cannot multiply two pdfs that share some variable.
   std::vector< std::string > theseVars = this->varNames();
@@ -178,7 +178,7 @@ const Pdf& Pdf::operator*=( const PdfModel& right ) throw( PdfException )
 }
 
 // Assignment operations with a pdf expression.
-const Pdf& Pdf::operator+=( const Pdf& right ) throw( PdfException )
+const PdfExpr& PdfExpr::operator+=( const PdfExpr& right ) throw( PdfException )
 {
   // Cannot add two pdfs that do not depend on exactly the same variables.
   if ( ! _expression.empty() )
@@ -198,7 +198,7 @@ const Pdf& Pdf::operator+=( const Pdf& right ) throw( PdfException )
   return *this;
 }
 
-const Pdf& Pdf::operator*=( const Pdf& right ) throw( PdfException )
+const PdfExpr& PdfExpr::operator*=( const PdfExpr& right ) throw( PdfException )
 {
   // Cannot multiply two pdfs that share some variable.
   std::vector< std::string > theseVars = this->varNames();
@@ -217,14 +217,14 @@ const Pdf& Pdf::operator*=( const Pdf& right ) throw( PdfException )
 }
 
 // Assignment operations with a parameter.
-const Pdf& Pdf::operator*=( const Parameter& right )
+const PdfExpr& PdfExpr::operator*=( const Parameter& right )
 {
   append( right           );
   append( Operation::mult );
   return *this;
 }
 
-const Pdf& Pdf::operator/=( const Parameter& right )
+const PdfExpr& PdfExpr::operator/=( const Parameter& right )
 {
   append( right          );
   append( Operation::div );
@@ -232,14 +232,14 @@ const Pdf& Pdf::operator/=( const Parameter& right )
 }
 
 // Assignment operations with a parameter expression.
-const Pdf& Pdf::operator*=( const ParameterExpr& right )
+const PdfExpr& PdfExpr::operator*=( const ParameterExpr& right )
 {
   append( right           );
   append( Operation::mult );
   return *this;
 }
 
-const Pdf& Pdf::operator/=( const ParameterExpr& right )
+const PdfExpr& PdfExpr::operator/=( const ParameterExpr& right )
 {
   append( right          );
   append( Operation::div );
@@ -247,14 +247,14 @@ const Pdf& Pdf::operator/=( const ParameterExpr& right )
 }
 
 // Assignment operations with a constant.
-const Pdf& Pdf::operator*=( const double& right )
+const PdfExpr& PdfExpr::operator*=( const double& right )
 {
   append( right           );
   append( Operation::mult );
   return *this;
 }
 
-const Pdf& Pdf::operator/=( const double& right )
+const PdfExpr& PdfExpr::operator/=( const double& right )
 {
   append( right          );
   append( Operation::div );
@@ -263,7 +263,7 @@ const Pdf& Pdf::operator/=( const double& right )
 
 
 // Setter for individual variable.
-void Pdf::setVar( const std::string& name, const double& val, const double& err ) throw( PdfException )
+void PdfExpr::setVar( const std::string& name, const double& val, const double& err ) throw( PdfException )
 {
   if ( ! _varMap.count( name ) )
     throw PdfException( "Cannot set unexisting variable " + name + "." );
@@ -278,7 +278,7 @@ void Pdf::setVar( const std::string& name, const double& val, const double& err 
 }
 
 // Setter for individual parameter.
-void Pdf::setPar( const std::string& name, const double& val, const double& err ) throw( PdfException )
+void PdfExpr::setPar( const std::string& name, const double& val, const double& err ) throw( PdfException )
 {
   if ( ! _parMap.count( name ) )
     throw PdfException( "Cannot set unexisting parameter " + name + "." );
@@ -294,10 +294,10 @@ void Pdf::setPar( const std::string& name, const double& val, const double& err 
 
 
 
-void Pdf::setVars( const std::vector< double >& vars ) throw( PdfException )
+void PdfExpr::setVars( const std::vector< double >& vars ) throw( PdfException )
 {
   if ( _varMap.size() != vars.size() )
-    throw PdfException( "Pdf::setVars: Number of arguments passed does not match number of required arguments." );
+    throw PdfException( "PdfExpr::setVars: Number of arguments passed does not match number of required arguments." );
 
   // Set the local values of the variables.
   typedef std::map< std::string, Variable >::iterator vIter;
@@ -312,10 +312,10 @@ void Pdf::setVars( const std::vector< double >& vars ) throw( PdfException )
 }
 
 
-void Pdf::setPars( const std::vector< double >& pars ) throw( PdfException )
+void PdfExpr::setPars( const std::vector< double >& pars ) throw( PdfException )
 {
   if ( _parMap.size() != pars.size() )
-    throw PdfException( "Pdf::setPars( vector ): Number of arguments passed does not match number of required arguments." );
+    throw PdfException( "PdfExpr::setPars( vector ): Number of arguments passed does not match number of required arguments." );
 
   // Set the local values of the parameters.
   typedef std::map< std::string, Parameter >::iterator pIter;
@@ -330,7 +330,7 @@ void Pdf::setPars( const std::vector< double >& pars ) throw( PdfException )
 }
 
 
-void Pdf::setPars( const std::map< std::string, Parameter >& pars ) throw( PdfException )
+void PdfExpr::setPars( const std::map< std::string, Parameter >& pars ) throw( PdfException )
 {
   // Set the local values of the parameters.
   typedef std::map< std::string, Parameter >::const_iterator pIter;
@@ -344,13 +344,13 @@ void Pdf::setPars( const std::map< std::string, Parameter >& pars ) throw( PdfEx
 }
 
 
-void Pdf::setPars( const FunctionMinimum& min ) throw( PdfException )
+void PdfExpr::setPars( const FunctionMinimum& min ) throw( PdfException )
 {
   const MnUserParameters& pars = min.userParameters();
   const std::vector< MinuitParameter >& parVec = pars.parameters();
 
   if ( _parMap.size() != parVec.size() )
-    throw PdfException( "Pdf::setPars( minimum ): Number of arguments passed does not match number of required arguments." );
+    throw PdfException( "PdfExpr::setPars( minimum ): Number of arguments passed does not match number of required arguments." );
 
   // Set the local values of the parameters.
   typedef std::vector< MinuitParameter >::const_iterator pIter;
@@ -364,7 +364,7 @@ void Pdf::setPars( const FunctionMinimum& min ) throw( PdfException )
 }
 
 
-void Pdf::cache()
+void PdfExpr::cache()
 {
   typedef std::vector< PdfModel* >::const_iterator pIter;
   for ( pIter pdf = _pdfs.begin(); pdf != _pdfs.end(); ++pdf )
@@ -375,9 +375,9 @@ void Pdf::cache()
 
 
 
-// Before running this function, the Pdf::setVars( vars ) function must be called.
-//    To avoid the risk of forgetting it, run Pdf::evaluate( vars ).
-const double Pdf::evaluate() const throw( PdfException )
+// Before running this function, the PdfExpr::setVars( vars ) function must be called.
+//    To avoid the risk of forgetting it, run PdfExpr::evaluate( vars ).
+const double PdfExpr::evaluate() const throw( PdfException )
 {
   // Return 0 if any of the variables is off limits.
   typedef std::map< std::string, std::pair< double, double > >::const_iterator lIter;
@@ -436,7 +436,7 @@ const double Pdf::evaluate() const throw( PdfException )
   }
 
   if ( values.size() != 1 )
-    throw PdfException( "Pdf parse error: too many values have been supplied." );
+    throw PdfException( "PdfExpr parse error: too many values have been supplied." );
 
   return _scale * values.top();
 }
@@ -444,7 +444,7 @@ const double Pdf::evaluate() const throw( PdfException )
 
 
 
-const std::map< std::string, double > Pdf::generate() const throw( PdfException )
+const std::map< std::string, double > PdfExpr::generate() const throw( PdfException )
 {
   std::stack< double >                                values;
   std::stack< std::pair< std::size_t, std::size_t > > ranges;
@@ -559,7 +559,7 @@ const std::map< std::string, double > Pdf::generate() const throw( PdfException 
   }
 
   if ( values.size() != 1 )
-    throw PdfException( "Pdf parse error: too many values have been supplied." );
+    throw PdfException( "PdfExpr parse error: too many values have been supplied." );
 
   std::map< std::string, double > entry;
   std::map< std::string, double > partial;
@@ -576,10 +576,10 @@ const std::map< std::string, double > Pdf::generate() const throw( PdfException 
 
 
 
-const double Pdf::evaluate( const std::vector< double >& vars ) const throw( PdfException )
+const double PdfExpr::evaluate( const std::vector< double >& vars ) const throw( PdfException )
 {
   if ( _varMap.size() != vars.size() )
-    throw PdfException( "Pdf::evaluate: Number of arguments passed does not match number of required arguments." );
+    throw PdfException( "PdfExpr::evaluate: Number of arguments passed does not match number of required arguments." );
 
   // Dictionary of the variable names with the values passed.
   std::map< std::string, double > localVars;
@@ -642,13 +642,13 @@ const double Pdf::evaluate( const std::vector< double >& vars ) const throw( Pdf
       }
 
   if ( values.size() != 1 )
-    throw PdfException( "Pdf parse error: too many values have been supplied." );
+    throw PdfException( "PdfExpr parse error: too many values have been supplied." );
 
   return values.top();
 }
 
 
-void Pdf::setLimits( const Variable& var, const double& min, const double& max )
+void PdfExpr::setLimits( const Variable& var, const double& min, const double& max )
 {
   const double& totalArea = this->area();
   const double& limitArea = this->area( var.name(), min, max );
@@ -658,7 +658,7 @@ void Pdf::setLimits( const Variable& var, const double& min, const double& max )
 }
 
 
-void Pdf::setLimits( const std::string& var, const double& min, const double& max )
+void PdfExpr::setLimits( const std::string& var, const double& min, const double& max )
 {
   const double& totalArea = this->area();
   const double& limitArea = this->area( var, min, max );
@@ -672,7 +672,7 @@ void Pdf::setLimits( const std::string& var, const double& min, const double& ma
 // Get a vector with the names of the variables common in all the
 //    products of pdfs. This is the list of variables that can be
 //    integrated over in a convolution operation.
-std::vector< std::string > Pdf::commonVars() const throw( PdfException )
+std::vector< std::string > PdfExpr::commonVars() const throw( PdfException )
 {
   // Vectors that will contain the variables each model depends on.
   std::vector< std::string > x;
@@ -728,7 +728,7 @@ std::vector< std::string > Pdf::commonVars() const throw( PdfException )
 
 
 
-double Pdf::area( const std::string& var, const double& min, const double& max ) const throw( PdfException )
+double PdfExpr::area( const std::string& var, const double& min, const double& max ) const throw( PdfException )
 {
   std::stack< double > values;
 
@@ -780,13 +780,13 @@ double Pdf::area( const std::string& var, const double& min, const double& max )
     }
 
   if ( values.size() != 1 )
-    throw PdfException( "Pdf parse error: too many values have been supplied." );
+    throw PdfException( "PdfExpr parse error: too many values have been supplied." );
 
   return values.top();
 }
 
 
-double Pdf::area() const throw( PdfException )
+double PdfExpr::area() const throw( PdfException )
 {
   std::stack< double > values;
 
@@ -829,7 +829,7 @@ double Pdf::area() const throw( PdfException )
     }
 
   if ( values.size() != 1 )
-    throw PdfException( "Pdf parse error: too many values have been supplied." );
+    throw PdfException( "PdfExpr parse error: too many values have been supplied." );
 
   return values.top();
 }

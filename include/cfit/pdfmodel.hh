@@ -8,14 +8,14 @@
 #include <cfit/variable.hh>
 #include <cfit/parameter.hh>
 #include <cfit/pdfbase.hh>
-#include <cfit/pdf.hh>
+#include <cfit/pdfexpr.hh>
 
 
 class FunctionMinimum;
 
 class PdfModel : public PdfBase
 {
-  friend class Pdf;
+  friend class PdfExpr;
 
 protected:
   std::vector< std::string > _varOrder;
@@ -51,26 +51,26 @@ public:
   }
 
   // ALERTA AMB ELS OPERADORS. NO S'HAURIA DE PODER FER gauss1 += gauss2, O HAURIA D'ESTAR BEN CONTROLAT.
-  friend const Pdf operator+( const PdfModel&      left, const PdfModel&      right );
-  friend const Pdf operator*( const PdfModel&      left, const PdfModel&      right );
+  friend const PdfExpr operator+( const PdfModel&      left, const PdfModel&      right );
+  friend const PdfExpr operator*( const PdfModel&      left, const PdfModel&      right );
 
-  friend const Pdf operator+( const PdfModel&      left, const Pdf&           right );
-  friend const Pdf operator*( const PdfModel&      left, const Pdf&           right );
+  friend const PdfExpr operator+( const PdfModel&      left, const PdfExpr&       right );
+  friend const PdfExpr operator*( const PdfModel&      left, const PdfExpr&       right );
 
-  friend const Pdf operator+( const Pdf&           left, const PdfModel&      right );
-  friend const Pdf operator*( const Pdf&           left, const PdfModel&      right );
+  friend const PdfExpr operator+( const PdfExpr&       left, const PdfModel&      right );
+  friend const PdfExpr operator*( const PdfExpr&       left, const PdfModel&      right );
 
-  friend const Pdf operator*( const Parameter&     left, const PdfModel&      right );
-  friend const Pdf operator*( const PdfModel&      left, const Parameter&     right );
-  friend const Pdf operator/( const PdfModel&      left, const Parameter&     right );
+  friend const PdfExpr operator*( const Parameter&     left, const PdfModel&      right );
+  friend const PdfExpr operator*( const PdfModel&      left, const Parameter&     right );
+  friend const PdfExpr operator/( const PdfModel&      left, const Parameter&     right );
 
-  friend const Pdf operator*( const ParameterExpr& left, const PdfModel&      right );
-  friend const Pdf operator*( const PdfModel&      left, const ParameterExpr& right );
-  friend const Pdf operator/( const PdfModel&      left, const ParameterExpr& right );
+  friend const PdfExpr operator*( const ParameterExpr& left, const PdfModel&      right );
+  friend const PdfExpr operator*( const PdfModel&      left, const ParameterExpr& right );
+  friend const PdfExpr operator/( const PdfModel&      left, const ParameterExpr& right );
 
-  friend const Pdf operator*( const double&        left, const PdfModel&      right );
-  friend const Pdf operator*( const PdfModel&      left, const double&        right );
-  friend const Pdf operator/( const PdfModel&      left, const double&        right );
+  friend const PdfExpr operator*( const double&        left, const PdfModel&      right );
+  friend const PdfExpr operator*( const PdfModel&      left, const double&        right );
+  friend const PdfExpr operator/( const PdfModel&      left, const double&        right );
 };
 
 #endif

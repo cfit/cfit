@@ -10,14 +10,14 @@
 
 
 class PdfModel;
-class Pdf;
+class PdfExpr;
 class CoefExpr;
 class Function;
 
 class ParameterExpr
 {
   friend class CoefExpr;
-  friend class Pdf;
+  friend class PdfExpr;
   friend class Function;
 
 private:
@@ -140,13 +140,13 @@ public:
   friend const CoefExpr operator/( const ParameterExpr& left, const std::complex< double >& right );
 
   // Binary arithmetic operations with pdfs.
-  friend const Pdf           operator*( const ParameterExpr& left, const PdfModel&      right );
-  friend const Pdf           operator*( const PdfModel&      left, const ParameterExpr& right );
-  friend const Pdf           operator/( const PdfModel&      left, const ParameterExpr& right );
+  friend const PdfExpr operator*( const ParameterExpr& left, const PdfModel&      right );
+  friend const PdfExpr operator*( const PdfModel&      left, const ParameterExpr& right );
+  friend const PdfExpr operator/( const PdfModel&      left, const ParameterExpr& right );
 
-  friend const Pdf           operator*( const ParameterExpr& left, const Pdf&           right );
-  friend const Pdf           operator*( const Pdf&           left, const ParameterExpr& right );
-  friend const Pdf           operator/( const Pdf&           left, const ParameterExpr& right );
+  friend const PdfExpr operator*( const ParameterExpr& left, const PdfExpr&       right );
+  friend const PdfExpr operator*( const PdfExpr&       left, const ParameterExpr& right );
+  friend const PdfExpr operator/( const PdfExpr&       left, const ParameterExpr& right );
 
 
   // Operations with variables as the left operand.
