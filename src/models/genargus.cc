@@ -2,6 +2,8 @@
 #include <cfit/models/genargus.hh>
 #include <cfit/math.hh>
 
+#include <cfit/random.hh>
+
 GenArgus::GenArgus( const Variable& x, const Parameter& c, const Parameter& chi, const Parameter& p )
   : _hasLower( false ), _hasUpper( false ), _lower( 0.0 ), _upper( 0.0 )
 {
@@ -174,9 +176,9 @@ const double GenArgus::evaluate( const std::vector< double >& vars ) const throw
 
 const double GenArgus::area( const double& min, const double& max ) const throw( PdfException )
 {
-  const double& vc    = c();
-  const double& cSq   = std::pow( c()  , 2 );
-  const double& chiSq = std::pow( chi(), 2 );
+  const double& vc     = c();
+  const double& cSq    = std::pow( c()  , 2 );
+  const double& chiSq  = std::pow( chi(), 2 );
   const double& pPlus1 = p() + 1.0;
 
   const double& lower = _hasLower ? std::max( _lower, 0.0 ) : 0.0;
@@ -201,5 +203,42 @@ const double GenArgus::area( const double& min, const double& max ) const throw(
   retval *= ( Math::gamma_p( pPlus1, chiSq * argmax ) - Math::gamma_p( pPlus1, chiSq * argmin ) ) / _norm;
 
   return retval;
+}
+
+
+const std::map< std::string, double > GenArgus::generate() const throw( PdfException )
+{
+  const double& vc     = c();
+  const double& cSq    = std::pow( c()  , 2 );
+  const double& chiSq  = std::pow( chi(), 2 );
+  const double& pPlus1 = p() + 1.0;
+
+  const double& lower  = _hasLower ? std::max( _lower, 0.0 ) : 0.0;
+  const double& argmax = _hasLower ? 1.0 - std::pow( lower / vc, 2 ) : 1.0;
+
+  // Generate a flat random number.
+  const double& unif = Random::flat();
+
+  double genVal = 0.0;
+  std::map< std::string, double > gen;
+
+  // Deal with the special case where chi = 0.
+  if ( chiSq == 0.0 )
+  {
+    genVal = vc * std::sqrt( 1.0 - std::pow( argmax - _norm * unif * 2.0 * pPlus1 / cSq, 1.0 / pPlus1 ) );
+    gen[ getVar( 0 ).name() ] = genVal;
+
+    return gen;
+  }
+
+  // Define useful terms for the random number generation.
+  const double& minTerm = Math::gamma_q( pPlus1, chiSq * argmax );
+  const double& rndTerm = _norm * unif * 2.0 * std::pow( chiSq, pPlus1 ) / cSq / std::tgamma( pPlus1 );
+
+  // Generate a random number.
+  genVal = vc * std::sqrt( 1.0 - Math::invgamma_q( pPlus1, minTerm + rndTerm ) / chiSq );
+  gen[ getVar( 0 ).name() ] = genVal;
+
+  return gen;
 }
 
