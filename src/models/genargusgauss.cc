@@ -227,7 +227,7 @@ const double GenArgusGauss::genargusgauss( const double& x ) const
 
   // Determine the required polynomial degree as the number of Gaussian sigmas
   //    in the Argus range of definition (0,c).
-  const unsigned& degree = 2.0 * vc / sigma();
+  const unsigned& degree = 3.0 * vc / sigma();
 
   // Determine the maximum relevant root to be used. For index k > degree/2,
   //    the Chebyshev polynomial root is negative or zero, and the Argus pdf
