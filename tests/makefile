@@ -1,5 +1,5 @@
 
-BINARIES = testGauss testCrystalBall testDoubleCrystalBall testExponential testGenArgus testResos
+BINARIES = testGauss testCrystalBall testDoubleCrystalBall testExponential testGenArgus testGenArgusGauss testResos
 
 BDIR = bin
 HDIR = ../include
