@@ -11,9 +11,10 @@
 #include <mpi.h>
 #endif
 
-void Dataset::push( const std::string& field, const double value, const double error )
+// Add event from field, value and error.
+void Dataset::push( const std::string& field, const double& value, const double& error )
 {
-  _data[ field ].push_back( std::make_pair< double >( value, error ) );
+  _data[ field ].push_back( std::make_pair( value, error ) );
 }
 
 

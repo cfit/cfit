@@ -15,7 +15,7 @@ public:
   Dataset()  {};
   ~Dataset() {};
 
-  void push( const std::string& field, const double value, const double error = 0. );
+  void push( const std::string& field, const double& value, const double& error = 0. );
 
   // Getters.
   int                        size  ()                                      const;
