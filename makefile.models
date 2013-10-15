@@ -15,7 +15,7 @@ HDRDIRS = $(HDIR)
 LIBDIRS = $(LDIR)
 LIBLIST = minuit cfit
 
-MODELS = gauss exponential crystalball doublecrystalball argus genargus genargusgauss polynomial \
+MODELS = gauss exponential expogauss crystalball doublecrystalball argus genargus genargusgauss polynomial \
          relbreitwigner gounarissakurai glass decay3body
 FILES_gauss =
 FILES_relbreitwigner =
