@@ -24,8 +24,10 @@ protected:
   void push( const Variable&  var ) throw( PdfException );
   void push( const Parameter& par ) throw( PdfException );
 
-  const Variable&  getVar( int index ) const;
-  const Parameter& getPar( int index ) const;
+  const Variable&  getVar( const Variable&  var ) const;
+  const Variable&  getVar( const int&       idx ) const;
+  const Parameter& getPar( const Parameter& par ) const;
+  const Parameter& getPar( const int&       idx ) const;
 
   virtual const double area( const double& min, const double& max ) const throw( PdfException );
 

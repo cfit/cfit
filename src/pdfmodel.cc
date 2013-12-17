@@ -33,16 +33,28 @@ void PdfModel::push( const Parameter& par ) throw( PdfException )
 }
 
 
-// Retrieve the variable at specified index.
-const Variable& PdfModel::getVar( int index ) const
+// Retrieve the mapped variable with same name as argument.
+const Variable& PdfModel::getVar( const Variable& var ) const
 {
-  return _varMap.find( _varOrder[ index ] )->second;
+  return _varMap.find( var.name() )->second;
+}
+
+// Retrieve the variable at specified index.
+const Variable& PdfModel::getVar( const int& idx ) const
+{
+  return _varMap.find( _varOrder[ idx ] )->second;
+}
+
+// Retrieve the mapped parameter with same name as argument.
+const Parameter& PdfModel::getPar( const Parameter& par ) const
+{
+  return _parMap.find( par.name() )->second;
 }
 
 // Retrieve the parameter at specified index.
-const Parameter& PdfModel::getPar( int index ) const
+const Parameter& PdfModel::getPar( const int& idx ) const
 {
-  return _parMap.find( _parOrder[ index ] )->second;
+  return _parMap.find( _parOrder[ idx ] )->second;
 }
 
 
