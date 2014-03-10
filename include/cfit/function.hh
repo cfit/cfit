@@ -92,7 +92,8 @@ public:
 
   const bool dependsOn( const std::string& varName ) const { return _varMap.count( varName ); };
 
-  double evaluate() const throw( PdfException );
+  double evaluate( const std::map< std::string, double >& varMap ) const throw( PdfException );
+  double evaluate()                                                const throw( PdfException );
 
   // Assignment operators.
   template< class T > const Function& operator+=( const T& arg );
