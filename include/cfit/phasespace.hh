@@ -2,6 +2,7 @@
 #define __PHASESPACE_HH__
 
 #include <cmath>
+#include <exception>
 
 class PhaseSpace
 {
@@ -20,11 +21,6 @@ private:
 
   static const double kallen( const double& x, const double& y, const double& z );
 
-  const double mSq13min( const double& mSq12 ) const;
-  const double mSq13max( const double& mSq12 ) const;
-  const double mSq23min( const double& mSq12 ) const;
-  const double mSq23max( const double& mSq12 ) const;
-
 public:
   PhaseSpace();
   PhaseSpace( const double& mMother, const double& m1, const double& m2, const double& m3 );
@@ -40,8 +36,15 @@ public:
   const double mSq2()      const { return _mSq2;      }
   const double mSq3()      const { return _mSq3;      }
 
+  const double mSqSum()    const { return _mSqSum;    }
+
   const double m  ( unsigned index ) const;
   const double mSq( unsigned index ) const;
+
+  const double mSq13min( const double& mSq12 ) const;
+  const double mSq13max( const double& mSq12 ) const;
+  const double mSq23min( const double& mSq12 ) const;
+  const double mSq23max( const double& mSq12 ) const;
 
   const double mSq12min() const { return std::pow( _m1      + _m2, 2 ); };
   const double mSq12max() const { return std::pow( _mMother - _m3, 2 ); };
@@ -49,6 +52,24 @@ public:
   const double mSq13max() const { return std::pow( _mMother - _m2, 2 ); };
   const double mSq23min() const { return std::pow( _m2      + _m3, 2 ); };
   const double mSq23max() const { return std::pow( _mMother - _m1, 2 ); };
+
+  const double mSqMin( const unsigned& index ) const
+  {
+    if ( index == 0 ) return mSq12min();
+    if ( index == 1 ) return mSq13min();
+    if ( index == 2 ) return mSq23min();
+
+    throw std::exception();
+  };
+
+  const double mSqMax( const unsigned& index ) const
+  {
+    if ( index == 0 ) return mSq12max();
+    if ( index == 1 ) return mSq13max();
+    if ( index == 2 ) return mSq23max();
+
+    throw std::exception();
+  };
 
   // Check if the kinematically allowed region contains a given point.
   bool contains( const double& mSq12, const double& mSq13, const double& mSq23 ) const;
