@@ -16,7 +16,7 @@ LIBDIRS = $(LDIR)
 LIBLIST = minuit cfit
 
 MODELS = gauss exponential expogauss crystalball doublecrystalball argus genargus genargusgauss polynomial \
-         relbreitwigner gounarissakurai glass decay3body
+         relbreitwigner flatte gounarissakurai glass decay3body
 FILES_gauss =
 FILES_relbreitwigner =
 FILES_gounarissakurai =
