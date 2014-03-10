@@ -9,7 +9,7 @@ Decay3Body::Decay3Body( const Variable&   mSq12,
 			const Variable&   mSq23,
 			const Amplitude&  amp  ,
 			const PhaseSpace& ps     )
-  : DecayModel( mSq12, mSq13, mSq23, amp, ps ), _norm( 1. )
+  : DecayModel( mSq12, mSq13, mSq23, amp, ps ), _norm( 1.0 )
 {
   // Do calculations common to all values of variables
   //    (usually compute norm).
@@ -158,7 +158,6 @@ const double Decay3Body::evaluateFuncs() const
 }
 
 
-
 void Decay3Body::cache()
 {
   // Compute the value of _norm.
@@ -181,8 +180,8 @@ void Decay3Body::cache()
   for ( int binX = 0; binX < nBins; ++binX )
     for ( int binY = 0; binY < nBins; ++binY )
     {
-      mSq12 = min + step * ( binX + .5 );
-      mSq13 = min + step * ( binY + .5 );
+      mSq12 = min + step * ( binX + 0.5 );
+      mSq13 = min + step * ( binY + 0.5 );
       mSq23 = mSqSum - mSq12 - mSq13;
 
       // Proceed only if the point lies inside the kinematically allowed Dalitz region.
@@ -194,6 +193,29 @@ void Decay3Body::cache()
   _norm *= std::pow( step, 2 );
 
   return;
+}
+
+
+
+const double Decay3Body::evaluate( const double& mSq12, const double& mSq13, const double& mSq23 ) const throw( PdfException )
+{
+  // Phase space amplitude of the decay of the particle.
+  std::complex< double > amp = _amp.evaluate( _ps, mSq12, mSq13, mSq23 );
+
+  // std::norm returns the squared modulus of the complex number, not its norm.
+  return std::norm( amp ) * evaluateFuncs( mSq12, mSq13, mSq23 ) / _norm;
+}
+
+
+const double Decay3Body::evaluate( const double& mSq12, const double& mSq13 ) const throw( PdfException )
+{
+  const double& mSq23 = _ps.mSqSum() - mSq12 - mSq13;
+
+  // Phase space amplitude of the decay of the particle.
+  std::complex< double > amp = _amp.evaluate( _ps, mSq12, mSq13, mSq23 );
+
+  // std::norm returns the squared modulus of the complex number, not its norm.
+  return std::norm( amp ) * evaluateFuncs( mSq12, mSq13, mSq23 ) / _norm;
 }
 
 
@@ -209,7 +231,15 @@ const double Decay3Body::evaluate() const throw( PdfException )
 
 const double Decay3Body::evaluate( const std::vector< double >& vars ) const throw( PdfException )
 {
-  throw PdfException( "Do not use evaluate( vars ) in decay3body" );
+  std::size_t size = vars.size();
+
+  if ( size == 2 )
+    return evaluate( vars[ 0 ], vars[ 1 ] );
+
+  if ( size == 3 )
+    return evaluate( vars[ 0 ], vars[ 1 ], vars[ 2 ] );
+
+  throw PdfException( "Decay3Body can only take either 2 or 3 arguments." );
 }
 
 

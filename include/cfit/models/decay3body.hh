@@ -42,8 +42,10 @@ public:
   void setPars( const FunctionMinimum&                    min  ) throw( PdfException );
 
   void cache();
-  const double evaluate(                                   ) const throw( PdfException );
-  const double evaluate( const std::vector< double >& vars ) const throw( PdfException );
+  const double evaluate(                                                               ) const throw( PdfException );
+  const double evaluate( const double& mSq12, const double& mSq13, const double& mSq23 ) const throw( PdfException );
+  const double evaluate( const double& mSq12, const double& mSq13                      ) const throw( PdfException );
+  const double evaluate( const std::vector< double >& vars                             ) const throw( PdfException );
 
   const std::map< std::string, double > generate();
 
