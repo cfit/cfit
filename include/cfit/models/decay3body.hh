@@ -22,7 +22,7 @@ private:
   std::default_random_engine _generator;
 
   const double evaluateFuncs() const;
-  const double evaluateFuncs( const double& mSq12, const double& mSq13, const double& mSq23 );
+  const double evaluateFuncs( const double& mSq12, const double& mSq13, const double& mSq23 ) const;
 
 public:
   Decay3Body( const Variable&   mSq12,

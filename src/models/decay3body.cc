@@ -121,22 +121,24 @@ void Decay3Body::setPars( const FunctionMinimum& min ) throw( PdfException )
 
 
 
-const double Decay3Body::evaluateFuncs( const double& mSq12, const double& mSq13, const double& mSq23 )
+const double Decay3Body::evaluateFuncs( const double& mSq12, const double& mSq13, const double& mSq23 ) const
 {
   double value = 1.0;
 
-  const std::string& name0 = getVar( 0 ).name(); // mSq12
-  const std::string& name1 = getVar( 1 ).name(); // mSq13
-  const std::string& name2 = getVar( 2 ).name(); // mSq23
+  const std::string& name12 = getVar( 0 ).name(); // mSq12
+  const std::string& name13 = getVar( 1 ).name(); // mSq13
+  const std::string& name23 = getVar( 2 ).name(); // mSq23
 
-  typedef std::vector< Function >::iterator fIter;
+  typedef std::vector< Function >::const_iterator fIter;
+
+  std::map< std::string, double > varMap;
   for ( fIter func = _funcs.begin(); func != _funcs.end(); ++func )
   {
-    if ( func->dependsOn( name0 ) ) func->setVar( name0, mSq12 );
-    if ( func->dependsOn( name1 ) ) func->setVar( name1, mSq13 );
-    if ( func->dependsOn( name2 ) ) func->setVar( name2, mSq23 );
+    if ( func->dependsOn( name12 ) ) varMap[ name12 ] = mSq12;
+    if ( func->dependsOn( name13 ) ) varMap[ name13 ] = mSq13;
+    if ( func->dependsOn( name23 ) ) varMap[ name23 ] = mSq23;
 
-    value *= func->evaluate();
+    value *= func->evaluate( varMap );
   }
 
   // Always return a non-negative value. Default to zero.
