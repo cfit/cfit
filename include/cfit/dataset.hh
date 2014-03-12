@@ -18,6 +18,7 @@ public:
   ~Dataset() {};
 
   void push( const std::string& field, const double& value, const double& error = 0. );
+  void push( const std::map< std::string, double >& event ); // Map of fields and values.
 
   // Getters.
   int                        size  ()                                      const;

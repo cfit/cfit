@@ -18,6 +18,15 @@ void Dataset::push( const std::string& field, const double& value, const double&
 }
 
 
+// Add event from map of fields and values.
+void Dataset::push( const std::map< std::string, double >& event )
+{
+  typedef std::map< std::string, double >::const_iterator fIter;
+  for ( fIter entry = event.begin(); entry != event.end(); ++entry )
+    _data[ entry->first ].push_back( std::make_pair( entry->second, 0.0 ) );
+}
+
+
 // Getters.
 int Dataset::size() const
 {
