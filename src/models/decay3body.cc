@@ -166,11 +166,11 @@ void Decay3Body::cache()
 
   // Define the properties of the integration method.
   const int    nBins = 400;
-  const double min   = std::pow( _ps.m1()      + _ps.m2(), 2 );
-  const double max   = std::pow( _ps.mMother() - _ps.m3(), 2 );
+  const double min   = _ps.mSq12min();
+  const double max   = _ps.mSq12max();
   const double step  = ( max - min ) / double( nBins );
 
-  const double mSqSum = _ps.mSqMother() + _ps.mSq1() + _ps.mSq2() + _ps.mSq3();
+  const double mSqSum = _ps.mSqSum();
 
   // Define the variables at each bin.
   double mSq12;
