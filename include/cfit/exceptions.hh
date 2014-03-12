@@ -25,11 +25,24 @@ private:
   std::string _what;
   bool _critical;
 public:
-  PdfException( std::string str )
-  {
-    _what = str;
-  }
+  PdfException( const std::string& str )
+    : _what( str )
+  {}
   ~PdfException() throw() {}
+  const char* what() const throw() { return _what.c_str(); }
+};
+
+
+class DataException : public std::exception
+{
+private:
+  std::string _what;
+  bool _critical;
+public:
+  DataException( const std::string& str )
+    : _what( str )
+  {}
+  ~DataException() throw() {}
   const char* what() const throw() { return _what.c_str(); }
 };
 

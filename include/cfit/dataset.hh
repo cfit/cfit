@@ -6,6 +6,8 @@
 #include <vector>
 #include <utility>
 
+#include <cfit/exceptions.hh>
+
 class Dataset
 {
 private:
@@ -19,10 +21,10 @@ public:
 
   // Getters.
   int                        size  ()                                      const;
-  double                     value ( const std::string& field, int entry ) const;
-  double                     error ( const std::string& field, int entry ) const;
-  std::vector< double >      values( const std::string& field )            const;
-  std::vector< double >      errors( const std::string& field )            const;
+  double                     value ( const std::string& field, int entry ) const throw( DataException );
+  double                     error ( const std::string& field, int entry ) const throw( DataException );
+  std::vector< double >      values( const std::string& field )            const throw( DataException );
+  std::vector< double >      errors( const std::string& field )            const throw( DataException );
   std::vector< std::string > fields()                                      const;
 //void                       dump  ()                                      const;
 

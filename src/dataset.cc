@@ -25,21 +25,31 @@ int Dataset::size() const
 }
 
 
-double Dataset::value( const std::string& field, int entry ) const
+double Dataset::value( const std::string& field, int entry ) const throw( DataException )
 {
+  if ( ! _data.count( field ) )
+    throw DataException( "Dataset: requested variable " + field + " does not exist in dataset" );
+
   return _data.find( field )->second[ entry ].first;
 }
 
 
-double Dataset::error( const std::string& field, int entry ) const
+double Dataset::error( const std::string& field, int entry ) const throw( DataException )
 {
+  if ( ! _data.count( field ) )
+    throw DataException( "Dataset: requested variable " + field + " does not exist in dataset" );
+
   return _data.find( field )->second[ entry ].second;
 }
 
 
-std::vector< double > Dataset::values( const std::string& field ) const
+std::vector< double > Dataset::values( const std::string& field ) const throw( DataException )
 {
   std::vector< double > vals;
+
+  if ( ! _data.count( field ) )
+    throw DataException( "Dataset: requested variable " + field + " does not exist in dataset" );
+
   const std::vector< std::pair< double, double > >& entries = _data.find( field )->second;
 
   std::transform( entries.begin(), entries.end(), std::back_inserter( vals ), Select1st() );
@@ -48,9 +58,13 @@ std::vector< double > Dataset::values( const std::string& field ) const
 }
 
 
-std::vector< double > Dataset::errors( const std::string& field ) const
+std::vector< double > Dataset::errors( const std::string& field ) const throw( DataException )
 {
   std::vector< double > errs;
+
+  if ( ! _data.count( field ) )
+    throw DataException( "Dataset: requested variable " + field + " does not exist in dataset" );
+
   const std::vector< std::pair< double, double > >& entries = _data.find( field )->second;
 
   std::transform( entries.begin(), entries.end(), std::back_inserter( errs ), Select2nd() );
