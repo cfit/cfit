@@ -19,8 +19,6 @@ private:
 
   std::vector< Function > _funcs;
 
-  std::default_random_engine _generator;
-
   const double evaluateFuncs() const;
   const double evaluateFuncs( const double& mSq12, const double& mSq13, const double& mSq23 ) const;
 
@@ -47,7 +45,7 @@ public:
   const double evaluate( const double& mSq12, const double& mSq13                      ) const throw( PdfException );
   const double evaluate( const std::vector< double >& vars                             ) const throw( PdfException );
 
-  const std::map< std::string, double > generate();
+  const std::map< std::string, double > generate() const throw( PdfException );
 
   friend const Decay3Body  operator* (       Decay3Body left, const Function&  right );
   friend const Decay3Body  operator* ( const Function&  left,       Decay3Body right );

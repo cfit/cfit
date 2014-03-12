@@ -1,8 +1,7 @@
 
-#include <random>
-
 #include <cfit/models/decay3body.hh>
 #include <cfit/function.hh>
+#include <cfit/random.hh>
 
 Decay3Body::Decay3Body( const Variable&   mSq12,
 			const Variable&   mSq13,
@@ -314,7 +313,7 @@ const Decay3Body operator*( const Function& left, Decay3Body right )
 }
 
 
-const std::map< std::string, double > Decay3Body::generate()
+const std::map< std::string, double > Decay3Body::generate() const throw( PdfException )
 {
   // Generate mSq12 and mSq13, and compute mSq23 from these.
   const double& min12 = std::pow( _ps.m1()      + _ps.m2(), 2 );
@@ -335,36 +334,32 @@ const std::map< std::string, double > Decay3Body::generate()
   // Generate uniform mSq12 and mSq13.
   double mSq12 = 0.0;
   double mSq13 = 0.0;
+  double mSq23 = 0.0;
 
   double pdfVal  = 0.0;
-  double uniform = 0.0;
 
   // Attempts to generate an event.
   int count = 10000;
-
-  std::uniform_real_distribution<double> flat( 0.0, 1.0 );
 
   std::map< std::string, double > values;
 
   while ( count-- )
   {
-    mSq12 = min12 + ( max12 - min12 ) * flat( _generator );
-    mSq13 = min13 + ( max13 - min13 ) * flat( _generator );
+    mSq12 = Random::flat( min12, max12 );
+    mSq13 = Random::flat( min13, max13 );
+    mSq23 = mSqSum - mSq12 - mSq13;
 
     values[ mSq12name ] = mSq12;
     values[ mSq13name ] = mSq13;
-    values[ mSq23name ] = mSqSum - mSq12 - mSq13;
+    values[ mSq23name ] = mSq23;
 
-    this->setVars( values );
-    pdfVal = this->evaluate();
+    pdfVal = this->evaluate( mSq12, mSq13, mSq23 );
 
     if ( pdfVal > max )
       std::cout << "Problem: " << pdfVal << " " << mSq12 << " " << mSq13 << " " << mSqSum - mSq12 - mSq13 << std::endl;
 
-    uniform = max * flat( _generator );
-
     // Apply the accept-reject decision.
-    if ( uniform < pdfVal )
+    if ( Random::flat( 0.0, max ) < pdfVal )
       return values;
   }
 
