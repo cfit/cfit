@@ -1096,38 +1096,3 @@ const PdfExpr operator/( const PdfExpr& left, const double& right )
   return PdfExpr( left, right, Operation::div );
 }
 
-
-const PdfExpr operator^( const PdfExpr& left, const PdfExpr& right ) throw( PdfException )
-{
-  // Find the sets of variables that are common in all the
-  //    models of the left and the right.
-  std::vector< std::string > commonLeft  = left .commonVars();
-  std::vector< std::string > commonRight = right.commonVars();
-
-  // Make sure that one of the previous sets contains the other.
-  std::vector< std::string > common;
-  std::set_intersection( commonLeft.begin() , commonLeft.end() ,
-			 commonRight.begin(), commonRight.end(),
-			 std::back_inserter( common ) );
-
-  const PdfExpr* resolution;
-  const PdfExpr* pdf;
-
-  if ( common == commonLeft )
-    {
-      resolution = &left;
-      pdf        = &right;
-    }
-  else if ( common == commonRight )
-    {
-      resolution = &right;
-      pdf        = &left;
-    }
-  else
-    throw PdfException( "Error computing convolution: left and right operands do not share enough variables." );
-
-  // ALERTA: MANCA FER TOTA LA IMPLEMENTACIÓ DE LA CONVOLUCIÓ.
-
-  return *( new PdfExpr() );
-}
-
