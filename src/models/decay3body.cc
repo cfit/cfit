@@ -230,6 +230,44 @@ const double Decay3Body::evaluate() const throw( PdfException )
 }
 
 
+const double Decay3Body::project( const std::string& varName, const double& x ) const throw( PdfException )
+{
+  // Find the index of the variable to be projected.
+  int index = -1;
+  for ( unsigned var = 0; var < 3; ++var )
+    if ( varName == getVar( var ).name() )
+      index = var;
+
+  // If the pdf does not depend on the passed variable name, the projection is 1.
+  if ( index == -1 )
+    return 1.0;
+
+  // Minimum and maximum values of the variable wrt which the integration,
+  //    is done i.e. the next to the projected variable.
+  const double& min = _ps.mSqMin( ( index + 1 ) % 3 );
+  const double& max = _ps.mSqMax( ( index + 1 ) % 3 );
+
+  // Integrate the model.
+  const int& nbins = 400;
+  double proj = 0.0;
+  for ( int yBin = 0; yBin < nbins; ++yBin )
+  {
+    double y = binCenter( yBin, nbins, min, max );
+    double z = _ps.mSqSum() - x - y;
+
+    // std::cout << "DEBUG Decay3Body: " << x << " " << y << " " << z << " " << evaluate( x, y, z ) << " " << proj << std::endl;
+
+    if ( index == 0 ) proj += evaluate( x, y, z );
+    if ( index == 1 ) proj += evaluate( z, x, y );
+    if ( index == 2 ) proj += evaluate( y, z, x );
+  }
+
+  proj *= ( max - min ) / double( nbins );
+
+  return proj;
+}
+
+
 const double Decay3Body::evaluate( const std::vector< double >& vars ) const throw( PdfException )
 {
   std::size_t size = vars.size();

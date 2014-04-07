@@ -12,6 +12,8 @@
 #include <cfit/functors.hh>
 
 
+class Region;
+
 class PdfBase
 {
 protected:
@@ -19,7 +21,7 @@ protected:
   std::map< std::string, Parameter > _parMap;
 
 public:
-  virtual ~PdfBase() {};
+  virtual ~PdfBase() {}
 
   // Setters.
   virtual void setVars( const std::vector< double >& vars ) throw( PdfException ) = 0;
@@ -34,15 +36,40 @@ public:
   const unsigned                            nVars()    const { return _varMap.size(); }
   const unsigned                            nPars()    const { return _parMap.size(); }
   const std::vector< std::string >          varNames() const;
+  const bool                                isFixed()  const
+  {
+    return std::all_of( _parMap.begin(), _parMap.end(), []( const std::pair< std::string, Parameter >& par ){ return par.second.isFixed(); } );
+  }
 
   // Before evaluating the pdf at all data points, cache anything common to
   //    all points (usually compute the norm).
   virtual void cache() = 0;
 
-  virtual const double evaluate()                                    const throw( PdfException ) = 0;
-  virtual const double evaluate( const std::vector< double >& vars ) const throw( PdfException ) = 0;
+  // Evaluate functions.
+  virtual const double evaluate()                                    const throw( PdfException ) = 0; // For variables already set. To be obsolete.
+  virtual const double evaluate( const std::vector< double >& vars ) const throw( PdfException ) = 0; // For any pdf.
+  virtual const double evaluate( const double& value )               const throw( PdfException )      // For pdfs of a single variable.
+  {
+    throw PdfException( "PdfBase::evaluate: evaluate( value ) has been called on a pdf with more than one variable." );
+  }
 
   virtual const std::map< std::string, double > generate()           const throw( PdfException ) = 0;
+
+  virtual const double project( const std::string& varName,
+                                const double&      value    ) const throw( PdfException ) = 0;
+  virtual const double project( const std::string& var1,
+                                const std::string& var2,
+                                const double&      val1,
+                                const double&      val2     ) const throw( PdfException ) = 0;
+
+  virtual const double project( const std::string& varName,
+                                const double&      value  ,
+                                const Region&      region   ) const throw( PdfException ) = 0;
+  virtual const double project( const std::string& var1  ,
+                                const std::string& var2  ,
+                                const double&      val1  ,
+                                const double&      val2  ,
+                                const Region&      region   ) const throw( PdfException ) = 0;
 
   const bool dependsOn( const std::string& var ) const
   {

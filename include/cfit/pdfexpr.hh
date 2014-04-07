@@ -16,6 +16,7 @@
 
 
 class FunctionMinimum;
+class Region;
 
 class PdfExpr : public PdfBase
 {
@@ -73,6 +74,22 @@ public:
   const double evaluate( const std::vector< double >& vars ) const throw( PdfException );
 
   const std::map< std::string, double > generate() const throw( PdfException );
+
+  const double project( const std::string& varName,
+                        const double&      value    ) const throw( PdfException );
+  const double project( const std::string& var1,
+                        const std::string& var2,
+                        const double&      val1,
+                        const double&      val2     ) const throw( PdfException );
+
+  const double project( const std::string& varName,
+                        const double&      value  ,
+                        const Region&      region   ) const throw( PdfException );
+  const double project( const std::string& var1,
+                        const std::string& var2,
+                        const double&      val1,
+                        const double&      val2,
+                        const Region&      region   ) const throw( PdfException );
 
 
   // Not sure if this is a dirty hack.

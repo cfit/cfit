@@ -22,6 +22,12 @@ private:
   const double evaluateFuncs() const;
   const double evaluateFuncs( const double& mSq12, const double& mSq13, const double& mSq23 ) const;
 
+  // Auxiliary function to compute the center of a bin.
+  static const double binCenter( const unsigned& bin, const unsigned& nbins, const double& min, const double& max )
+  {
+    return ( max - min ) / double( nbins ) * ( bin + 0.5 ) + min;
+  }
+
 public:
   Decay3Body( const Variable&   mSq12,
 	      const Variable&   mSq13,
@@ -44,6 +50,8 @@ public:
   const double evaluate( const double& mSq12, const double& mSq13, const double& mSq23 ) const throw( PdfException );
   const double evaluate( const double& mSq12, const double& mSq13                      ) const throw( PdfException );
   const double evaluate( const std::vector< double >& vars                             ) const throw( PdfException );
+
+  const double project ( const std::string& varName, const double& value ) const throw( PdfException );
 
   const std::map< std::string, double > generate() const throw( PdfException );
 
