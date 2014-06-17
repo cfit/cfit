@@ -33,7 +33,7 @@ public:
   double operator()( const std::vector<double>& par ) const throw( PdfException ) = 0;
 
   // Setters.
-  void setUp( const double& up ) { _up = up; };
+  void setUp( const double& up ) { _up = up; }
 
   FunctionMinimum minimize() const;
 };

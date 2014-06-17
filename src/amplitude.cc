@@ -129,7 +129,7 @@ std::complex< double > Amplitude::evaluate( const PhaseSpace& ps,
                                             const double&     mSq23 ) const throw( PdfException )
 {
   if ( ! ps.contains( mSq12, mSq13, mSq23 ) )
-    return 0.;
+    return 0.0;
 
   std::stack< std::complex< double > > values;
 

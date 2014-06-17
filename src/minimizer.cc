@@ -48,3 +48,4 @@ double Minimizer::up() const throw( MinimizerException )
 
   return _up;
 }
+
