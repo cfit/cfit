@@ -446,6 +446,38 @@ const double PdfExpr::evaluate() const throw( PdfException )
 
 const std::map< std::string, double > PdfExpr::generate() const throw( PdfException )
 {
+  std::map< std::string, double > genVals;
+  double val = 0.0;
+  double min = 0.0;
+  double max = 0.0;
+
+  typedef std::map< std::string, std::pair< double, double > >::const_iterator lIter;
+
+  // Generate full events until one of them is valid.
+  bool valid = false;
+  while ( ! valid )
+  {
+    valid = true;
+    genVals = generateFull();
+    for ( lIter lim = _limits.begin(); valid && ( lim != _limits.end() ); ++lim )
+    {
+      val = genVals[ lim->first ];
+      min = lim->second.first;
+      max = lim->second.second;
+
+      if ( ( val < min ) || ( val > max ) )
+        valid = false;
+    }
+  }
+
+  return genVals;
+}
+
+
+// Generate over the full range of definition of all the models. It may happen that
+//    some variable gets generated outside of its specified range.
+const std::map< std::string, double > PdfExpr::generateFull() const throw( PdfException )
+{
   std::stack< double >                                values;
   std::stack< std::pair< std::size_t, std::size_t > > ranges;
 
@@ -464,8 +496,6 @@ const std::map< std::string, double > PdfExpr::generate() const throw( PdfExcept
   std::size_t first = 0;
   std::size_t last  = 0;
 
-  std::default_random_engine& generator = Random::engine();
-  std::uniform_real_distribution< double > uniform( 0.0, 1.0 );
   double rnd = 0.0;
 
   Operation::Op op;
@@ -535,7 +565,7 @@ const std::map< std::string, double > PdfExpr::generate() const throw( PdfExcept
               if ( ( x < 0 ) || ( y > 0 ) )
                 throw PdfException( "Generation error: negative coefficient multiplying a pdf." );
 
-            rnd = ( x + std::fabs( y ) ) * uniform( generator );
+            rnd = Random::uniform( 0, x + std::fabs( y ) );
 
             // Choose one of the two distributions.
             if ( rnd < x )
@@ -603,43 +633,43 @@ const double PdfExpr::evaluate( const std::vector< double >& vars ) const throw(
   typedef std::string::const_iterator eIter;
   for ( eIter ch = _expression.begin(); ch != _expression.end(); ++ch )
     if ( *ch == 'm' )
-      {
-	// Determine the variables that the pdf depends on.
-	modelVars.clear();
-	std::map< std::string, Variable >& pdfVars = (*pdf)->_varMap;
-	for ( vIter var = pdfVars.begin(); var != pdfVars.end(); ++var )
-	  modelVars.push_back( localVars.find( var->second.name() )->second );
+    {
+      // Determine the variables that the pdf depends on.
+      modelVars.clear();
+      std::map< std::string, Variable >& pdfVars = (*pdf)->_varMap;
+      for ( vIter var = pdfVars.begin(); var != pdfVars.end(); ++var )
+        modelVars.push_back( localVars.find( var->second.name() )->second );
 
-	// Evaluate the function at the given point.
-	values.push( (*pdf++)->evaluate( modelVars ) );
-      }
+      // Evaluate the function at the given point.
+      values.push( (*pdf++)->evaluate( modelVars ) );
+    }
     else if ( *ch == 'p' )
       values.push( _parMap.find( par++->name() )->second.value() );
     else if ( *ch == 'c' )
       values.push( *ctt++ );
     else
+    {
+      if ( *ch == 'b' )
       {
-	if ( *ch == 'b' )
-	  {
-	    if ( values.size() < 2 )
-	      throw PdfException( "Parse error: not enough values in the stack." );
-	    y = values.top();
-	    values.pop();
-	    x = values.top();
-	    values.pop();
-	    values.push( Operation::operate( x, y, *ops++ ) );
-	  }
-	else if ( *ch == 'u' )
-	  {
-	    if ( values.empty() )
-	      throw PdfException( "Parse error: not enough values in the stack." );
-	    x = values.top();
-	    values.pop();
-	    values.push( Operation::operate( x, *ops++ ) );
-	  }
-	else
-	  throw PdfException( std::string( "Parse error: unknown operation " ) + *ch + "." );
+        if ( values.size() < 2 )
+          throw PdfException( "Parse error: not enough values in the stack." );
+        y = values.top();
+        values.pop();
+        x = values.top();
+        values.pop();
+        values.push( Operation::operate( x, y, *ops++ ) );
       }
+      else if ( *ch == 'u' )
+      {
+        if ( values.empty() )
+          throw PdfException( "Parse error: not enough values in the stack." );
+        x = values.top();
+        values.pop();
+        values.push( Operation::operate( x, *ops++ ) );
+      }
+      else
+        throw PdfException( std::string( "Parse error: unknown operation " ) + *ch + "." );
+    }
 
   if ( values.size() != 1 )
     throw PdfException( "PdfExpr parse error: too many values have been supplied." );
@@ -857,28 +887,28 @@ const double PdfExpr::project( const std::string& varName, const double& value )
     else if ( *ch == 'c' )
       values.push( *ctt++ );
     else
+    {
+      if ( *ch == 'b' )
       {
-	if ( *ch == 'b' )
-	  {
-	    if ( values.size() < 2 )
-	      throw PdfException( "Parse error: not enough values in the stack." );
-	    y = values.top();
-	    values.pop();
-	    x = values.top();
-	    values.pop();
-	    values.push( Operation::operate( x, y, *ops++ ) );
-	  }
-	else if ( *ch == 'u' )
-	  {
-	    if ( values.empty() )
-	      throw PdfException( "Parse error: not enough values in the stack." );
-	    x = values.top();
-	    values.pop();
-	    values.push( Operation::operate( x, *ops++ ) );
-	  }
-	else
-	  throw PdfException( std::string( "Parse error: unknown operation " ) + *ch + "." );
+        if ( values.size() < 2 )
+          throw PdfException( "Parse error: not enough values in the stack." );
+        y = values.top();
+        values.pop();
+        x = values.top();
+        values.pop();
+        values.push( Operation::operate( x, y, *ops++ ) );
       }
+      else if ( *ch == 'u' )
+      {
+        if ( values.empty() )
+          throw PdfException( "Parse error: not enough values in the stack." );
+        x = values.top();
+        values.pop();
+        values.push( Operation::operate( x, *ops++ ) );
+      }
+      else
+        throw PdfException( std::string( "Parse error: unknown operation " ) + *ch + "." );
+    }
 
   if ( values.size() != 1 )
     throw PdfException( "PdfExpr parse error: too many values have been supplied." );
@@ -910,28 +940,28 @@ const double PdfExpr::project( const std::string& var1, const std::string& var2,
     else if ( *ch == 'c' )
       values.push( *ctt++ );
     else
+    {
+      if ( *ch == 'b' )
       {
-	if ( *ch == 'b' )
-	  {
-	    if ( values.size() < 2 )
-	      throw PdfException( "Parse error: not enough values in the stack." );
-	    y = values.top();
-	    values.pop();
-	    x = values.top();
-	    values.pop();
-	    values.push( Operation::operate( x, y, *ops++ ) );
-	  }
-	else if ( *ch == 'u' )
-	  {
-	    if ( values.empty() )
-	      throw PdfException( "Parse error: not enough values in the stack." );
-	    x = values.top();
-	    values.pop();
-	    values.push( Operation::operate( x, *ops++ ) );
-	  }
-	else
-	  throw PdfException( std::string( "Parse error: unknown operation " ) + *ch + "." );
+        if ( values.size() < 2 )
+          throw PdfException( "Parse error: not enough values in the stack." );
+        y = values.top();
+        values.pop();
+        x = values.top();
+        values.pop();
+        values.push( Operation::operate( x, y, *ops++ ) );
       }
+      else if ( *ch == 'u' )
+      {
+        if ( values.empty() )
+          throw PdfException( "Parse error: not enough values in the stack." );
+        x = values.top();
+        values.pop();
+        values.push( Operation::operate( x, *ops++ ) );
+      }
+      else
+        throw PdfException( std::string( "Parse error: unknown operation " ) + *ch + "." );
+    }
 
   if ( values.size() != 1 )
     throw PdfException( "PdfExpr parse error: too many values have been supplied." );
@@ -964,28 +994,28 @@ const double PdfExpr::project( const std::string& varName,
     else if ( *ch == 'c' )
       values.push( *ctt++ );
     else
+    {
+      if ( *ch == 'b' )
       {
-	if ( *ch == 'b' )
-	  {
-	    if ( values.size() < 2 )
-	      throw PdfException( "Parse error: not enough values in the stack." );
-	    y = values.top();
-	    values.pop();
-	    x = values.top();
-	    values.pop();
-	    values.push( Operation::operate( x, y, *ops++ ) );
-	  }
-	else if ( *ch == 'u' )
-	  {
-	    if ( values.empty() )
-	      throw PdfException( "Parse error: not enough values in the stack." );
-	    x = values.top();
-	    values.pop();
-	    values.push( Operation::operate( x, *ops++ ) );
-	  }
-	else
-	  throw PdfException( std::string( "Parse error: unknown operation " ) + *ch + "." );
+        if ( values.size() < 2 )
+          throw PdfException( "Parse error: not enough values in the stack." );
+        y = values.top();
+        values.pop();
+        x = values.top();
+        values.pop();
+        values.push( Operation::operate( x, y, *ops++ ) );
       }
+      else if ( *ch == 'u' )
+      {
+        if ( values.empty() )
+          throw PdfException( "Parse error: not enough values in the stack." );
+        x = values.top();
+        values.pop();
+        values.push( Operation::operate( x, *ops++ ) );
+      }
+      else
+        throw PdfException( std::string( "Parse error: unknown operation " ) + *ch + "." );
+    }
 
   if ( values.size() != 1 )
     throw PdfException( "PdfExpr parse error: too many values have been supplied." );
@@ -1018,28 +1048,28 @@ const double PdfExpr::project( const std::string& var1, const std::string& var2,
     else if ( *ch == 'c' )
       values.push( *ctt++ );
     else
+    {
+      if ( *ch == 'b' )
       {
-	if ( *ch == 'b' )
-	  {
-	    if ( values.size() < 2 )
-	      throw PdfException( "Parse error: not enough values in the stack." );
-	    y = values.top();
-	    values.pop();
-	    x = values.top();
-	    values.pop();
-	    values.push( Operation::operate( x, y, *ops++ ) );
-	  }
-	else if ( *ch == 'u' )
-	  {
-	    if ( values.empty() )
-	      throw PdfException( "Parse error: not enough values in the stack." );
-	    x = values.top();
-	    values.pop();
-	    values.push( Operation::operate( x, *ops++ ) );
-	  }
-	else
-	  throw PdfException( std::string( "Parse error: unknown operation " ) + *ch + "." );
+        if ( values.size() < 2 )
+          throw PdfException( "Parse error: not enough values in the stack." );
+        y = values.top();
+        values.pop();
+        x = values.top();
+        values.pop();
+        values.push( Operation::operate( x, y, *ops++ ) );
       }
+      else if ( *ch == 'u' )
+      {
+        if ( values.empty() )
+          throw PdfException( "Parse error: not enough values in the stack." );
+        x = values.top();
+        values.pop();
+        values.push( Operation::operate( x, *ops++ ) );
+      }
+      else
+        throw PdfException( std::string( "Parse error: unknown operation " ) + *ch + "." );
+    }
 
   if ( values.size() != 1 )
     throw PdfException( "PdfExpr parse error: too many values have been supplied." );

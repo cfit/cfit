@@ -49,6 +49,8 @@ private:
     append( oper  );
   }
 
+  const std::map< std::string, double > generateFull() const throw( PdfException );
+
 public:
   PdfExpr() : _scale( 1.0 ) {};
   PdfExpr( const PdfModel& model )
@@ -69,7 +71,7 @@ public:
   void setPars( const std::map< std::string, Parameter >& pars ) throw( PdfException );
   void setPars( const FunctionMinimum&                    min  ) throw( PdfException );
 
-  void   cache();
+  void         cache();
   const double evaluate()                                    const throw( PdfException );
   const double evaluate( const std::vector< double >& vars ) const throw( PdfException );
 
