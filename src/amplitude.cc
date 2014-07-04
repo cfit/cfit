@@ -92,6 +92,17 @@ void Amplitude::append( const Operation::Op& oper )
 }
 
 
+// Establishes the usage of the helicity formalism for the resonances already added.
+//    Resonances still to be added will use the angular formalism carried in their respective objects.
+void Amplitude::useHelicity( const bool helicity )
+{
+  typedef std::vector< Resonance* >::const_iterator rIter;
+
+  for ( rIter res = _resos.begin(); res != _resos.end(); ++res )
+    (*res)->useHelicity( helicity );
+}
+
+
 void Amplitude::setPars( const std::map< std::string, Parameter >& pars )
 {
   typedef std::map< std::string, Parameter >::iterator mIter;

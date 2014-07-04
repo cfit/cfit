@@ -133,6 +133,38 @@ double Resonance::zemach( const PhaseSpace& ps, const double& mSqAB, const doubl
 }
 
 
+double Resonance::helicity( const PhaseSpace& ps, const double& mSqAB, const double& mSqAC, const double& mSqBC ) const
+{
+  if ( _l == 0 )
+    return 1.;
+
+  // Squared mass differences that some terms depend on.
+  const double& diffSqMC = ps.mSqMother()   - ps.mSq( _noRes );
+  const double& diffSqAB = ps.mSq( _resoA ) - ps.mSq( _resoB );
+
+  // Zemach tensor for l = 1.
+  const double& hel1  = mSqAC - mSqBC - diffSqMC * diffSqAB / mSq();
+
+  if ( _l == 1 )
+    return hel1;
+
+  if ( _l == 2 )
+    {
+      // Squared mass sums that some terms depend on.
+      const double& sumSqMC = ps.mSqMother()   + ps.mSq( _noRes );
+      const double& sumSqAB = ps.mSq( _resoA ) + ps.mSq( _resoB );
+
+      double first  = mSqAB - 2. * sumSqMC + std::pow( diffSqMC, 2 ) / mSq();
+      double second = mSqAB - 2. * sumSqAB + std::pow( diffSqAB, 2 ) / mSq();
+
+      return std::pow( hel1, 2 ) - first * second / 3.;
+    }
+
+  // Maybe should throw an exception.
+
+  return 0.;
+}
+
 
 double Resonance::blattWeisskopfPrime( const PhaseSpace& ps, const double& mSqAB ) const
 {
@@ -186,5 +218,11 @@ std::complex< double > Resonance::evaluate( const PhaseSpace& ps,
   const double& mSqAC = m2AC( mSq12, mSq13, mSq23 );
   const double& mSqBC = m2BC( mSq12, mSq13, mSq23 );
 
-  return propagator( ps, mSqAB ) * zemach( ps, mSqAB, mSqAC, mSqBC ) * blattWeisskopfPrime( ps, mSqAB );
+  std::complex< double > angular;
+  if ( _helicity )
+    angular = helicity( ps, mSqAB, mSqAC, mSqBC );
+  else
+    angular = zemach( ps, mSqAB, mSqAC, mSqBC );
+
+  return propagator( ps, mSqAB ) * angular * blattWeisskopfPrime( ps, mSqAB );
 }

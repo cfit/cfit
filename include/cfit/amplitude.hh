@@ -97,6 +97,8 @@ public:
       delete *res;
   }
 
+  void useHelicity( const bool helicity = true );
+
   const std::map< std::string, Parameter >& getPars() const { return _parMap; };
   void setPars( const std::map< std::string, Parameter >& pars );
 

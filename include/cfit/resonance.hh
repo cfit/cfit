@@ -21,6 +21,8 @@ protected:
   unsigned _noRes;      // Index of the non-resonant particle.
   int      _l;          // Angular momentum quantum number.
 
+  bool     _helicity;   // Use helicity formalism for angular distribution, instead of Zemach.
+
   std::map< const std::string, Parameter > _parMap;
   std::vector< std::string >               _parOrder;
 public:
@@ -34,6 +36,8 @@ public:
     _noRes  = 6 - resoA - resoB;
     _l      = l;
 
+    _helicity = false;
+
     push( mass  );
     push( width );
     push( r     );
@@ -42,6 +46,8 @@ public:
   virtual ~Resonance() {};
 
   void push( const Parameter& par );
+
+  void useHelicity( const bool helicity = true ) { _helicity = helicity; }
 
   // For resonances with larger number of parameters, be able to get them by index.
   //    Important: the zeroth extra parameter is the 3rd element in the vector.
@@ -62,29 +68,34 @@ public:
   //    Order is only relevant for the sign of the Zemach angular term for l = 1.
   // m2ij functions below select the squared invariant mass according to the given
   //    _reso1 and _reso2 values.
-  double                 m2AB               ( const double& mSq12, const double& mSq13, const double& mSq23 ) const;
-  double                 m2AC               ( const double& mSq12, const double& mSq13, const double& mSq23 ) const;
-  double                 m2BC               ( const double& mSq12, const double& mSq13, const double& mSq23 ) const;
+  double                 m2AB                ( const double& mSq12, const double& mSq13, const double& mSq23 ) const;
+  double                 m2AC                ( const double& mSq12, const double& mSq13, const double& mSq23 ) const;
+  double                 m2BC                ( const double& mSq12, const double& mSq13, const double& mSq23 ) const;
 
-  static double          kallen             ( const double& x    , const double& y    , const double& z     );
+  static double          kallen              ( const double& x    , const double& y    , const double& z     );
 
   // Momentum of a resonant particle in the rest frame of the resonant pair.
-  double                 q                  ( const PhaseSpace& ps, const double& mSqAB )                     const;
-  double                 qSq                ( const PhaseSpace& ps, const double& mSqAB )                     const;
+  double                 q                   ( const PhaseSpace& ps, const double& mSqAB )                     const;
+  double                 qSq                 ( const PhaseSpace& ps, const double& mSqAB )                     const;
 
   // Phase space factor, equal to 2q/m.
-  double                 rho                ( const PhaseSpace& ps, const double& mSqAB )                     const;
-  double                 runningWidth       ( const PhaseSpace& ps, const double& mSqAB )                     const;
-  double                 blattWeisskopfPrime( const PhaseSpace& ps, const double& mSqAB )                     const;
-  double                 blattWeisskopf     ( const PhaseSpace& ps, const double& mSqAB )                     const;
-  double                 zemach             ( const PhaseSpace& ps,
-                                              const double&     mSqAB,
-                                              const double&     mSqAC,
-                                              const double&     mSqBC )                                       const;
-  std::complex< double > evaluate           ( const PhaseSpace& ps,
-                                              const double&     mSqAB,
-                                              const double&     mSqAC,
-                                              const double&     mSqBC )                                       const;
+  double                 rho                 ( const PhaseSpace& ps, const double& mSqAB )                     const;
+  double                 runningWidth        ( const PhaseSpace& ps, const double& mSqAB )                     const;
+  double                 blattWeisskopfPrime ( const PhaseSpace& ps, const double& mSqAB )                     const;
+  double                 blattWeisskopf      ( const PhaseSpace& ps, const double& mSqAB )                     const;
+  double                 zemach              ( const PhaseSpace& ps,
+                                               const double&     mSqAB,
+                                               const double&     mSqAC,
+                                               const double&     mSqBC )                                       const;
+  double                 helicity            ( const PhaseSpace& ps,
+                                               const double&     mSqAB,
+                                               const double&     mSqAC,
+                                               const double&     mSqBC )                                       const;
+
+  std::complex< double > evaluate            ( const PhaseSpace& ps,
+                                               const double&     mSqAB,
+                                               const double&     mSqAC,
+                                               const double&     mSqBC )                                       const;
 
   virtual std::complex< double > propagator( const PhaseSpace& ps, const double& mSqAB ) const = 0;
   virtual Resonance*             copy()                                                  const = 0;
@@ -130,6 +141,8 @@ inline Resonance::Resonance( const char&      resoA, const char&      resoB,
   _resoB  = std::tolower( resoB ) - 'a' + 1;
   _noRes  = 6 - resoA - resoB;
   _l      = l;
+
+  _helicity = false;
 
   push( mass  );
   push( width );
