@@ -98,6 +98,7 @@ public:
   }
 
   void useHelicity( const bool helicity = true );
+  void useTwoBW   ( const bool twoBW    = true );
 
   const std::map< std::string, Parameter >& getPars() const { return _parMap; };
   void setPars( const std::map< std::string, Parameter >& pars );

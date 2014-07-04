@@ -103,6 +103,15 @@ void Amplitude::useHelicity( const bool helicity )
 }
 
 
+void Amplitude::useTwoBW( const bool twoBW )
+{
+  typedef std::vector< Resonance* >::const_iterator rIter;
+
+  for ( rIter res = _resos.begin(); res != _resos.end(); ++res )
+    (*res)->useTwoBW( twoBW );
+}
+
+
 void Amplitude::setPars( const std::map< std::string, Parameter >& pars )
 {
   typedef std::map< std::string, Parameter >::iterator mIter;

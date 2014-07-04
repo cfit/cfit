@@ -75,13 +75,26 @@ double Resonance::m2BC( const double& mSq12, const double& mSq13, const double& 
 // Momentum of a resonant particle in the rest frame of the resonant pair.
 double Resonance::q( const PhaseSpace& ps, const double& mSqAB ) const
 {
-  return std::sqrt( kallen( mSqAB, ps.mSq( _resoA ), ps.mSq( _resoB ) ) ) / ( 2. * std::sqrt( mSqAB ) );
+  return std::sqrt( kallen( mSqAB, ps.mSq( _resoA ), ps.mSq( _resoB ) ) ) / ( 2.0 * std::sqrt( mSqAB ) );
 }
 
 // Squared momentum of a resonant particle in the rest frame of the resonant pair.
 double Resonance::qSq( const PhaseSpace& ps, const double& mSqAB ) const
 {
-  return kallen( mSqAB, ps.mSq( _resoA ), ps.mSq( _resoB ) ) / ( 4. * mSqAB );
+  return kallen( mSqAB, ps.mSq( _resoA ), ps.mSq( _resoB ) ) / ( 4.0 * mSqAB );
+}
+
+
+// Momentum of the non-resonant particle in the rest frame of the resonant pair.
+double Resonance::p( const PhaseSpace& ps, const double& mSqAB ) const
+{
+  return std::sqrt( kallen( mSqAB, ps.mSq( _noRes ), ps.mSqMother() ) ) / ( 2.0 * std::sqrt( mSqAB ) );
+}
+
+// Squared momentum of a resonant particle in the rest frame of the resonant pair.
+double Resonance::pSq( const PhaseSpace& ps, const double& mSqAB ) const
+{
+  return kallen( mSqAB, ps.mSq( _noRes ), ps.mSqMother() ) / ( 4.0 * mSqAB );
 }
 
 
@@ -192,6 +205,32 @@ double Resonance::blattWeisskopfPrime( const PhaseSpace& ps, const double& mSqAB
 }
 
 
+double Resonance::blattWeisskopfPrimeP( const PhaseSpace& ps, const double& mSqAB ) const
+{
+  if ( _l == 0 )
+    return 1.0;
+
+  const double& p0    = p( ps, std::pow( mass(), 2 ) );
+  const double& pm    = p( ps, mSqAB );
+  const double& rpSq0 = std::pow( r() * p0, 2 );
+  const double& rpSq  = std::pow( r() * pm, 2 );
+
+  if ( _l == 1 )
+    return std::sqrt( ( 1.0 + rpSq0 ) / ( 1.0 + rpSq ) );
+
+  if ( _l == 2 )
+  {
+    double num = 9.0 + 3.0 * rpSq0 + std::pow( rpSq0, 2 );
+    double den = 9.0 + 3.0 * rpSq  + std::pow( rpSq , 2 );
+    return std::sqrt( num / den );
+  }
+
+  // Maybe should throw an exception.
+
+  return 0.;
+}
+
+
 // Blatt-Weisskopf centrifugal barrier factors.
 // Maybe should throw an exception.
 double Resonance::blattWeisskopf( const PhaseSpace& ps, const double& mSqAB ) const
@@ -224,5 +263,10 @@ std::complex< double > Resonance::evaluate( const PhaseSpace& ps,
   else
     angular = zemach( ps, mSqAB, mSqAC, mSqBC );
 
-  return propagator( ps, mSqAB ) * angular * blattWeisskopfPrime( ps, mSqAB );
+
+  std::complex< double > centrifugal = blattWeisskopfPrime( ps, mSqAB );
+  if ( _twoBW )
+    centrifugal *= blattWeisskopfPrimeP( ps, mSqAB );
+
+  return propagator( ps, mSqAB ) * angular * centrifugal;
 }

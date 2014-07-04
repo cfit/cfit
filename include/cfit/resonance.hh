@@ -22,6 +22,7 @@ protected:
   int      _l;          // Angular momentum quantum number.
 
   bool     _helicity;   // Use helicity formalism for angular distribution, instead of Zemach.
+  bool     _twoBW;      // Use two Blatt-Weisskopf centrifugal terms, instead of one.
 
   std::map< const std::string, Parameter > _parMap;
   std::vector< std::string >               _parOrder;
@@ -37,6 +38,7 @@ public:
     _l      = l;
 
     _helicity = false;
+    _twoBW    = false;
 
     push( mass  );
     push( width );
@@ -48,6 +50,7 @@ public:
   void push( const Parameter& par );
 
   void useHelicity( const bool helicity = true ) { _helicity = helicity; }
+  void useTwoBW   ( const bool twoBW    = true ) { _twoBW    = twoBW;    }
 
   // For resonances with larger number of parameters, be able to get them by index.
   //    Important: the zeroth extra parameter is the 3rd element in the vector.
@@ -78,10 +81,15 @@ public:
   double                 q                   ( const PhaseSpace& ps, const double& mSqAB )                     const;
   double                 qSq                 ( const PhaseSpace& ps, const double& mSqAB )                     const;
 
+  // Momentum of the non-resonant particle in the rest frame of the resonant pair.
+  double                 p                   ( const PhaseSpace& ps, const double& mSqAB )                     const;
+  double                 pSq                 ( const PhaseSpace& ps, const double& mSqAB )                     const;
+
   // Phase space factor, equal to 2q/m.
   double                 rho                 ( const PhaseSpace& ps, const double& mSqAB )                     const;
   double                 runningWidth        ( const PhaseSpace& ps, const double& mSqAB )                     const;
   double                 blattWeisskopfPrime ( const PhaseSpace& ps, const double& mSqAB )                     const;
+  double                 blattWeisskopfPrimeP( const PhaseSpace& ps, const double& mSqAB )                     const;
   double                 blattWeisskopf      ( const PhaseSpace& ps, const double& mSqAB )                     const;
   double                 zemach              ( const PhaseSpace& ps,
                                                const double&     mSqAB,
@@ -143,6 +151,7 @@ inline Resonance::Resonance( const char&      resoA, const char&      resoB,
   _l      = l;
 
   _helicity = false;
+  _twoBW    = false;
 
   push( mass  );
   push( width );

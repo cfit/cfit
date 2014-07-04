@@ -13,8 +13,10 @@ std::complex< double > GounarisSakurai::propagator( const PhaseSpace& ps, const 
 
   std::complex< double > prop = 1. + gsd * width() / mass();
 
-//prop *= 1. / ( std::pow( mass(), 2 ) - mSqAB + gsf( ps, mSqAB ) - I * mass() * runningWidth( ps, mSqAB ) );
-  prop *= 1. / ( std::pow( mass(), 2 ) - mSqAB + gsf( ps, mSqAB ) - I * std::sqrt( mSqAB ) * runningWidth( ps, mSqAB ) );
+  if ( _buggy )
+    prop *= 1. / ( std::pow( mass(), 2 ) - mSqAB + gsf( ps, mSqAB ) - I * std::sqrt( mSqAB ) * runningWidth( ps, mSqAB ) );
+  else
+    prop *= 1. / ( std::pow( mass(), 2 ) - mSqAB + gsf( ps, mSqAB ) - I * mass()             * runningWidth( ps, mSqAB ) );
 
   return prop;
 }
