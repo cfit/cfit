@@ -3,9 +3,9 @@ PROJECT = cfit
 
 HDIR = include
 CDIR = src
-ODIR = obj
-LDIR = lib
-DDIR = dep
+DDIR = dep$(if $(CMTCONFIG),/$(CMTCONFIG))
+ODIR = obj$(if $(CMTCONFIG),/$(CMTCONFIG))
+LDIR = lib$(if $(CMTCONFIG),/$(CMTCONFIG))
 
 #define MPI_ON
 #1
@@ -67,8 +67,8 @@ $(LIB): $(OFILES) $(MAKEFILE_LIST)
 # Rules for dependency files.
 $(DFILES): $(DDIR)/%.d: $(CDIR)/%.cc $(HDIR)/$(firstword $(subst /, ,$(PROJECT)))/%.hh $(MAKEFILE_LIST)
 	@ mkdir -p $(dir $@)
-	@ echo $(CXX) -MM -MF $@ -MT $$(echo $@ | sed "s/^$(DDIR)/$(ODIR)/g;s/\.d$$/\.o/g") $< -I $(HDIR)
-	@ $(CXX) -MM -MF $@ -MT $$(echo $@ | sed "s/^$(DDIR)/$(ODIR)/g;s/\.d$$/\.o/g") $< $(DFLAGS) -I $(HDIR)
+	@ echo $(CXX) -MM -MF $@ -MT $$(echo $@ | sed "s,^$(DDIR),$(ODIR),g;s/\.d$$/\.o/g") $< -I $(HDIR)
+	@ $(CXX) -MM -MF $@ -MT $$(echo $@ | sed "s,^$(DDIR),$(ODIR),g;s/\.d$$/\.o/g") $< $(DFLAGS) -I $(HDIR)
 
 # Rules for objects.
 $(OFILES): $(ODIR)/%.o: $(CDIR)/%.cc $(DDIR)/%.d $(MAKEFILE_LIST)
