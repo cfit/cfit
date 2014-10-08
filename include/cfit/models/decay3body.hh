@@ -19,6 +19,9 @@ private:
 
   std::vector< Function > _funcs;
 
+  // Maximum value of the pdf.
+  double _maxPdf;
+
   const double evaluateFuncs() const;
   const double evaluateFuncs( const double& mSq12, const double& mSq13, const double& mSq23 ) const;
 
@@ -53,6 +56,7 @@ public:
 
   const double project ( const std::string& varName, const double& value ) const throw( PdfException );
 
+  void setMaxPdf( const double& max ) { _maxPdf = max; }
   const std::map< std::string, double > generate() const throw( PdfException );
 
   friend const Decay3Body  operator* (       Decay3Body left, const Function&  right );

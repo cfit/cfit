@@ -8,7 +8,7 @@ Decay3Body::Decay3Body( const Variable&   mSq12,
 			const Variable&   mSq23,
 			const Amplitude&  amp  ,
 			const PhaseSpace& ps     )
-  : DecayModel( mSq12, mSq13, mSq23, amp, ps ), _norm( 1.0 )
+  : DecayModel( mSq12, mSq13, mSq23, amp, ps ), _norm( 1.0 ), _maxPdf( 14.0 )
 {
   // Do calculations common to all values of variables
   //    (usually compute norm).
@@ -363,9 +363,6 @@ const std::map< std::string, double > Decay3Body::generate() const throw( PdfExc
   const std::string& mSq13name = getVar( 1 ).name();
   const std::string& mSq23name = getVar( 2 ).name();
 
-  // Maximum value of the pdf.
-  const double& max = 14.0;
-
   // Sum of squared invariant masses of all particles (mother and daughters).
   const double& mSqSum = _ps.mSqMother() + _ps.mSq1() + _ps.mSq2() + _ps.mSq3();
 
@@ -393,11 +390,11 @@ const std::map< std::string, double > Decay3Body::generate() const throw( PdfExc
 
     pdfVal = this->evaluate( mSq12, mSq13, mSq23 );
 
-    if ( pdfVal > max )
+    if ( pdfVal > _maxPdf )
       std::cout << "Problem: " << pdfVal << " " << mSq12 << " " << mSq13 << " " << mSqSum - mSq12 - mSq13 << std::endl;
 
     // Apply the accept-reject decision.
-    if ( Random::flat( 0.0, max ) < pdfVal )
+    if ( Random::flat( 0.0, _maxPdf ) < pdfVal )
       return values;
   }
 
