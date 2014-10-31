@@ -3,6 +3,7 @@
 
 #include <complex>
 #include <vector>
+#include <map>
 #include <string>
 
 #include <cfit/parameter.hh>
@@ -53,6 +54,13 @@ private:
 
 public:
   CoefExpr() {};
+
+  const std::map< std::string, Parameter > getPars() const;
+
+  void setPars( const std::map< std::string, Parameter >& pars );
+  void setPars( const std::map< std::string, double    >& pars );
+
+  const std::complex< double > evaluate() const throw( PdfException );
 
   // Binary arithmetic operators.
   friend const CoefExpr operator+( const Coef&                   left, const Coef&                   right );
