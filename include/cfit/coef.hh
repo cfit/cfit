@@ -27,7 +27,9 @@ public:
     _real.setValue( re );
     _imag.setValue( im );
   };
-  const std::complex< double > value() const;
+
+  const std::complex< double > value()   const;
+  const bool                   isFixed() const;
 
   // Operations of coefficients with themselves.
   friend const CoefExpr operator+( const Coef&   left, const Coef&   right );

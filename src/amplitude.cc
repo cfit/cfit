@@ -1,6 +1,7 @@
 
 #include <stack>
 #include <algorithm>
+#include <functional>
 
 #include <cfit/phasespace.hh>
 #include <cfit/amplitude.hh>
@@ -90,6 +91,19 @@ void Amplitude::append( const Operation::Op& oper )
   _opers.push_back( oper );
   _expression += "b"; // b = binary operation.
 }
+
+
+const bool Amplitude::isFixed() const
+{
+  bool fixed = true;
+  fixed &= std::all_of( _parms.begin(), _parms.end(), std::mem_fun_ref( &Parameter::isFixed ) );
+  fixed &= std::all_of( _coefs.begin(), _coefs.end(), std::mem_fun_ref( &Coef     ::isFixed ) );
+  fixed &= std::all_of( _resos.begin(), _resos.end(), std::mem_fun    ( &Resonance::isFixed ) );
+  fixed &= std::all_of( _fvecs.begin(), _fvecs.end(), std::mem_fun_ref( &Fvector  ::isFixed ) );
+
+  return fixed;
+}
+
 
 
 // Establishes the usage of the helicity formalism for the resonances already added.

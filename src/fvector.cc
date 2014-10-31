@@ -1,7 +1,18 @@
 
+#include <algorithm>
+
 #include <cfit/fvector.hh>
 #include <cfit/phasespace.hh>
 
+
+const bool Fvector::isFixed() const
+{
+  return std::all_of( _parMap.begin(), _parMap.end(),
+                      []( const std::pair< std::string, Parameter >& par )
+                      {
+                        return par.second.isFixed();
+                      } );
+}
 
 
 void Fvector::pushBeta( const std::vector< Coef >& beta )

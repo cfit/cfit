@@ -97,6 +97,8 @@ public:
       delete *res;
   }
 
+  const bool isFixed() const;
+
   void useHelicity( const bool helicity = true );
   void useTwoBW   ( const bool twoBW    = true );
 

@@ -38,7 +38,8 @@ public:
   const std::vector< std::string >          varNames() const;
   const bool                                isFixed()  const
   {
-    return std::all_of( _parMap.begin(), _parMap.end(), []( const std::pair< std::string, Parameter >& par ){ return par.second.isFixed(); } );
+    return std::all_of( _parMap.begin(), _parMap.end(),
+                        []( const std::pair< std::string, Parameter >& par ){ return par.second.isFixed(); } );
   }
 
   // Before evaluating the pdf at all data points, cache anything common to

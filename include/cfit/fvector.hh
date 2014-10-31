@@ -75,9 +75,11 @@ public:
     pushS0pr( s0pr );
   }
 
-  void usePvecSvp( const bool& val = true ) { _usePvecSvp = val; }
-
   ~Fvector() {};
+
+  const bool isFixed() const;
+
+  void usePvecSvp( const bool& val = true ) { _usePvecSvp = val; }
 
   void pushBeta( const std::vector< Coef >& beta );
   void pushfPr ( const std::vector< Coef >& fPr  );

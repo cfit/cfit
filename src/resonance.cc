@@ -1,4 +1,6 @@
 
+#include <algorithm>
+
 #include <cfit/resonance.hh>
 #include <cfit/phasespace.hh>
 
@@ -8,6 +10,18 @@ void Resonance::push( const Parameter& par )
   _parMap[ par.name() ] = par;
   _parOrder.push_back( par.name() );
 }
+
+
+const bool Resonance::isFixed() const
+{
+  // Check whether all the parameters of the resonance are fixed.
+  return std::all_of( _parMap.begin(), _parMap.end(),
+                      []( const std::pair< std::string, Parameter >& par )
+                      {
+                        return par.second.isFixed();
+                      } );
+}
+
 
 
 // For resonances with larger number of parameters, be able to get them by index.

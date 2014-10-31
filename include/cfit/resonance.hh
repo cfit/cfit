@@ -56,6 +56,8 @@ public:
   //    Important: the zeroth extra parameter is the 3rd element in the vector.
   double getPar( const unsigned index ) const throw( PdfException );
 
+  const bool   isFixed() const;
+
   const double mass()   const { return _parMap.find( _parOrder[ 0 ] )->second.value(); }
   const double m()      const { return _parMap.find( _parOrder[ 0 ] )->second.value(); }
   const double width()  const { return _parMap.find( _parOrder[ 1 ] )->second.value(); }
