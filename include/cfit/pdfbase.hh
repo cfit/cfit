@@ -50,6 +50,9 @@ public:
   virtual void setVar ( const std::string& name, const double& val, const double& err = -1. ) throw( PdfException ) = 0;
   virtual void setPar ( const std::string& name, const double& val, const double& err = -1. ) throw( PdfException ) = 0;
 
+  void fix    ( const std::string& name ) throw( PdfException );
+  void release( const std::string& name ) throw( PdfException );
+
   // Getters.
   const std::map< std::string, Variable  >& getVars()  const { return _varMap;        }
   const std::map< std::string, Parameter >& getPars()  const { return _parMap;        }
