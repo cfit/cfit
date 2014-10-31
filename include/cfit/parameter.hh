@@ -2,12 +2,14 @@
 #define __PARAMETER_HH__
 
 #include <string>
+#include <complex>
 
 class PdfModel;
 class PdfExpr;
 class ParameterExpr;
 class Variable;
 class Function;
+class CoefExpr;
 
 class Parameter
 {
@@ -152,6 +154,16 @@ public:
   friend const PdfExpr       operator*( const Parameter&     left, const PdfExpr&       right );
   friend const PdfExpr       operator*( const PdfExpr&       left, const Parameter&     right );
   friend const PdfExpr       operator/( const PdfExpr&       left, const Parameter&     right );
+
+  friend const CoefExpr operator+( const std::complex< double >& left, const Parameter&              right );
+  friend const CoefExpr operator-( const std::complex< double >& left, const Parameter&              right );
+  friend const CoefExpr operator*( const std::complex< double >& left, const Parameter&              right );
+  friend const CoefExpr operator/( const std::complex< double >& left, const Parameter&              right );
+
+  friend const CoefExpr operator+( const Parameter&              left, const std::complex< double >& right );
+  friend const CoefExpr operator-( const Parameter&              left, const std::complex< double >& right );
+  friend const CoefExpr operator*( const Parameter&              left, const std::complex< double >& right );
+  friend const CoefExpr operator/( const Parameter&              left, const std::complex< double >& right );
 };
 
 #endif
