@@ -43,7 +43,7 @@ double Chi2::operator()( const std::vector<double>& pars ) const throw( PdfExcep
   double chi2 = 0.;
 
   // Sum of the terms of the chi^2.
-  for ( int n = 0; n < _data.size(); ++n )
+  for ( std::size_t n = 0; n < _data.size(); ++n )
     {
       // Initialize the value of the variance for the current entry.
       //    It must be s_y^2 + Sum( s_x^2 ).

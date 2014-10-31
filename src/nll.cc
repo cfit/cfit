@@ -45,25 +45,25 @@ double Nll::operator()( const std::vector<double>& pars ) const throw( PdfExcept
   double value = 0.;
 
   // Sum of the terms of the nll.
-  for ( int n = 0; n < _data.size(); ++n )
-    {
-      // Reset the vector of values of the variables.
-      vars.clear();
+  for ( std::size_t n = 0; n < _data.size(); ++n )
+  {
+    // Reset the vector of values of the variables and the previously cached values.
+    vars  .clear();
 
-      // Fill the vector of values and sum the terms of the variance.
-      for ( vIter var = varNames.begin(); var != varNames.end(); ++var )
-	vars.push_back( _data.value( *var, n ) );
+    // Fill the vector of values and sum the terms of the variance.
+    for ( vIter var = varNames.begin(); var != varNames.end(); ++var )
+      vars.push_back( _data.value( *var, n ) );
 
-      _pdf.setVars( vars );
+    _pdf.setVars( vars );
 
-      // Add the term to the nll.
-      value = _pdf.evaluate();
-      if ( value )
-	nll += - 2. * log( value );
+    // Add the term to the nll.
+    value = _pdf.evaluate();
+    if ( value )
+      nll += - 2. * log( value );
 //       else
 // 	std::cout << "Warning: pdf evaluates to zero for entry " << n
 // 		  << ". Not taking this entry into account for the nll." << std::endl;
-    }
+  }
 
 #ifdef MPI_ON
   // If running with MPI, each process has only computed a piece of the chi2.

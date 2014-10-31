@@ -21,7 +21,7 @@ public:
   void push( const std::map< std::string, double >& event ); // Map of fields and values.
 
   // Getters.
-  int                        size  ()                                      const;
+  std::size_t                size  ()                                      const;
   double                     value ( const std::string& field, int entry ) const throw( DataException );
   double                     error ( const std::string& field, int entry ) const throw( DataException );
   std::vector< double >      values( const std::string& field )            const throw( DataException );

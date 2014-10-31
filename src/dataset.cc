@@ -28,8 +28,11 @@ void Dataset::push( const std::map< std::string, double >& event )
 
 
 // Getters.
-int Dataset::size() const
+std::size_t Dataset::size() const
 {
+  if ( _data.begin() == _data.end() )
+    return 0;
+
   return _data.begin()->second.size();
 }
 
