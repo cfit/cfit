@@ -13,6 +13,9 @@
 
 class Minimizer : public FCNBase
 {
+private:
+  void cache();
+
 protected:
   PdfBase&        _pdf;
   const Dataset&  _data;
@@ -21,10 +24,14 @@ protected:
   //    Notice that, if the user wants n-sigma uncertainties, up = n^2.
   double _up;
 
+  // Maps of cached expressions.
+  std::map< unsigned, std::vector< double >                 > _cacheR;
+  std::map< unsigned, std::vector< std::complex< double > > > _cacheC;
+
 public:
   Minimizer( PdfBase& pdf, const Dataset& data )
     : _pdf( pdf ), _data( data ), _up( -1.0 )
-  {}
+  { cache(); }
 
   const PdfBase& pdf() const { return _pdf; }
 

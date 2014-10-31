@@ -8,6 +8,17 @@
 #include <cfit/parameter.hh>
 
 
+void Minimizer::cache()
+{
+  const std::map< unsigned, std::vector< double >                 >& cachedR = _pdf.cacheReal   ( _data );
+  const std::map< unsigned, std::vector< std::complex< double > > >& cachedC = _pdf.cacheComplex( _data );
+
+  _cacheR.insert( cachedR.begin(), cachedR.end() );
+  _cacheC.insert( cachedC.begin(), cachedC.end() );
+}
+
+
+
 FunctionMinimum Minimizer::minimize() const
 {
   // Work with Minuit user defined parameters.

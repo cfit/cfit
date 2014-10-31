@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <complex>
 #include <algorithm>
 
 #include <cfit/variable.hh>
@@ -12,11 +13,30 @@
 #include <cfit/functors.hh>
 
 
+class Dataset;
 class Region;
+class Minimizer;
 
 class PdfBase
 {
+  friend Minimizer;
+
+private:
+  static unsigned _cacheIdxReal;
+  static unsigned _cacheIdxComplex;
+
 protected:
+  // Make a dataset available to a pdf such that it can compute values to be cached.
+  virtual const std::map< unsigned, std::vector< double > > cacheReal( const Dataset& data )
+  {
+    return std::map< unsigned, std::vector< double > >();
+  }
+
+  virtual const std::map< unsigned, std::vector< std::complex< double > > > cacheComplex( const Dataset& data )
+  {
+    return std::map< unsigned, std::vector< std::complex< double > > >();
+  }
+
   std::map< std::string, Variable  > _varMap;
   std::map< std::string, Parameter > _parMap;
 
@@ -42,6 +62,12 @@ public:
                         []( const std::pair< std::string, Parameter >& par ){ return par.second.isFixed(); } );
   }
 
+  const unsigned& nCachedReal()    const { return _cacheIdxReal;    }
+  const unsigned& nCachedComplex() const { return _cacheIdxComplex; }
+
+  virtual const unsigned& assignCacheIdxReal()    { return _cacheIdxReal++;    }
+  virtual const unsigned& assignCacheIdxComplex() { return _cacheIdxComplex++; }
+
   // Before evaluating the pdf at all data points, cache anything common to
   //    all points (usually compute the norm).
   virtual void cache() = 0;
@@ -53,6 +79,10 @@ public:
   {
     throw PdfException( "PdfBase::evaluate: evaluate( value ) has been called on a pdf with more than one variable." );
   }
+
+  virtual const double evaluate( const std::vector< double                 >& vars,
+                                 const std::vector< double                 >&     ,
+                                 const std::vector< std::complex< double > >&       ) const throw( PdfException ) = 0;
 
   virtual const std::map< std::string, double > generate()           const throw( PdfException ) = 0;
 

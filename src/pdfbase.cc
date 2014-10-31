@@ -5,6 +5,11 @@
 
 #include <cfit/pdfbase.hh>
 
+
+unsigned PdfBase::_cacheIdxReal    = 0;
+unsigned PdfBase::_cacheIdxComplex = 0;
+
+
 const std::vector< std::string > PdfBase::varNames() const
 {
   std::vector< std::string > varNames;

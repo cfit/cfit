@@ -51,6 +51,17 @@ private:
 
   const std::map< std::string, double > generateFull() const throw( PdfException );
 
+
+  template < class T >
+  static void insert(       std::map< unsigned, std::vector< T > >& cache ,
+                      const std::map< unsigned, std::vector< T > >& cached )
+  {
+    cache.insert( cached.begin(), cached.end() );
+  }
+
+  const std::map< unsigned, std::vector<               double   > > cacheReal   ( const Dataset& data );
+  const std::map< unsigned, std::vector< std::complex< double > > > cacheComplex( const Dataset& data );
+
 public:
   PdfExpr() : _scale( 1.0 ) {};
   PdfExpr( const PdfModel& model )
@@ -76,6 +87,9 @@ public:
   const double evaluate( const std::vector< double >& vars ) const throw( PdfException );
 
   const std::map< std::string, double > generate() const throw( PdfException );
+  const double evaluate( const std::vector< double                 >& vars  ,
+                         const std::vector< double                 >& cacheR,
+                         const std::vector< std::complex< double > >& cacheC  ) const throw( PdfException );
 
   const double project( const std::string& varName,
                         const double&      value    ) const throw( PdfException );

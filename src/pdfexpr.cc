@@ -604,6 +604,28 @@ const std::map< std::string, double > PdfExpr::generateFull() const throw( PdfEx
 }
 
 
+const std::map< unsigned, std::vector< double > > PdfExpr::cacheReal( const Dataset& data )
+{
+  std::map< unsigned, std::vector< double > > cache;
+
+  for ( std::vector< PdfModel* >::iterator pdf = _pdfs.begin(); pdf != _pdfs.end(); ++pdf )
+    insert( cache, (*pdf)->cacheReal( data ) );
+
+  return cache;
+}
+
+
+
+const std::map< unsigned, std::vector< std::complex< double > > > PdfExpr::cacheComplex( const Dataset& data )
+{
+  std::map< unsigned, std::vector< std::complex< double > > > cache;
+
+  for ( std::vector< PdfModel* >::iterator pdf = _pdfs.begin(); pdf != _pdfs.end(); ++pdf )
+    insert( cache, (*pdf)->cacheComplex( data ) );
+
+  return cache;
+}
+
 
 
 const double PdfExpr::evaluate( const std::vector< double >& vars ) const throw( PdfException )
@@ -676,6 +698,82 @@ const double PdfExpr::evaluate( const std::vector< double >& vars ) const throw(
 
   return values.top();
 }
+
+
+
+const double PdfExpr::evaluate( const std::vector< double                 >& vars  ,
+                                const std::vector< double                 >& cacheR,
+                                const std::vector< std::complex< double > >& cacheC  ) const throw( PdfException )
+{
+  if ( _varMap.size() != vars.size() )
+    throw PdfException( "PdfExpr::evaluate: Number of arguments passed does not match number of required arguments." );
+
+  // Dictionary of the variable names with the values passed.
+  std::map< std::string, double > localVars;
+  std::vector< double > modelVars;
+
+  // Set the local values of the variables.
+  int index = 0;
+  typedef std::map< std::string, Variable >::const_iterator vIter;
+  for ( vIter var = _varMap.begin(); var != _varMap.end(); ++var )
+    localVars[ var->first ] = vars[ index++ ];
+
+  std::stack< double > values;
+
+  double x;
+  double y;
+  std::vector< PdfModel*     >::const_iterator pdf = _pdfs .begin();
+  std::vector< Parameter     >::const_iterator par = _parms.begin();
+  std::vector< double        >::const_iterator ctt = _ctnts.begin();
+  std::vector< Operation::Op >::const_iterator ops = _opers.begin();
+
+  typedef std::string::const_iterator eIter;
+  for ( eIter ch = _expression.begin(); ch != _expression.end(); ++ch )
+    if ( *ch == 'm' )
+    {
+      // Determine the variables that the pdf depends on.
+      modelVars.clear();
+      std::map< std::string, Variable >& pdfVars = (*pdf)->_varMap;
+      for ( vIter var = pdfVars.begin(); var != pdfVars.end(); ++var )
+        modelVars.push_back( localVars.find( var->second.name() )->second );
+
+      // Evaluate the function at the given point.
+      values.push( (*pdf++)->evaluate( modelVars, cacheR, cacheC ) );
+    }
+    else if ( *ch == 'p' )
+      values.push( _parMap.find( par++->name() )->second.value() );
+    else if ( *ch == 'c' )
+      values.push( *ctt++ );
+    else
+    {
+      if ( *ch == 'b' )
+      {
+        if ( values.size() < 2 )
+          throw PdfException( "Parse error: not enough values in the stack." );
+        y = values.top();
+        values.pop();
+        x = values.top();
+        values.pop();
+        values.push( Operation::operate( x, y, *ops++ ) );
+      }
+      else if ( *ch == 'u' )
+      {
+        if ( values.empty() )
+          throw PdfException( "Parse error: not enough values in the stack." );
+        x = values.top();
+        values.pop();
+        values.push( Operation::operate( x, *ops++ ) );
+      }
+      else
+        throw PdfException( std::string( "Parse error: unknown operation " ) + *ch + "." );
+    }
+
+  if ( values.size() != 1 )
+    throw PdfException( "PdfExpr parse error: too many values have been supplied." );
+
+  return values.top();
+}
+
 
 
 void PdfExpr::setLimits( const Variable& var, const double& min, const double& max )
