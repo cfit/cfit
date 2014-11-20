@@ -112,6 +112,8 @@ public:
   void setLimits( const Variable&    var, const double& min, const double& max );
   void setLimits( const std::string& var, const double& min, const double& max );
 
+  const double yield() const;
+
   double area()                                                               const throw( PdfException );
   double area( const std::string& var, const double& min, const double& max ) const throw( PdfException );
 

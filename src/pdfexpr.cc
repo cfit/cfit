@@ -914,6 +914,57 @@ double PdfExpr::area( const std::string& var, const double& min, const double& m
 }
 
 
+
+const double PdfExpr::yield() const
+{
+  std::stack< double > values;
+
+  double x;
+  double y;
+  std::vector< Parameter     >::const_iterator par = _parms.begin();
+  std::vector< double        >::const_iterator ctt = _ctnts.begin();
+  std::vector< Operation::Op >::const_iterator ops = _opers.begin();
+
+  typedef std::string::const_iterator eIter;
+  for ( eIter ch = _expression.begin(); ch != _expression.end(); ++ch )
+    if ( *ch == 'm' )
+      values.push( 1.0 );
+    else if ( *ch == 'p' )
+      values.push( _parMap.find( par++->name() )->second.value() );
+    else if ( *ch == 'c' )
+      values.push( *ctt++ );
+    else
+    {
+      if ( *ch == 'b' )
+      {
+        if ( values.size() < 2 )
+          throw PdfException( "Parse error: not enough values in the stack." );
+        y = values.top();
+        values.pop();
+        x = values.top();
+        values.pop();
+        values.push( Operation::operate( x, y, *ops++ ) );
+      }
+      else if ( *ch == 'u' )
+      {
+        if ( values.empty() )
+          throw PdfException( "Parse error: not enough values in the stack." );
+        x = values.top();
+        values.pop();
+        values.push( Operation::operate( x, *ops++ ) );
+      }
+      else
+        throw PdfException( std::string( "Parse error: unknown operation " ) + *ch + "." );
+    }
+
+  if ( values.size() != 1 )
+    throw PdfException( "PdfExpr parse error: too many values have been supplied." );
+
+  return values.top();
+}
+
+
+
 double PdfExpr::area() const throw( PdfException )
 {
   std::stack< double > values;

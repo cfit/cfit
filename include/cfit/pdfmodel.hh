@@ -30,6 +30,7 @@ protected:
   const Parameter& getPar( const Parameter& par ) const;
   const Parameter& getPar( const int&       idx ) const;
 
+  const double yield() const { return 1.0; }
   virtual const double area( const double& min, const double& max ) const throw( PdfException );
 
 public:

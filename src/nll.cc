@@ -82,6 +82,8 @@ double Nll::operator()( const std::vector<double>& pars ) const throw( PdfExcept
 // 		  << ". Not taking this entry into account for the nll." << std::endl;
   }
 
+  nll += 2.0 * _pdf.yield();
+
 #ifdef MPI_ON
   // If running with MPI, each process has only computed a piece of the chi2.
   //    Add all the pieces up and broadcast them to all the processes.

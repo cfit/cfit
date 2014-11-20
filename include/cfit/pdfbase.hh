@@ -105,6 +105,8 @@ public:
                                 const double&      val2  ,
                                 const Region&      region   ) const throw( PdfException ) = 0;
 
+  virtual const double yield() const = 0;
+
   const bool dependsOn( const std::string& var ) const
   {
     const std::vector< std::string >& vars = varNames();
