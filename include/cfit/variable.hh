@@ -22,6 +22,10 @@ public:
     : _name( name ), _value( value ), _error( error )
   {}
 
+  Variable( const char* name )
+    : _name( name )
+  {}
+
   void set( double value, double error = -1. )
   {
     _value = value;
