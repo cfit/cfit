@@ -13,19 +13,22 @@ class MinimizerExpr : public FCNBase
 {
 private:
   double _up;
+  bool   _verbose;
+
   std::vector< const Minimizer* > _minimizers;
   std::map< std::string, Parameter > _parMap;
 
 public:
   MinimizerExpr()
-    : _up( -1.0 )
+    : _up( -1.0 ), _verbose( false )
     {}
 
   // Getters.
   double up() const throw( MinimizerException );
 
   // Setters.
-  void setUp( const double& up ) { _up = up; }
+  void setUp  ( const double& up  ) { _up = up;       }
+  void verbose( const bool&   val ) { _verbose = val; }
 
   double operator()( const std::vector< double >& par ) const throw( PdfException );
 

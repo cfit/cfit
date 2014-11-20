@@ -85,13 +85,14 @@ double Nll::operator()( const std::vector<double>& pars ) const throw( PdfExcept
 #ifdef MPI_ON
   // If running with MPI, each process has only computed a piece of the chi2.
   //    Add all the pieces up and broadcast them to all the processes.
-  double result = 0.;
+  double result = 0.0;
   MPI::Comm& world = MPI::COMM_WORLD;
   world.Allreduce( &nll, &result, 1, MPI::DOUBLE, MPI::SUM );
 
   return result;
 #else
-  std::cout << "nll = " << nll << std::endl;
+  if ( _verbose )
+    std::cout << "nll = " << nll << std::endl;
 
   return nll;
 #endif

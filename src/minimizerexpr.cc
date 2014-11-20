@@ -20,6 +20,9 @@ double MinimizerExpr::up() const throw( MinimizerException )
 
 double MinimizerExpr::operator()( const std::vector< double >& pars ) const throw( PdfException )
 {
+  if ( _minimizers.empty() )
+    throw PdfException( "Minimizer expression does not contain any minimizer." );
+
   if ( pars.size() != _parMap.size() )
     throw PdfException( "Number of parameters passed does not match number of required arguments." );
 
@@ -45,7 +48,8 @@ double MinimizerExpr::operator()( const std::vector< double >& pars ) const thro
     total += (**mmzr)( mPars );
   }
 
-  std::cout << "total = " << total << std::endl;
+  if ( _verbose )
+    std::cout << "total = " << total << std::endl;
 
   return total;
 }
