@@ -31,7 +31,6 @@ protected:
   const Parameter& getPar( const int&       idx ) const;
 
   const double yield() const { return 1.0; }
-  virtual const double area( const double& min, const double& max ) const throw( PdfException );
 
 public:
   virtual PdfModel* copy() const = 0;
@@ -66,6 +65,11 @@ public:
   {
     throw PdfException( "Generate error: attempting to generate with a model without generate() implementation" );
   }
+
+
+  // Calculate the area of single-variable functions within given interval.
+  virtual const double area( const double& min, const double& max ) const throw( PdfException );
+
 
   // Projection function for pdfs with one single variable.
   virtual const double project( const std::string& varName, const double& value ) const throw( PdfException )
