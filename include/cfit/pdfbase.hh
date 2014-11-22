@@ -68,8 +68,8 @@ public:
   const unsigned& nCachedReal()    const { return _cacheIdxReal;    }
   const unsigned& nCachedComplex() const { return _cacheIdxComplex; }
 
-  virtual const unsigned& assignCacheIdxReal()    { return _cacheIdxReal++;    }
-  virtual const unsigned& assignCacheIdxComplex() { return _cacheIdxComplex++; }
+  virtual const unsigned assignCacheIdxReal()    { return _cacheIdxReal++;    }
+  virtual const unsigned assignCacheIdxComplex() { return _cacheIdxComplex++; }
 
   // Before evaluating the pdf at all data points, cache anything common to
   //    all points (usually compute the norm).
