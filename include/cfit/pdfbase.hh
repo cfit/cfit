@@ -21,10 +21,6 @@ class PdfBase
 {
   friend Minimizer;
 
-private:
-  static unsigned _cacheIdxReal;
-  static unsigned _cacheIdxComplex;
-
 protected:
   // Make a dataset available to a pdf such that it can compute values to be cached.
   virtual const std::map< unsigned, std::vector< double > > cacheReal( const Dataset& data )
@@ -41,6 +37,9 @@ protected:
   std::map< std::string, Parameter > _parMap;
 
 public:
+  static unsigned _cacheIdxReal;
+  static unsigned _cacheIdxComplex;
+
   virtual ~PdfBase() {}
 
   // Setters.

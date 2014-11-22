@@ -327,8 +327,8 @@ const std::map< unsigned, std::vector< std::complex< double > > > Decay3BodyCP::
     return cached;
 
   // Get an index for the cached complex amplitudes.
-  _ampDirCache = assignCacheIdxComplex();
-  _ampCnjCache = assignCacheIdxComplex();
+  _ampDirCache = _cacheIdxComplex++;
+  _ampCnjCache = _cacheIdxComplex++;
 
   const std::string& mSq12name = getVar( 0 ).name();
   const std::string& mSq13name = getVar( 1 ).name();
