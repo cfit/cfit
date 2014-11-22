@@ -109,8 +109,7 @@ public:
 
 
   // Not sure if this is a dirty hack.
-  void setLimits( const Variable&    var, const double& min, const double& max );
-  void setLimits( const std::string& var, const double& min, const double& max );
+  void setLimits( const Variable& var, const double& min, const double& max );
 
   const double yield() const;
 

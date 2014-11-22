@@ -775,7 +775,6 @@ const double PdfExpr::evaluate( const std::vector< double                 >& var
 }
 
 
-
 void PdfExpr::setLimits( const Variable& var, const double& min, const double& max )
 {
   const double& totalArea = this->area();
@@ -784,17 +783,6 @@ void PdfExpr::setLimits( const Variable& var, const double& min, const double& m
   _scale *= totalArea / limitArea;
   _limits[ var.name() ] = std::make_pair( min, max );
 }
-
-
-void PdfExpr::setLimits( const std::string& var, const double& min, const double& max )
-{
-  const double& totalArea = this->area();
-  const double& limitArea = this->area( var, min, max );
-
-  _scale *= totalArea / limitArea;
-  _limits[ var ] = std::make_pair( min, max );
-}
-
 
 
 // Get a vector with the names of the variables common in all the
