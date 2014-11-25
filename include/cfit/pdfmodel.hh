@@ -45,7 +45,10 @@ public:
   virtual void setPars( const FunctionMinimum&                    min  ) throw( PdfException );
 
   virtual       void   cache() {}
-  virtual const double evaluate()                                    const throw( PdfException ) = 0;
+  virtual const double evaluate()                                    const throw( PdfException )
+  {
+    throw PdfException( "PdfModel: the evaluate() function without arguments will be deprecated. Don't use it." );
+  }
   virtual const double evaluate( const std::vector< double >& vars ) const throw( PdfException ) = 0;
   virtual const double evaluate( const double& value )               const throw( PdfException ) // For pdfs of a single variable.
   {
