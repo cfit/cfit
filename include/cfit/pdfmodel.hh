@@ -35,12 +35,9 @@ protected:
 public:
   virtual PdfModel* copy() const = 0;
 
-  void setVar ( const std::string& name, const double& val, const double& err = -1. ) throw( PdfException );
   void setPar ( const std::string& name, const double& val, const double& err = -1. ) throw( PdfException );
 
-  virtual void setVars( const std::vector< double >&              vars ) throw( PdfException );
   virtual void setPars( const std::vector< double >&              pars ) throw( PdfException );
-  virtual void setVars( const std::map< std::string, Variable  >& vars ) throw( PdfException );
   virtual void setPars( const std::map< std::string, Parameter >& pars ) throw( PdfException );
   virtual void setPars( const FunctionMinimum&                    min  ) throw( PdfException );
 

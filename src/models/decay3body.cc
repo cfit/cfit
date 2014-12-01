@@ -22,49 +22,6 @@ Decay3Body* Decay3Body::copy() const
 }
 
 
-// Need to overwrite setters defined in PdfModel, since function variables may need to be set.
-void Decay3Body::setVars( const std::vector< double >& vars ) throw( PdfException )
-{
-  if ( _varMap.size() != vars.size() )
-    throw PdfException( "Decay3Body::setVars: Number of arguments passed does not match number of required arguments." );
-
-  typedef std::map< std::string, Variable >::iterator vIter;
-  int index = 0;
-  for ( vIter var = _varMap.begin(); var != _varMap.end(); ++var )
-    var->second.setValue( vars[ index++ ] );
-
-  typedef std::vector< Function >::iterator fIter;
-  for ( fIter func = _funcs.begin(); func != _funcs.end(); ++func )
-    func->setVars( _varMap );
-}
-
-
-// Need to overwrite setters defined in PdfModel, since function variables may need to be set.
-void Decay3Body::setVars( const std::map< std::string, Variable >& vars ) throw( PdfException )
-{
-  typedef std::map< const std::string, Variable >::iterator vIter;
-  for ( vIter var = _varMap.begin(); var != _varMap.end(); ++var )
-    var->second.setValue( vars.find( var->first )->second.value() );
-
-  typedef std::vector< Function >::iterator fIter;
-  for ( fIter func = _funcs.begin(); func != _funcs.end(); ++func )
-    func->setVars( _varMap );
-}
-
-
-void Decay3Body::setVars( const std::map< std::string, double >& vars ) throw( PdfException )
-{
-  typedef std::map< const std::string, Variable >::iterator vIter;
-  for ( vIter var = _varMap.begin(); var != _varMap.end(); ++var )
-    var->second.setValue( vars.find( var->first )->second );
-
-  typedef std::vector< Function >::iterator fIter;
-  for ( fIter func = _funcs.begin(); func != _funcs.end(); ++func )
-    func->setVars( _varMap );
-}
-
-
-
 
 // Set the parameters to those given as argument.
 // They must be sorted alphabetically, since it's how MnUserParameters are passed
@@ -145,19 +102,6 @@ const double Decay3Body::evaluateFuncs( const double& mSq12, const double& mSq13
 }
 
 
-// The values of the variables must be set with setVars before using this function.
-const double Decay3Body::evaluateFuncs() const
-{
-  double value = 1.0;
-
-  typedef std::vector< Function >::const_iterator fIter;
-  for ( fIter func = _funcs.begin(); func != _funcs.end(); ++func )
-    value *= func->evaluate();
-
-  // Always return a non-negative value. Default to zero.
-  return std::max( value, 0.0 );
-}
-
 
 void Decay3Body::cache()
 {
@@ -220,16 +164,6 @@ const double Decay3Body::evaluate( const double& mSq12, const double& mSq13 ) co
 }
 
 
-const double Decay3Body::evaluate() const throw( PdfException )
-{
-  // Phase space amplitude of the decay of the particle.
-  std::complex< double > amp = _amp.evaluate( _ps, mSq12(), mSq13(), mSq23() );
-
-  // std::norm returns the squared modulus of the complex number, not its norm.
-  return std::norm( amp ) * evaluateFuncs() / _norm;
-}
-
-
 const double Decay3Body::project( const std::string& varName, const double& x ) const throw( PdfException )
 {
   // Find the index of the variable to be projected.
@@ -254,8 +188,6 @@ const double Decay3Body::project( const std::string& varName, const double& x ) 
   {
     double y = binCenter( yBin, nbins, min, max );
     double z = _ps.mSqSum() - x - y;
-
-    // std::cout << "DEBUG Decay3Body: " << x << " " << y << " " << z << " " << evaluate( x, y, z ) << " " << proj << std::endl;
 
     if ( index == 0 ) proj += evaluate( x, y, z );
     if ( index == 1 ) proj += evaluate( z, x, y );

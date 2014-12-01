@@ -203,12 +203,6 @@ const double CrystalBall::evaluate( const std::vector< double >& vars ) const th
 }
 
 
-const double CrystalBall::evaluate() const throw( PdfException )
-{
-  return evaluate( getVar( 0 ).value() );
-}
-
-
 const double CrystalBall::area( const double& min, const double& max ) const throw( PdfException )
 {
   return ( cumulativeNorm( std::min( max, _upper ) ) - cumulativeNorm( std::max( min, _lower ) ) ) / _norm;

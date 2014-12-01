@@ -30,10 +30,6 @@ public:
   const std::string mSq12name() const { return getVar( 0 ).name(); }
   const std::string mSq13name() const { return getVar( 1 ).name(); }
   const std::string mSq23name() const { return getVar( 2 ).name(); }
-
-  const double mSq12() const { return getVar( 0 ).value(); }
-  const double mSq13() const { return getVar( 1 ).value(); }
-  const double mSq23() const { return getVar( 2 ).value(); }
 };
 
 #endif

@@ -272,12 +272,6 @@ const double DoubleCrystalBall::evaluate( const std::vector< double >& vars ) co
 }
 
 
-const double DoubleCrystalBall::evaluate() const throw( PdfException )
-{
-  return evaluate( getVar( 0 ).value() );
-}
-
-
 const double DoubleCrystalBall::area( const double& min, const double& max ) const throw( PdfException )
 {
   return ( cumulativeNorm( max ) - cumulativeNorm( min ) ) / _norm;

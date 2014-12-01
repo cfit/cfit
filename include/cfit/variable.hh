@@ -12,34 +12,20 @@ class Variable
 {
 private:
   std::string _name;
-  double      _value;
-  double      _error;
 
 public:
   Variable() {}
 
-  Variable( std::string name, double value = 0., double error = 0. )
-    : _name( name ), _value( value ), _error( error )
+  Variable( const std::string& name )
+    : _name( name )
   {}
 
   Variable( const char* name )
     : _name( name )
   {}
 
-  void set( double value, double error = -1. )
-  {
-    _value = value;
-    if ( error >= 0. )
-      _error = error;
-  }
-  void setValue( double value ) { _value = value; }
-  void setError( double error ) { _error = error; }
-
   // Getters.
-  std::string name()  const { return _name;  }
-  double      value() const { return _value; }
-  double      error() const { return _error; }
-
+  const std::string& name() const { return _name; }
 
   // Binary operations that need access to this class.
   friend const Function pow( const Variable& left, const double& right );

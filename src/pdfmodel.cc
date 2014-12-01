@@ -58,15 +58,6 @@ const Parameter& PdfModel::getPar( const int& idx ) const
 }
 
 
-// Setter for individual variable.
-void PdfModel::setVar( const std::string& name, const double& val, const double& err ) throw( PdfException )
-{
-  if ( ! _varMap.count( name ) )
-    throw PdfException( "Cannot set unexisting variable " + name + "." );
-
-  _varMap[ name ].set( val, err );
-}
-
 // Setter for individual parameter.
 void PdfModel::setPar( const std::string& name, const double& val, const double& err ) throw( PdfException )
 {
@@ -74,19 +65,6 @@ void PdfModel::setPar( const std::string& name, const double& val, const double&
     throw PdfException( "Cannot set unexisting parameter " + name + "." );
 
   _parMap[ name ].set( val, err );
-}
-
-// Set the variables to those given as argument.
-// They must be sorted alphabetically.
-void PdfModel::setVars( const std::vector< double >& vars ) throw( PdfException )
-{
-  if ( _varMap.size() != vars.size() )
-    throw PdfException( "PdfModel::setVars: Number of arguments passed does not match number of required arguments." );
-
-  typedef std::map< std::string, Variable >::iterator vIter;
-  int index = 0;
-  for ( vIter var = _varMap.begin(); var != _varMap.end(); var++ )
-    var->second.setValue( vars[ index++ ] );
 }
 
 
@@ -118,18 +96,6 @@ void PdfModel::setPars( const FunctionMinimum& min ) throw( PdfException )
   for ( pIter par = parVec.begin(); par != parVec.end(); ++par )
     _parMap[ par->name() ].set( par->value(), par->error() );
 }
-
-
-
-// The function must be virtual to allow the derived decay model classes to use their
-//    own setPars function.
-void PdfModel::setVars( const std::map< std::string, Variable >& vars ) throw( PdfException )
-{
-  typedef std::map< const std::string, Variable >::iterator vIter;
-  for ( vIter var = _varMap.begin(); var != _varMap.end(); ++var )
-    var->second.setValue( vars.find( var->first )->second.value() );
-}
-
 
 
 // The function must be virtual to allow the derived decay model classes to use their

@@ -46,7 +46,6 @@ private:
 
   std::vector< Function > _funcs;
 
-  const double evaluateFuncs() const;
   const double evaluateFuncs( const double& mSq12, const double& mSq13, const double& mSq23 ) const;
   const double evaluateFuncs( const double& mSq12, const double& mSq13                      ) const;
 
@@ -84,19 +83,12 @@ public:
   const std::string mSq13name() const { return getVar( 1 ).name(); }
   const std::string mSq23name() const { return getVar( 2 ).name(); }
 
-  const double mSq12() const { return getVar( 0 ).value(); }
-  const double mSq13() const { return getVar( 1 ).value(); }
-  const double mSq23() const { return getVar( 2 ).value(); }
-
   // Norm components getters.
   const double&                 nDir() const { return _nDir; }
   const double&                 nCnj() const { return _nCnj; }
   const std::complex< double >& nXed() const { return _nXed; }
 
   // Need to define own setters, since function variables and parameters may need to be set, too.
-  void setVars( const std::vector< double >&              vars ) throw( PdfException );
-  void setVars( const std::map< std::string, Variable >&  vars ) throw( PdfException );
-  void setVars( const std::map< std::string, double >&    vars ) throw( PdfException );
   void setPars( const std::vector< double >&              pars ) throw( PdfException );
   void setPars( const std::map< std::string, Parameter >& pars ) throw( PdfException );
   void setPars( const FunctionMinimum&                    min  ) throw( PdfException );
@@ -128,7 +120,6 @@ public:
 
 
   void cache();
-  const double evaluate(                                                               ) const throw( PdfException );
   const double evaluate( const double& mSq12, const double& mSq13, const double& mSq23 ) const throw( PdfException );
   const double evaluate( const double& mSq12, const double& mSq13                      ) const throw( PdfException );
   const double evaluate( const std::vector< double >& vars                             ) const throw( PdfException );

@@ -59,7 +59,7 @@ public:
   Function() {};
 
   // Constructor from other objects.
-  // arg could be a variable, parameter, parameter expression, or constant
+  // arg could be a variable, parameter, parameter expression, or constant.
   template< class T >
   explicit Function( const T& arg )
   {
@@ -68,7 +68,7 @@ public:
 
 
   // Assignment operators.
-  // arg could be a variable, parameter, parameter expression, or constant
+  // arg could be a variable, parameter, parameter expression, or constant.
   template< class T >
   inline const Function& operator=( const T& arg )
   {
@@ -79,10 +79,8 @@ public:
   }
 
   // Setters.
-  void setVar( const std::string& name, const double& val, const double& err = -1. ) throw( PdfException );
   void setPar( const std::string& name, const double& val, const double& err = -1. ) throw( PdfException );
 
-  void setVars( const std::map< std::string, Variable  >& vars ) throw( PdfException );
   void setPars( const std::map< std::string, Parameter >& pars ) throw( PdfException );
   void setPars( const FunctionMinimum&                    pars ) throw( PdfException );
 
@@ -93,7 +91,6 @@ public:
   const bool dependsOn( const std::string& varName ) const { return _varMap.count( varName ); };
 
   double evaluate( const std::map< std::string, double >& varMap ) const throw( PdfException );
-  double evaluate()                                                const throw( PdfException );
 
   // Assignment operators.
   template< class T > const Function& operator+=( const T& arg );

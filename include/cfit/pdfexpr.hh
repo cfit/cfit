@@ -74,16 +74,13 @@ public:
 
   ~PdfExpr();
 
-  void setVar( const std::string& name, const double& val, const double& err = -1. ) throw( PdfException );
   void setPar( const std::string& name, const double& val, const double& err = -1. ) throw( PdfException );
 
-  void setVars( const std::vector< double >&              vars ) throw( PdfException );
   void setPars( const std::vector< double >&              pars ) throw( PdfException );
   void setPars( const std::map< std::string, Parameter >& pars ) throw( PdfException );
   void setPars( const FunctionMinimum&                    min  ) throw( PdfException );
 
   void         cache();
-  const double evaluate()                                    const throw( PdfException );
   const double evaluate( const std::vector< double >& vars ) const throw( PdfException );
 
   const std::map< std::string, double > generate() const throw( PdfException );

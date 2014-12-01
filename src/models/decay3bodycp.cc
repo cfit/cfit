@@ -82,50 +82,6 @@ Decay3BodyCP* Decay3BodyCP::copy() const
 }
 
 
-// Need to overwrite setters defined in PdfModel, since function variables may need to be set.
-void Decay3BodyCP::setVars( const std::vector< double >& vars ) throw( PdfException )
-{
-  if ( _varMap.size() != vars.size() )
-    throw PdfException( "Decay3BodyCP::setVars: Number of arguments passed does not match number of required arguments." );
-
-  typedef std::map< std::string, Variable >::iterator vIter;
-  int index = 0;
-  for ( vIter var = _varMap.begin(); var != _varMap.end(); ++var )
-    var->second.setValue( vars[ index++ ] );
-
-  typedef std::vector< Function >::iterator fIter;
-  for ( fIter func = _funcs.begin(); func != _funcs.end(); ++func )
-    func->setVars( _varMap );
-}
-
-
-// Need to overwrite setters defined in PdfModel, since function variables may need to be set.
-void Decay3BodyCP::setVars( const std::map< std::string, Variable >& vars ) throw( PdfException )
-{
-  typedef std::map< const std::string, Variable >::iterator vIter;
-  for ( vIter var = _varMap.begin(); var != _varMap.end(); ++var )
-    var->second.setValue( vars.find( var->first )->second.value() );
-
-  typedef std::vector< Function >::iterator fIter;
-  for ( fIter func = _funcs.begin(); func != _funcs.end(); ++func )
-    func->setVars( _varMap );
-}
-
-
-void Decay3BodyCP::setVars( const std::map< std::string, double >& vars ) throw( PdfException )
-{
-  typedef std::map< const std::string, Variable >::iterator vIter;
-  for ( vIter var = _varMap.begin(); var != _varMap.end(); ++var )
-    var->second.setValue( vars.find( var->first )->second );
-
-  typedef std::vector< Function >::iterator fIter;
-  for ( fIter func = _funcs.begin(); func != _funcs.end(); ++func )
-    func->setVars( _varMap );
-}
-
-
-
-
 // Set the parameters to those given as argument.
 // They must be sorted alphabetically, since it's how MnUserParameters are passed
 //    in the minimize function of the minimizers. It must be so, because pushing
@@ -232,19 +188,6 @@ const double Decay3BodyCP::evaluateFuncs( const double& mSq12, const double& mSq
   return evaluateFuncs( mSq12, mSq13, mSq23 );
 };
 
-
-// The values of the variables must be set with setVars before using this function.
-const double Decay3BodyCP::evaluateFuncs() const
-{
-  double value = 1.0;
-
-  typedef std::vector< Function >::const_iterator fIter;
-  for ( fIter func = _funcs.begin(); func != _funcs.end(); ++func )
-    value *= func->evaluate();
-
-  // Always return a non-negative value. Default to zero.
-  return std::max( value, 0.0 );
-}
 
 
 void Decay3BodyCP::cache()
@@ -386,12 +329,6 @@ const double Decay3BodyCP::evaluate( const double& mSq12, const double& mSq13 ) 
   const double& mSq23 = _ps.mSqSum() - mSq12 - mSq13;
 
   return evaluateUnnorm( mSq12, mSq13, mSq23 ) / _norm;
-}
-
-
-const double Decay3BodyCP::evaluate() const throw( PdfException )
-{
-  throw PdfException( "Decay3BodyCP: do not use evaluate() without arguments." );
 }
 
 

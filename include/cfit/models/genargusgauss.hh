@@ -53,7 +53,6 @@ public:
 
   void cache();
 
-  const double evaluate(                                   ) const throw( PdfException );
   const double evaluate( const double& x                   ) const throw( PdfException );
   const double evaluate( const std::vector< double >& vars ) const throw( PdfException );
 

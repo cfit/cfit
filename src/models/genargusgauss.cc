@@ -261,12 +261,6 @@ const double GenArgusGauss::evaluate( const double& x ) const throw( PdfExceptio
 }
 
 
-const double GenArgusGauss::evaluate() const throw( PdfException )
-{
-  return evaluate( getVar( 0 ).value() );
-}
-
-
 const double GenArgusGauss::evaluate( const std::vector< double >& vars ) const throw( PdfException )
 {
   return evaluate( vars[ 0 ] );

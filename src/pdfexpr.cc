@@ -262,21 +262,6 @@ const PdfExpr& PdfExpr::operator/=( const double& right )
 }
 
 
-// Setter for individual variable.
-void PdfExpr::setVar( const std::string& name, const double& val, const double& err ) throw( PdfException )
-{
-  if ( ! _varMap.count( name ) )
-    throw PdfException( "Cannot set unexisting variable " + name + "." );
-
-  _varMap[ name ].set( val, err );
-
-  // Propagate the values to the list of pdfs.
-  typedef std::vector< PdfModel* >::const_iterator pdfIter;
-  for ( pdfIter pdf = _pdfs.begin(); pdf != _pdfs.end(); ++pdf )
-    if ( (*pdf)->_varMap.count( name ) )
-      (*pdf)->_varMap[ name ].set( val, err );
-}
-
 // Setter for individual parameter.
 void PdfExpr::setPar( const std::string& name, const double& val, const double& err ) throw( PdfException )
 {
@@ -290,25 +275,6 @@ void PdfExpr::setPar( const std::string& name, const double& val, const double& 
   for ( pdfIter pdf = _pdfs.begin(); pdf != _pdfs.end(); ++pdf )
     if ( (*pdf)->_parMap.count( name ) )
       (*pdf)->_parMap[ name ].set( val, err );
-}
-
-
-
-void PdfExpr::setVars( const std::vector< double >& vars ) throw( PdfException )
-{
-  if ( _varMap.size() != vars.size() )
-    throw PdfException( "PdfExpr::setVars: Number of arguments passed does not match number of required arguments." );
-
-  // Set the local values of the variables.
-  typedef std::map< std::string, Variable >::iterator vIter;
-  int index = 0;
-  for ( vIter var = _varMap.begin(); var != _varMap.end(); ++var )
-    var->second.setValue( vars[ index++ ] );
-
-  // Propagate the values to the list of pdfs.
-  typedef std::vector< PdfModel* >::const_iterator pdfIter;
-  for ( pdfIter pdf = _pdfs.begin(); pdf != _pdfs.end(); ++pdf )
-    (*pdf)->setVars( _varMap );
 }
 
 
@@ -372,75 +338,6 @@ void PdfExpr::cache()
 
   return;
 }
-
-
-
-// Before running this function, the PdfExpr::setVars( vars ) function must be called.
-//    To avoid the risk of forgetting it, run PdfExpr::evaluate( vars ).
-const double PdfExpr::evaluate() const throw( PdfException )
-{
-  // Return 0 if any of the variables is off limits.
-  typedef std::map< std::string, std::pair< double, double > >::const_iterator lIter;
-  for ( lIter limit = _limits.begin(); limit != _limits.end(); ++limit )
-  {
-    std::map< std::string, Variable >::const_iterator var = _varMap.find( limit->first );
-    if ( var != _varMap.end() )
-    {
-      double value = var->second.value();
-      if ( ( value < limit->second.first ) || ( value > limit->second.second ) )
-        return 0.0;
-    }
-  }
-
-  std::stack< double > values;
-
-  double x;
-  double y;
-  std::vector< PdfModel*     >::const_iterator pdf = _pdfs .begin();
-  std::vector< Parameter     >::const_iterator par = _parms.begin();
-  std::vector< double        >::const_iterator ctt = _ctnts.begin();
-  std::vector< Operation::Op >::const_iterator ops = _opers.begin();
-
-  typedef std::string::const_iterator eIter;
-  for ( eIter ch = _expression.begin(); ch != _expression.end(); ++ch )
-  {
-    if ( *ch == 'm' )
-      values.push( (*pdf++)->evaluate() );
-    else if ( *ch == 'p' )
-      values.push( _parMap.find( par++->name() )->second.value() );
-    else if ( *ch == 'c' )
-      values.push( *ctt++ );
-    else
-    {
-      if ( *ch == 'b' )
-      {
-        if ( values.size() < 2 )
-          throw PdfException( "Parse error: not enough values in the stack." );
-        y = values.top();
-        values.pop();
-        x = values.top();
-        values.pop();
-        values.push( Operation::operate( x, y, *ops++ ) );
-      }
-      else if ( *ch == 'u' )
-      {
-        if ( values.empty() )
-          throw PdfException( "Parse error: not enough values in the stack." );
-        x = values.top();
-        values.pop();
-        values.push( Operation::operate( x, *ops++ ) );
-      }
-      else
-        throw PdfException( std::string( "Parse error: unknown operation " ) + *ch + "." );
-    }
-  }
-
-  if ( values.size() != 1 )
-    throw PdfException( "PdfExpr parse error: too many values have been supplied." );
-
-  return _scale * values.top();
-}
-
 
 
 

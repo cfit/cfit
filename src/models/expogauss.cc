@@ -189,12 +189,6 @@ const double ExpoGauss::evaluate( const double& x ) const throw( PdfException )
 }
 
 
-const double ExpoGauss::evaluate() const throw( PdfException )
-{
-  return evaluate( getVar( 0 ).value() );
-}
-
-
 const double ExpoGauss::evaluate( const std::vector< double >& vars ) const throw( PdfException )
 {
   return evaluate( vars[ 0 ] );
