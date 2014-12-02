@@ -15,6 +15,7 @@ class PhaseSpace;
 class Resonance
 {
   friend class Amplitude;
+
 protected:
   unsigned _resoA;      // Indices of the resonant particles.
   unsigned _resoB;      //
@@ -24,8 +25,9 @@ protected:
   bool     _helicity;   // Use helicity formalism for angular distribution, instead of Zemach.
   bool     _twoBW;      // Use two Blatt-Weisskopf centrifugal terms, instead of one.
 
-  std::map< const std::string, Parameter > _parMap;
-  std::vector< std::string >               _parOrder;
+  std::map< std::string, Parameter > _parMap;
+  std::vector< std::string >         _parOrder;
+
 public:
   template <class T>
   Resonance( const T&         resoA, const T&         resoB,
