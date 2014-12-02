@@ -11,8 +11,10 @@
 #include <cfit/pdfmodel.hh>
 #include <cfit/functors.hh>
 
+
+
 // Add a variable to the variables map.
-void PdfModel::push( const Variable& var ) throw( PdfException )
+void PdfModel::push( const Variable& var )
 {
   if ( _varMap.find( var.name() ) != _varMap.end() )
     throw PdfException( "Variable \"" + var.name() + "\" does already exist in this model." );
@@ -23,7 +25,7 @@ void PdfModel::push( const Variable& var ) throw( PdfException )
 
 
 // Add a parameter to the parameters map and add its name to the ordering vector.
-void PdfModel::push( const Parameter& par ) throw( PdfException )
+void PdfModel::push( const Parameter& par )
 {
   if ( _parMap.find( par.name() ) != _parMap.end() )
     throw PdfException( "Parameter \"" + par.name() + "\" does already exist in this model." );
@@ -31,6 +33,55 @@ void PdfModel::push( const Parameter& par ) throw( PdfException )
   _parMap[ par.name() ] = par;
   _parOrder.push_back( par.name() );
 }
+
+
+// Push the two parameters in a coefficient.
+void PdfModel::push( const Coef& coef )
+{
+  push( coef.real() );
+  push( coef.imag() );
+}
+
+
+// Push all the parameters in a parameter expression.
+void PdfModel::push( const ParameterExpr& expr )
+{
+  const std::map< std::string, Parameter >& pars = expr.getPars();
+  typedef std::map< const std::string, Parameter >::const_iterator pIter;
+  for ( pIter par = pars.begin(); par != pars.end(); ++par )
+    push( par->second );
+}
+
+
+// Push all the parameters in a coefficient expression.
+void PdfModel::push( const CoefExpr& expr )
+{
+  const std::map< std::string, Parameter >& pars = expr.getPars();
+  typedef std::map< const std::string, Parameter >::const_iterator pIter;
+  for ( pIter par = pars.begin(); par != pars.end(); ++par )
+    push( par->second );
+}
+
+
+// Push all the parameters in a resonance.
+void PdfModel::push( const Resonance& reso )
+{
+  const std::map< std::string, Parameter >& pars = reso.getPars();
+  typedef std::map< const std::string, Parameter >::const_iterator pIter;
+  for ( pIter par = pars.begin(); par != pars.end(); ++par )
+    push( par->second );
+}
+
+
+// Push all the parameters in an amplitude.
+void PdfModel::push( const Amplitude& amp )
+{
+  const std::map< std::string, Parameter >& pars = amp.getPars();
+  typedef std::map< const std::string, Parameter >::const_iterator pIter;
+  for ( pIter par = pars.begin(); par != pars.end(); ++par )
+    push( par->second );
+}
+
 
 
 // Retrieve the mapped variable with same name as argument.
