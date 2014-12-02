@@ -1,5 +1,4 @@
 
-// #include <cfit/parameter.hh>
 #include <cfit/parameterexpr.hh>
 
 
@@ -28,6 +27,20 @@ void ParameterExpr::append( const Operation::Op& oper )
   _opers.push_back( oper );
   _expression += "b"; // b = binary operation.
 }
+
+
+// Return a map from parameter names to parameters for all parameters used in the expression.
+const std::map< std::string, Parameter > ParameterExpr::getPars() const
+{
+  std::map< std::string, Parameter > parMap;
+
+  typedef std::vector< Parameter >::const_iterator pIter;
+  for ( pIter par = _parms.begin(); par != _parms.end(); ++par )
+    parMap.emplace( par->name(), *par );
+
+  return parMap;
+}
+
 
 
 const ParameterExpr& ParameterExpr::operator+=( const ParameterExpr& right )

@@ -26,7 +26,7 @@ const bool Resonance::isFixed() const
 
 // For resonances with larger number of parameters, be able to get them by index.
 //    Important: the zeroth extra parameter is the 3rd element in the vector.
-double Resonance::getPar( const unsigned index ) const throw( PdfException )
+double Resonance::getPar( const unsigned index ) const
 {
   if ( _parOrder.size() > index + 3 )
     return _parMap.find( _parOrder[ index + 3 ] )->second.value();

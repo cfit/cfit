@@ -56,7 +56,8 @@ public:
 
   // For resonances with larger number of parameters, be able to get them by index.
   //    Important: the zeroth extra parameter is the 3rd element in the vector.
-  double getPar( const unsigned index ) const throw( PdfException );
+  double                                    getPar( const unsigned index ) const;
+  const std::map< std::string, Parameter >& getPars()                      const { return _parMap; };
 
   const bool   isFixed() const;
 

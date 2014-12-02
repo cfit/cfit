@@ -3,6 +3,7 @@
 
 #include <complex>
 #include <vector>
+#include <map>
 #include <string>
 
 #include <cfit/parameter.hh>
@@ -52,6 +53,9 @@ private:
 
 public:
   ParameterExpr() {};
+
+  // Return a map from parameter names to parameters for all parameters used in the expression.
+  const std::map< std::string, Parameter > getPars() const;
 
   const ParameterExpr& operator+=( const ParameterExpr& right );
   const ParameterExpr& operator-=( const ParameterExpr& right );
@@ -172,7 +176,6 @@ public:
   friend const Function operator-( const ParameterExpr& left, const Function&      right );
   friend const Function operator*( const ParameterExpr& left, const Function&      right );
   friend const Function operator/( const ParameterExpr& left, const Function&      right );
-
 };
 
 #endif
