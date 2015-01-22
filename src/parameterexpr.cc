@@ -1,4 +1,6 @@
 
+#include <stack>
+
 #include <cfit/parameterexpr.hh>
 
 
@@ -39,6 +41,73 @@ const std::map< std::string, Parameter > ParameterExpr::getPars() const
     parMap.emplace( par->name(), *par );
 
   return parMap;
+}
+
+
+void ParameterExpr::setPars( const std::map< std::string, Parameter >& pars )
+{
+  // Set the values of the parameters.
+  typedef std::vector< Parameter >::iterator pIter;
+  for ( pIter par = _parms.begin(); par != _parms.end(); ++par )
+    par->setValue( pars.find( par->name() )->second.value() );
+}
+
+
+void ParameterExpr::setPars( const std::map< std::string, double >& pars )
+{
+  // Set the values of the parameters.
+  typedef std::vector< Parameter >::iterator pIter;
+  for ( pIter par = _parms.begin(); par != _parms.end(); ++par )
+    par->setValue( pars.find( par->name() )->second );
+}
+
+
+const double ParameterExpr::evaluate() const
+{
+  std::stack< double > values;
+
+  double x;
+  double y;
+  std::vector< double        >::const_iterator ctt = _ctnts.begin();
+  std::vector< Parameter     >::const_iterator par = _parms.begin();
+  std::vector< Operation::Op >::const_iterator ops = _opers.begin();
+
+  typedef std::string::const_iterator eIter;
+  for ( eIter ch = _expression.begin(); ch != _expression.end(); ++ch )
+  {
+    if ( *ch == 'c' )
+      values.push( *ctt++ );
+    else if ( *ch == 'p' )
+      values.push( (par++)->value() );
+    else
+    {
+      if ( *ch == 'b' )
+      {
+        if ( values.size() < 2 )
+          throw PdfException( "Parse error: not enough values in the stack." );
+        y = values.top();
+        values.pop();
+        x = values.top();
+        values.pop();
+        values.push( Operation::operate( x, y, *ops++ ) );
+      }
+      else if ( *ch == 'u' )
+      {
+        if ( values.empty() )
+          throw PdfException( "Parse error: not enough values in the stack." );
+        x = values.top();
+        values.pop();
+        values.push( Operation::operate( x, *ops++ ) );
+      }
+      else
+        throw PdfException( std::string( "Parse error: unknown operation " ) + *ch + "." );
+    }
+  }
+
+  if ( values.size() != 1 )
+    throw PdfException( "PdfExpr parse error: too many values have been supplied." );
+
+  return values.top();
 }
 
 

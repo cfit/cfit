@@ -57,6 +57,13 @@ public:
   // Return a map from parameter names to parameters for all parameters used in the expression.
   const std::map< std::string, Parameter > getPars() const;
 
+  // Setters.
+  void setPars( const std::map< std::string, Parameter >& pars );
+  void setPars( const std::map< std::string, double    >& pars );
+
+  // Evaluate function.
+  const double evaluate() const;
+
   const ParameterExpr& operator+=( const ParameterExpr& right );
   const ParameterExpr& operator-=( const ParameterExpr& right );
   const ParameterExpr& operator*=( const ParameterExpr& right );
