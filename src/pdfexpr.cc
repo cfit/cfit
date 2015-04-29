@@ -18,6 +18,7 @@
 #include <cfit/random.hh>
 
 
+
 PdfExpr::PdfExpr( const PdfExpr& right )
 {
   _varMap = right._varMap;
@@ -76,6 +77,7 @@ void PdfExpr::append( const PdfModel& model )
   _expression += "m"; // m = model.
 }
 
+
 // Append a pdf expression.
 void PdfExpr::append( const PdfExpr& pdf )
 {
@@ -129,7 +131,7 @@ void PdfExpr::append( const Operation::Op& oper )
 }
 
 
-// Assignment operation.
+// Assignment operations.
 const PdfExpr& PdfExpr::operator=( const PdfModel& right )
 {
   clear();
@@ -137,6 +139,16 @@ const PdfExpr& PdfExpr::operator=( const PdfModel& right )
   append( right );
   return *this;
 }
+
+
+const PdfExpr& PdfExpr::operator=( const PdfExpr& right )
+{
+  clear();
+
+  append( right );
+  return *this;
+}
+
 
 // Assignment operations with a pdf model.
 const PdfExpr& PdfExpr::operator+=( const PdfModel& right ) throw( PdfException )

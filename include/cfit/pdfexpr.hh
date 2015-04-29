@@ -115,6 +115,7 @@ public:
 
   // Assignment operator.
   const PdfExpr& operator= ( const PdfModel&      right );
+  const PdfExpr& operator= ( const PdfExpr&       right );
 
   // Assignment operators with pdf objects.
   const PdfExpr& operator+=( const PdfModel&      right ) throw( PdfException );
