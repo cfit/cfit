@@ -12,6 +12,12 @@ void CoefExpr::append( const std::complex< double >& val )
   _expression += "c"; // c = constant.
 }
 
+void CoefExpr::append( const double& val )
+{
+  _ctnts.push_back( val );
+  _expression += "c"; // c = constant.
+}
+
 void CoefExpr::append( const Parameter& par )
 {
   _parms.push_back( par );

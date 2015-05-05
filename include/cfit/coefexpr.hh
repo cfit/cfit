@@ -28,6 +28,7 @@ private:
   std::vector< Operation::Op >          _opers;
 
   void append( const std::complex< double >& val  );
+  void append( const double&                 val  );
   void append( const Parameter&              par  );
   void append( const ParameterExpr&          expr );
   void append( const Coef&                   coef );
@@ -54,6 +55,9 @@ private:
 
 public:
   CoefExpr() {};
+
+  template <class T>
+  CoefExpr( const T& expr ) { append( expr ); }
 
   const std::map< std::string, Parameter > getPars() const;
 
