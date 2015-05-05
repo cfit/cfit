@@ -29,6 +29,11 @@ private:
   Amplitude _amp;
 
   CoefExpr  _z;
+  CoefExpr  _qoverp;
+
+  // Booleans to control whether mixing and CP violation parameters have already been set.
+  bool _hasMixing;
+  bool _hasCPV;
 
   PhaseSpace _ps;
 
@@ -82,19 +87,36 @@ public:
                  const PhaseSpace&    ps            ,
                  bool                 docache = true  );
 
+  Decay3BodyMix( const Variable&      mSq12  ,
+                 const Variable&      mSq13  ,
+                 const Variable&      mSq23  ,
+                 const Variable&      t      ,
+                 const ParameterExpr& width  ,
+                 const Amplitude&     amp    ,
+                 const CoefExpr&      z      ,
+                 const CoefExpr&      qoverp ,
+                 const PhaseSpace&    ps     ,
+                 bool                 docache  );
+
   Decay3BodyMix* copy() const;
 
   // Getters.
-  const double                 gamma() const { return _width.evaluate();          }
-  const double                 tau()   const { return 1.0 / gamma();              }
-  const double                 x()     const { return std::real( _z.evaluate() ); }
-  const double                 y()     const { return std::imag( _z.evaluate() ); }
-  const std::complex< double > z()     const { return _z.evaluate();              }
+  const double                 gamma()  const { return _width.evaluate();          }
+  const double                 tau()    const { return 1.0 / gamma();              }
+  const double                 x()      const { return std::real( _z.evaluate() ); }
+  const double                 y()      const { return std::imag( _z.evaluate() ); }
+  const std::complex< double > z()      const { return _z     .evaluate();         }
+  const std::complex< double > qoverp() const { return _qoverp.evaluate();         }
 
   // Getters for the norm components.
   const double&                 nDir() const { return _nDir; }
   const double&                 nCnj() const { return _nCnj; }
   const std::complex< double >& nXed() const { return _nXed; }
+
+  // Setters for the mixing and CP violation parameters.
+  void setMixing       ( const CoefExpr& z      );
+  void setCPV          ( const CoefExpr& qoverp );
+  inline void setqoverp( const CoefExpr& qoverp ) { setCPV( qoverp ); }
 
   // Need to define own setters, since function variables and parameters may need to be set, too.
   void setPars( const std::vector< double >&              pars ) throw( PdfException );

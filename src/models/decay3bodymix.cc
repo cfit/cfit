@@ -21,6 +21,9 @@ Decay3BodyMix::Decay3BodyMix( const Variable&      mSq12  ,
     _width( width ),
     _amp( amp ),
     _z( z ),
+    _qoverp( 1.0 ),
+    _hasMixing( true  ),
+    _hasCPV   ( false ),
     _ps( ps ),
     _nDir( 0.0 ), _nCnj( 0.0 ), _nXed( 0.0 ), _norm( 1.0 ), _fixedAmp( false ),
     _maxPdf( 54.0 ), _cacheAmps( false ), _ampDirCache( 0 ), _ampCnjCache( 0 )
@@ -40,6 +43,48 @@ Decay3BodyMix::Decay3BodyMix( const Variable&      mSq12  ,
   if ( docache )
     cache();
 }
+
+
+// Main constructor.
+Decay3BodyMix::Decay3BodyMix( const Variable&      mSq12  ,
+                              const Variable&      mSq13  ,
+                              const Variable&      mSq23  ,
+                              const Variable&      t      ,
+                              const ParameterExpr& width  ,
+                              const Amplitude&     amp    ,
+                              const CoefExpr&      z      ,
+                              const CoefExpr&      qoverp ,
+                              const PhaseSpace&    ps     ,
+                              bool                 docache  )
+  : _mSq12( mSq12.name() ), _mSq13( mSq13.name() ), _mSq23( mSq23.name() ), _t( t.name() ),
+    _width( width ),
+    _amp( amp ),
+    _z( z ),
+    _qoverp( qoverp ),
+    _hasMixing( true ),
+    _hasCPV   ( true ),
+    _ps( ps ),
+    _nDir( 0.0 ), _nCnj( 0.0 ), _nXed( 0.0 ), _norm( 1.0 ), _fixedAmp( false ),
+    _maxPdf( 54.0 ), _cacheAmps( false ), _ampDirCache( 0 ), _ampCnjCache( 0 )
+{
+  // Make the variables available to cfit.
+  push( mSq12 );
+  push( mSq13 );
+  push( mSq23 );
+  push( t     );
+
+  // Make all the parameters in width, amp and z available to cfit.
+  push( width  );
+  push( amp    );
+  push( z      );
+  push( qoverp );
+
+  // Do calculations common to all values of variables (compute norm).
+  if ( docache )
+    cache();
+}
+
+
 
 
 // Copy function using default copy constructor.
@@ -69,6 +114,27 @@ const std::complex< double > Decay3BodyMix::psii( const double& t ) const
 
 
 
+// Setters for the mixing and CP violation parameters.
+void Decay3BodyMix::setMixing( const CoefExpr& z )
+{
+  if ( _hasMixing )
+    throw PdfException( "Decay3BodyMix: mixing coefficient z has already been set." );
+
+  _hasMixing = true;
+  push( _z = z );
+}
+
+void Decay3BodyMix::setCPV( const CoefExpr& qoverp )
+{
+  if ( _hasCPV )
+    throw PdfException( "Decay3BodyMix: mixing coefficient z has already been set." );
+
+  _hasCPV = true;
+  push( _qoverp = qoverp );
+}
+
+
+
 
 // Set the parameters to those given as argument.
 // They must be sorted alphabetically, since it's how MnUserParameters are passed
@@ -84,9 +150,10 @@ void Decay3BodyMix::setPars( const std::vector< double >& pars ) throw( PdfExcep
   for ( pIter par = _parMap.begin(); par != _parMap.end(); ++par )
     par->second.setValue( pars[ index++ ] );
 
-  _width.setPars( _parMap );
-  _amp  .setPars( _parMap );
-  _z    .setPars( _parMap );
+  _width .setPars( _parMap );
+  _amp   .setPars( _parMap );
+  if ( _hasMixing ) _z     .setPars( _parMap );
+  if ( _hasCPV    ) _qoverp.setPars( _parMap );
 
   typedef std::vector< Function >::iterator fIter;
   for ( fIter func = _funcs.begin(); func != _funcs.end(); ++func )
@@ -101,9 +168,10 @@ void Decay3BodyMix::setPars( const std::map< std::string, Parameter >& pars ) th
   for ( pIter par = _parMap.begin(); par != _parMap.end(); ++par )
     par->second.setValue( pars.find( par->first )->second.value() );
 
-  _width.setPars( _parMap );
-  _amp  .setPars( _parMap );
-  _z    .setPars( _parMap );
+  _width .setPars( _parMap );
+  _amp   .setPars( _parMap );
+  if ( _hasMixing ) _z     .setPars( _parMap );
+  if ( _hasCPV    ) _qoverp.setPars( _parMap );
 
   typedef std::vector< Function >::iterator fIter;
   for ( fIter func = _funcs.begin(); func != _funcs.end(); ++func )
@@ -127,9 +195,10 @@ void Decay3BodyMix::setPars( const FunctionMinimum& min ) throw( PdfException )
       par->second.setValue( mpar->value() );
   }
 
-  _width.setPars( _parMap );
-  _amp  .setPars( _parMap );
-  _z    .setPars( _parMap );
+  _width .setPars( _parMap );
+  _amp   .setPars( _parMap );
+  if ( _hasMixing ) _z     .setPars( _parMap );
+  if ( _hasCPV    ) _qoverp.setPars( _parMap );
 
   typedef std::vector< Function >::iterator fIter;
   for ( fIter func = _funcs.begin(); func != _funcs.end(); ++func )
@@ -240,8 +309,17 @@ void Decay3BodyMix::cache()
 
   // Calculate the norm.
   const double&& xval = x();
+  const double&& yval = y();
   const double&& xSq  = std::pow( xval, 2 );
-  _norm = ( _nDir + xval * std::real( _nXed ) ) / ( gamma() * ( 1.0 - xSq ) );
+  const double&& ySq  = std::pow( yval, 2 );
+
+  const std::complex< double >&& qoverp = _qoverp.evaluate();
+  const double&& cpvp                   = ( 1.0 + std::norm( qoverp ) ) / 2.0;
+  const double&& cpvm                   = ( 1.0 - std::norm( qoverp ) ) / 2.0;
+
+  _norm  = ( _nDir * cpvp + xval * std::real( _nXed * qoverp ) ) / ( 1.0 - xSq );
+  _norm += ( _nDir * cpvm - yval * std::imag( _nXed * qoverp ) ) / ( 1.0 + ySq );
+  _norm /= gamma();
 
   return;
 }
@@ -291,6 +369,8 @@ const double Decay3BodyMix::evaluateUnnorm( const double& mSq12, const double& m
   // Particle decay amplitude.
   std::complex< double > ampDir = _amp.evaluate( _ps, mSq12, mSq13, mSq23 );
   std::complex< double > ampCnj = _amp.evaluate( _ps, mSq13, mSq12, mSq23 );
+  if ( _hasCPV )
+    ampCnj *= _qoverp.evaluate();
 
   const std::complex< double >&& apb2 =          ( ampDir + ampCnj ) / 2.0;
   const std::complex< double >&& amb2 = std::conj( ampDir - ampCnj ) / 2.0;
@@ -349,6 +429,8 @@ const double Decay3BodyMix::evaluate( const std::vector< double >&              
   // Particle decay amplitude.
   std::complex< double > ampDir = cacheC[ _ampDirCache ];
   std::complex< double > ampCnj = cacheC[ _ampCnjCache ];
+  if ( _hasCPV )
+    ampCnj *= _qoverp.evaluate();
 
   const std::complex< double >&& apb2 =          ( ampDir + ampCnj ) / 2.0;
   const std::complex< double >&& amb2 = std::conj( ampDir - ampCnj ) / 2.0;
