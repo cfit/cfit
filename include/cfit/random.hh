@@ -6,13 +6,13 @@
 class Random
 {
 private:
-  static std::default_random_engine               _engine;
+  static std::mt19937_64                          _engine;
 
   static std::uniform_real_distribution< double > _uniform;
   static std::normal_distribution      < double > _normal;
 
 public:
-  static std::default_random_engine& engine()
+  static std::mt19937_64& engine()
   {
     return _engine;
   }
