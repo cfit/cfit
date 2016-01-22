@@ -54,7 +54,7 @@ LIB     = $(LDIR)/lib$(subst /,,$(PROJECT)).so
 
 all:    lib
 lib:    $(LIB)
-.PHONY: tidy sweep clean
+.PHONY: install checkusr tidy sweep clean
 
 OFILES = $(foreach obj,$(OBJLIST),$(ODIR)/$(obj).o)
 DFILES = $(foreach dep,$(OBJLIST),$(DDIR)/$(dep).d)
@@ -77,6 +77,19 @@ $(OFILES): $(ODIR)/%.o: $(CDIR)/%.cc $(DDIR)/%.d $(MAKEFILE_LIST)
 
 # Include all existent dependency files.
 include $(wildcard $(DFILES))
+
+install: | checkusr $(LIB)
+	@ install -d $(usr)/include/$(PROJECT)
+	@ install -d $(usr)/$(LDIR)
+	@ echo "Installing headers in $(usr)/include/$(PROJECT)"
+	@ install -D -m 644 include/$(PROJECT)/*.hh $(usr)/include/$(PROJECT)
+	@ echo "Installing libraries in $(usr)/$(LDIR)"
+	@ install -D -m 755 $(LIB)                  $(usr)/$(LDIR)
+
+checkusr:
+ifndef usr
+	$(error $(shell echo -e '\e[91;1m')usr$(shell echo -e '\e[21m') variable is not set. Define $(shell echo -e '\e[1m')usr$(shell echo -e '\e[21m') to be the destination directory$(shell echo -e '\e[0m'))
+endif
 
 # This rule removes libraries that have been linked or copied in the
 #    specified $(LDIR). These libraries may be needed to run the
