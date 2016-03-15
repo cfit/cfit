@@ -70,6 +70,12 @@ public:
     append( model );
   }
 
+  PdfExpr( const ParameterExpr& expr )
+    : _scale( 1.0 )
+  {
+    append( expr );
+  }
+
   PdfExpr( const PdfExpr& right );
 
   ~PdfExpr();
@@ -116,6 +122,7 @@ public:
   // Assignment operator.
   const PdfExpr& operator= ( const PdfModel&      right );
   const PdfExpr& operator= ( const PdfExpr&       right );
+  const PdfExpr& operator= ( const ParameterExpr& right );
 
   // Assignment operators with pdf objects.
   const PdfExpr& operator+=( const PdfModel&      right ) throw( PdfException );

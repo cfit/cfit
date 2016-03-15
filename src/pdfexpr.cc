@@ -150,6 +150,15 @@ const PdfExpr& PdfExpr::operator=( const PdfExpr& right )
 }
 
 
+const PdfExpr& PdfExpr::operator=( const ParameterExpr& right )
+{
+  clear();
+
+  append( right );
+  return *this;
+}
+
+
 // Assignment operations with a pdf model.
 const PdfExpr& PdfExpr::operator+=( const PdfModel& right ) throw( PdfException )
 {
