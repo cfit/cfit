@@ -112,6 +112,16 @@ const double ParameterExpr::evaluate() const
 
 
 
+const ParameterExpr& ParameterExpr::operator=( const Parameter& right )
+{
+  clear();
+  append( right );
+
+  return *this;
+}
+
+
+
 const ParameterExpr& ParameterExpr::operator+=( const ParameterExpr& right )
 {
   if ( _expression.empty() )

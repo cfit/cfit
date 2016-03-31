@@ -32,6 +32,14 @@ private:
   void append( const ParameterExpr& expr );
   void append( const Operation::Op& oper );
 
+  void clear()
+  {
+    _expression = "";
+    _ctnts.clear();
+    _parms.clear();
+    _opers.clear();
+  }
+
   template< class L, class R >
   ParameterExpr( const L& left, const R& right, const Operation::Op& oper )
   {
@@ -54,6 +62,11 @@ private:
 public:
   ParameterExpr() {};
 
+  ParameterExpr( const Parameter& par )
+  {
+    append( par );
+  }
+
   // Return a map from parameter names to parameters for all parameters used in the expression.
   const std::map< std::string, Parameter > getPars() const;
 
@@ -63,6 +76,8 @@ public:
 
   // Evaluate function.
   const double evaluate() const;
+
+  const ParameterExpr& operator= ( const Parameter&     right );
 
   const ParameterExpr& operator+=( const ParameterExpr& right );
   const ParameterExpr& operator-=( const ParameterExpr& right );
