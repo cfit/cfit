@@ -90,6 +90,15 @@ public:
 
   const bool dependsOn( const std::string& varName ) const { return _varMap.count( varName ); };
 
+  const bool isFixed() const
+  {
+    bool fixed = true;
+    for ( std::map< std::string, Parameter >::const_iterator par = _parMap.begin(); par != _parMap.end(); ++par )
+      fixed &= par->second.isFixed();
+
+    return fixed;
+  }
+
   double evaluate( const std::map< std::string, double >& varMap ) const throw( PdfException );
 
   // Assignment operators.
