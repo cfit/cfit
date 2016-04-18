@@ -18,6 +18,9 @@ void ParameterExpr::append( const Parameter& par )
 
 void ParameterExpr::append( const ParameterExpr& expr )
 {
+  if ( expr._expression.empty() )
+    throw ExprException( "ParameterExpr append( ParameterExpr ) error: right expression is empty." );
+
   _ctnts.insert( _ctnts.end(), expr._ctnts.begin(), expr._ctnts.end() );
   _parms.insert( _parms.end(), expr._parms.begin(), expr._parms.end() );
   _opers.insert( _opers.end(), expr._opers.begin(), expr._opers.end() );
@@ -105,7 +108,7 @@ const double ParameterExpr::evaluate() const
   }
 
   if ( values.size() != 1 )
-    throw PdfException( "PdfExpr parse error: too many values have been supplied." );
+    throw PdfException( "ParameterExpr parse error: too many values have been supplied." );
 
   return values.top();
 }
@@ -124,6 +127,9 @@ const ParameterExpr& ParameterExpr::operator=( const Parameter& right )
 
 const ParameterExpr& ParameterExpr::operator+=( const ParameterExpr& right )
 {
+  if ( right._expression.empty() )
+    throw ExprException( "ParameterExpr operator += error: right expression is empty." );
+
   if ( _expression.empty() )
   {
     append( right );
@@ -139,6 +145,9 @@ const ParameterExpr& ParameterExpr::operator+=( const ParameterExpr& right )
 
 const ParameterExpr& ParameterExpr::operator-=( const ParameterExpr& right )
 {
+  if ( right._expression.empty() )
+    throw ExprException( "ParameterExpr operator -= error: right expression is empty." );
+
   if ( _expression.empty() )
   {
     append( right );
@@ -156,6 +165,9 @@ const ParameterExpr& ParameterExpr::operator-=( const ParameterExpr& right )
 
 const ParameterExpr& ParameterExpr::operator*=( const ParameterExpr& right )
 {
+  if ( right._expression.empty() )
+    throw ExprException( "ParameterExpr operator *= error: right expression is empty." );
+
   if ( _expression.empty() )
     return *this;
 
@@ -168,6 +180,9 @@ const ParameterExpr& ParameterExpr::operator*=( const ParameterExpr& right )
 
 const ParameterExpr& ParameterExpr::operator/=( const ParameterExpr& right )
 {
+  if ( right._expression.empty() )
+    throw ExprException( "ParameterExpr operator /= error: right expression is empty." );
+
   if ( _expression.empty() )
     return *this;
 

@@ -46,4 +46,19 @@ public:
   const char* what() const throw() { return _what.c_str(); }
 };
 
+
+class ExprException : public std::exception
+{
+private:
+  std::string _what;
+  bool _critical;
+public:
+  ExprException( const std::string& str )
+    : _what( str )
+  {}
+  ~ExprException() throw() {}
+  const char* what() const throw() { return _what.c_str(); }
+};
+
+
 #endif
