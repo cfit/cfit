@@ -16,7 +16,7 @@ Decay3BodyCP::Decay3BodyCP( const Variable&   mSq12  ,
                             const PhaseSpace& ps     ,
                             bool              docache  )
   : _amp( amp ), _ps( ps ), _hasKappa( false ), _z( z ),
-    _nDir( 0.0 ), _nCnj( 0.0 ), _nXed( 0.0 ), _norm( 1.0 ), _fixedAmp( false ),
+    _nDir( 0.0 ), _nCnj( 0.0 ), _nXed( 0.0 ), _norm( 1.0 ), _fixed( false ),
     _maxPdf( 14.0 ), _cacheAmps( false ), _ampDirCache( 0 ), _ampCnjCache( 0 )
 {
   const std::map< std::string, Parameter >& pars = _amp.getPars();
@@ -50,7 +50,7 @@ Decay3BodyCP::Decay3BodyCP( const Variable&   mSq12  ,
                             const PhaseSpace& ps     ,
                             bool              docache  )
   : _amp( amp ), _ps( ps ), _hasKappa( true ), _kappa( kappa ), _z( z ),
-    _nDir( 0.0 ), _nCnj( 0.0 ), _nXed( 0.0 ), _norm( 1.0 ), _fixedAmp( false ),
+    _nDir( 0.0 ), _nCnj( 0.0 ), _nXed( 0.0 ), _norm( 1.0 ), _fixed( false ),
     _maxPdf( 14.0 ), _cacheAmps( false ), _ampDirCache( 0 ), _ampCnjCache( 0 )
 {
   const std::map< std::string, Parameter >& pars = _amp.getPars();
@@ -195,7 +195,7 @@ void Decay3BodyCP::cache()
   const std::complex< double >& vz     = _z.evaluate();
   const double&                 vKappa = _hasKappa ? _kappa.value() : 1.0;
 
-  if ( _fixedAmp )
+  if ( _fixed )
   {
     _norm = _nDir + std::norm( vz ) * _nCnj + 2.0 * vKappa * real( vz * _nXed );
     return;
@@ -251,9 +251,11 @@ void Decay3BodyCP::cache()
   _nCnj *= stepSq;
   _nXed *= stepSq;
 
-  _fixedAmp = _amp.isFixed();
+  _fixed = _amp.isFixed();
+  for ( std::vector< Function >::const_iterator func = _funcs.begin(); func != _funcs.end(); ++func )
+    _fixed &= func->isFixed();
 
-  _norm  = _nDir + std::norm( vz ) * _nCnj + 2.0 * vKappa * std::real( vz * _nXed );
+  _norm = _nDir + std::norm( vz ) * _nCnj + 2.0 * vKappa * std::real( vz * _nXed );
 
   return;
 }
@@ -436,6 +438,7 @@ const Decay3BodyCP& Decay3BodyCP::operator*=( const Function& right ) throw( Pdf
   _funcs.push_back( right );
 
   // Recompute the norm, since the pdf shape has changed under this operation.
+  _fixed = false;
   cache();
 
   return *this;
@@ -459,6 +462,7 @@ const Decay3BodyCP operator*( Decay3BodyCP left, const Function& right )
   left._funcs.push_back( right );
 
   // Recompute the norm, since the pdf shape has changed under this operation.
+  left._fixed = false;
   left.cache();
 
   return left;
@@ -482,6 +486,7 @@ const Decay3BodyCP operator*( const Function& left, Decay3BodyCP right )
   right._funcs.push_back( left );
 
   // Recompute the norm, since the pdf shape has changed under this operation.
+  right._fixed = false;
   right.cache();
 
   return right;

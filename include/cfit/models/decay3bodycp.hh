@@ -33,7 +33,8 @@ private:
   std::complex< double > _nXed;
   double                 _norm;
 
-  bool                   _fixedAmp;
+  // Keep track of whether the amplitudes and functions are all fixed.
+  bool                   _fixed;
 
   // Maximum value of the pdf.
   double _maxPdf;
@@ -96,9 +97,11 @@ public:
   // Norm components setters.
   void setNormComponents( const double& nDir, const double& nCnj, const std::complex< double >& nXed )
   {
-    _fixedAmp = _amp.isFixed();
+    _fixed = _amp.isFixed();
+    for ( std::vector< Function >::const_iterator func = _funcs.begin(); func != _funcs.end(); ++func )
+      _fixed &= func->isFixed();
 
-    if ( _fixedAmp )
+    if ( _fixed )
     {
       _nDir = nDir;
       _nCnj = nCnj;
@@ -108,9 +111,11 @@ public:
 
   void setNormComponents( const double& nDir, const std::complex< double >& nXed )
   {
-    _fixedAmp = _amp.isFixed();
+    _fixed = _amp.isFixed();
+    for ( std::vector< Function >::const_iterator func = _funcs.begin(); func != _funcs.end(); ++func )
+      _fixed &= func->isFixed();
 
-    if ( _fixedAmp )
+    if ( _fixed )
     {
       _nDir = nDir;
       _nCnj = nDir;
