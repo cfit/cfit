@@ -26,12 +26,26 @@ private:
   bool        _hasLimits;
 
 public:
-  Parameter() {}
+  Parameter()
+    : _name     ( "@uninitialized_parameter@" ),
+      _value    ( 0.0   ),
+      _error    ( 0.0   ),
+      _isFixed  ( false ),
+      _isBlind  ( false ),
+      _lower    ( 0.0   ),
+      _upper    ( 0.0   ),
+      _hasLimits( false )
+    {}
 
   Parameter( std::string name, double value = 0., double error = 0. )
-    : _name( name ), _value( value ), _error( error ),
-      _isFixed( false ), _isBlind( false ),
-      _lower( 0. ), _upper( 0. ), _hasLimits( false )
+    : _name     ( name  ),
+      _value    ( value ),
+      _error    ( error ),
+      _isFixed  ( false ),
+      _isBlind  ( false ),
+      _lower    ( 0.0   ),
+      _upper    ( 0.0   ),
+      _hasLimits( false )
   {}
 
   // Setters.
