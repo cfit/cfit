@@ -20,8 +20,8 @@ class Decay3BodyBinned : public PdfModel
 private:
   BinnedAmplitude _amp;
 
-  bool      _hasKappa;
-  Parameter _kappa;
+  bool          _hasKappa;
+  ParameterExpr _kappa;
 
   CoefExpr  _z;
 
@@ -40,14 +40,17 @@ private:
   unsigned _ampDirCache;
   unsigned _ampCnjCache;
 
-  std::vector< Function > _funcs;
-
   // const double evaluateFuncs() const;
   // const double evaluateFuncs( const int& bin ) const;
 
   const double evaluateUnnorm( const int& bin ) const throw( PdfException );
 
   // const std::map< unsigned, std::vector< std::complex< double > > > cacheComplex( const Dataset& data );
+
+  void setParExpr();
+
+  // One or more functions to define the efficiency.
+  std::vector< Function > _funcs;
 
 public:
   Decay3BodyBinned( const Variable&        bin           ,
@@ -61,19 +64,21 @@ public:
                     const Parameter&       kappa         ,
                     bool                   docache = true );
 
+  Decay3BodyBinned( const Variable&        bin           ,
+                    const BinnedAmplitude& amp           ,
+                    const CoefExpr&        z             ,
+                    const ParameterExpr&   kappa         ,
+                    bool                   docache = true );
+
   Decay3BodyBinned* copy() const;
+
+  // Getters.
+  const std::complex< double > z()     const { return             _z    .evaluate(); }
+  const double                 kappa() const { return _hasKappa ? _kappa.evaluate() : 1.0; }
 
   // Norm components getters.
   const double& nDir() const { return _nDir; }
   const double& nXed() const { return _nXed; }
-
-  // Need to define own setters, since function variables and parameters may need to be set, too.
-  // void setVars( const std::vector< double >&              vars ) throw( PdfException );
-  // void setVars( const std::map< std::string, Variable >&  vars ) throw( PdfException );
-  // void setVars( const std::map< std::string, double >&    vars ) throw( PdfException );
-  void setPars( const std::vector< double >&              pars ) throw( PdfException );
-  void setPars( const std::map< std::string, Parameter >& pars ) throw( PdfException );
-  void setPars( const FunctionMinimum&                    min  ) throw( PdfException );
 
   // Norm components setters.
   void setNormComponents( const double& nDir, const double& nXed )

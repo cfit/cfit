@@ -18,14 +18,8 @@ Decay3BodyBinned::Decay3BodyBinned( const Variable&        bin    ,
 {
   push( bin );
 
-  const std::map< std::string, Parameter >& pars = _amp.getPars();
-  typedef std::map< const std::string, Parameter >::const_iterator pIter;
-  for ( pIter par = pars.begin(); par != pars.end(); ++par )
-    push( par->second );
-
-  const std::map< std::string, Parameter >& zpars = _z.getPars();
-  for ( pIter par = zpars.begin(); par != zpars.end(); ++par )
-    push( par->second );
+  push( amp );
+  push( z   );
 
   // Do calculations common to all values of variables
   //    (usually compute norm).
@@ -46,15 +40,8 @@ Decay3BodyBinned::Decay3BodyBinned( const Variable&         bin    ,
 {
   push( bin );
 
-  const std::map< std::string, Parameter >& pars = _amp.getPars();
-  typedef std::map< const std::string, Parameter >::const_iterator pIter;
-  for ( pIter par = pars.begin(); par != pars.end(); ++par )
-    push( par->second );
-
-  const std::map< std::string, Parameter >& zpars = _z.getPars();
-  for ( pIter par = zpars.begin(); par != zpars.end(); ++par )
-    push( par->second );
-
+  push( amp   );
+  push( z     );
   push( kappa );
 
   // Do calculations common to all values of variables
@@ -65,143 +52,46 @@ Decay3BodyBinned::Decay3BodyBinned( const Variable&         bin    ,
 
 
 
+
+Decay3BodyBinned::Decay3BodyBinned( const Variable&         bin    ,
+                                    const BinnedAmplitude&  amp    ,
+                                    const CoefExpr&         z      ,
+                                    const ParameterExpr&    kappa  ,
+                                    bool                    docache  )
+  : _amp( amp ), _hasKappa( true ), _kappa( kappa ), _z( z ),
+    _nDir( 0.0 ), _nXed( 0.0 ), _norm( 1.0 ), _fixedAmp( false ),
+    _cacheAmps( false ), _ampDirCache( 0 ), _ampCnjCache( 0 )
+{
+  push( bin );
+
+  push( amp   );
+  push( z     );
+  push( kappa );
+
+  // Do calculations common to all values of variables
+  //    (usually compute norm).
+  if ( docache )
+    cache();
+}
+
+
+
+
+
 Decay3BodyBinned* Decay3BodyBinned::copy() const
 {
   return new Decay3BodyBinned( *this );
 }
 
 
-// // Need to overwrite setters defined in PdfModel, since function variables may need to be set.
-// void Decay3BodyBinned::setVars( const std::vector< double >& vars ) throw( PdfException )
-// {
-//   if ( _varMap.size() != vars.size() )
-//     throw PdfException( "Decay3BodyBinned::setVars: Number of arguments passed does not match number of required arguments." );
 
-//   typedef std::map< std::string, Variable >::iterator vIter;
-//   int index = 0;
-//   for ( vIter var = _varMap.begin(); var != _varMap.end(); ++var )
-//     var->second.setValue( vars[ index++ ] );
-
-//   typedef std::vector< Function >::iterator fIter;
-//   for ( fIter func = _funcs.begin(); func != _funcs.end(); ++func )
-//     func->setVars( _varMap );
-// }
-
-
-// // Need to overwrite setters defined in PdfModel, since function variables may need to be set.
-// void Decay3BodyBinned::setVars( const std::map< std::string, Variable >& vars ) throw( PdfException )
-// {
-//   typedef std::map< const std::string, Variable >::iterator vIter;
-//   for ( vIter var = _varMap.begin(); var != _varMap.end(); ++var )
-//     var->second.setValue( vars.find( var->first )->second.value() );
-
-//   typedef std::vector< Function >::iterator fIter;
-//   for ( fIter func = _funcs.begin(); func != _funcs.end(); ++func )
-//     func->setVars( _varMap );
-// }
-
-
-// void Decay3BodyBinned::setVars( const std::map< std::string, double >& vars ) throw( PdfException )
-// {
-//   typedef std::map< const std::string, Variable >::iterator vIter;
-//   for ( vIter var = _varMap.begin(); var != _varMap.end(); ++var )
-//     var->second.setValue( vars.find( var->first )->second );
-
-//   typedef std::vector< Function >::iterator fIter;
-//   for ( fIter func = _funcs.begin(); func != _funcs.end(); ++func )
-//     func->setVars( _varMap );
-// }
-
-
-
-
-// Set the parameters to those given as argument.
-// They must be sorted alphabetically, since it's how MnUserParameters are passed
-//    in the minimize function of the minimizers. It must be so, because pushing
-//    two parameters with the same name would create confusion otherwise.
-void Decay3BodyBinned::setPars( const std::vector< double >& pars ) throw( PdfException )
+void Decay3BodyBinned::setParExpr()
 {
-  if ( _parMap.size() != pars.size() )
-    throw PdfException( "Decay3BodyBinned::setPars: Number of arguments passed does not match number of required arguments." );
-
-  // Set the parameter map values in order.
-  typedef std::map< std::string, Parameter >::iterator pIter;
-  int index = 0;
-  for ( pIter par = _parMap.begin(); par != _parMap.end(); ++par )
-    par->second.setValue( pars[ index++ ] );
-
-  // Propagate the parameter values to the amplitude and to the z coefficient expression.
-  _amp.setPars( _parMap );
-  _z  .setPars( _parMap );
+  _z.setPars( _parMap );
 
   // Propagate the kappa parameter value if necessary.
   if ( _hasKappa )
-    _kappa.setValue( _parMap[ _kappa.name() ].value() );
-
-  // Propagate the parameter values to the functions, if there are any.
-  typedef std::vector< Function >::iterator fIter;
-  for ( fIter func = _funcs.begin(); func != _funcs.end(); ++func )
-    func->setPars( _parMap );
-}
-
-
-// Need to overwrite setters defined in PdfModel, since function parameters may need to be set.
-void Decay3BodyBinned::setPars( const std::map< std::string, Parameter >& pars ) throw( PdfException )
-{
-  // Set the parameter map values by name.
-  typedef std::map< const std::string, Parameter >::iterator pIter;
-  for ( pIter par = _parMap.begin(); par != _parMap.end(); ++par )
-    par->second.setValue( pars.find( par->first )->second.value() );
-
-  // Propagate the parameter values to the amplitude and to the z coefficient expression.
-  _amp.setPars( _parMap );
-  _z  .setPars( _parMap );
-
-  // Propagate the kappa parameter value if necessary.
-  if ( _hasKappa )
-    _kappa.setValue( pars.find( _kappa.name() )->second.value() );
-
-  // Propagate the parameter values to the functions, if there are any.
-  typedef std::vector< Function >::iterator fIter;
-  for ( fIter func = _funcs.begin(); func != _funcs.end(); ++func )
-    func->setPars( _parMap );
-}
-
-
-// Need to overwrite setters defined in PdfModel, since function parameters may need to be set.
-void Decay3BodyBinned::setPars( const FunctionMinimum& min ) throw( PdfException )
-{
-  // Set the parameter map values by name.
-  const std::vector< MinuitParameter >& pars = min.userParameters().parameters();
-  typedef std::map< const std::string, Parameter >::iterator pIter;
-  std::vector< MinuitParameter >::const_iterator mpar;
-  for ( pIter par = _parMap.begin(); par != _parMap.end(); ++par )
-  {
-    // Find the named parameter in the minuit user parameters vector.
-    mpar = std::find_if( pars.begin(), pars.end(),
-                         [par]( const MinuitParameter& mpar )
-                         { return mpar.name() == par->first; } );
-
-    // If the passed minimum does not contain a required parameter it may be because it's
-    //    the result of a partial fit.
-
-    // If the parameter has been found, set its value.
-    if ( mpar != pars.end() )
-      par->second.setValue( mpar->value() );
-  }
-
-  // Propagate the parameter values to the amplitude and to the z coefficient expression.
-  _amp.setPars( _parMap );
-  _z  .setPars( _parMap );
-
-  // Propagate the kappa parameter value if necessary.
-  if ( _hasKappa )
-    _kappa.setValue( _parMap.find( _kappa.name() )->second.value() );
-
-  // Propagate the parameter values to the functions, if there are any.
-  typedef std::vector< Function >::iterator fIter;
-  for ( fIter func = _funcs.begin(); func != _funcs.end(); ++func )
-    func->setPars( _parMap );
+    _kappa.setPars( _parMap );
 }
 
 
@@ -298,8 +188,8 @@ void Decay3BodyBinned::cache()
   _fixedAmp = true; // _amp.isFixed();
 
   // Calculate the norm.
-  const std::complex< double >& vz     = _z.evaluate();
-  const double&                 vKappa = _hasKappa ? _kappa.value() : 1.0;
+  const std::complex< double >& vz     = z();
+  const double&                 vKappa = kappa();
   _norm = _nDir * ( 1.0 + std::norm( vz ) ) + 2.0 * vKappa * std::real( vz * _nXed );
 
   return;
@@ -312,8 +202,8 @@ const double Decay3BodyBinned::evaluateUnnorm( const int& bin ) const throw( Pdf
 {
   const std::tuple< double, double, std::complex< double > >&& tx = _amp.evaluate( bin );
 
-  const std::complex< double >&& vz     = _z.evaluate();
-  const double&&                 vKappa = _hasKappa ? _kappa.value() : 1.0;
+  const std::complex< double >&& vz     = z();
+  const double&&                 vKappa = kappa();
 
   return std::get< 0 >( tx )                   +
          std::get< 1 >( tx ) * std::norm( vz ) +
