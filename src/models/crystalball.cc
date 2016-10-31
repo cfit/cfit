@@ -132,22 +132,44 @@ const double CrystalBall::cumulativeNorm( const double& x ) const
 
   const double& alphaSq = std::pow( valpha, 2 );
 
-  if ( x < vmu - valpha * vsigma )
-  {
-    // Tail piece.
-    const double& num = std::pow( vn, vn ) * std::exp( - alphaSq / 2.0 );
-    const double& den = std::pow( vn - alphaSq - valpha * ( x - vmu ) / vsigma, vn - 1.0 );
-    return vsigma / valpha / ( vn - 1.0 ) * num / den;
-  }
-  else
-  {
-    // Complete area of the tail.
-    const double& normTail = vsigma / valpha * vn / ( vn - 1.0 ) * std::exp( - alphaSq / 2.0 );
+  const double& chi = ( x - vmu ) / vsigma;
 
-    // Calculation of the area under the core (Gaussian) piece.
-    const double& sqrt2    = std::sqrt( 2.0 );
-    const double& sqrtpih  = std::sqrt( M_PI / 2.0 );
-    return normTail + vsigma * sqrtpih * ( Math::erf( ( x - vmu ) / ( vsigma * sqrt2 ) ) + Math::erf( valpha / sqrt2 ) );
+  const double& sqrt2    = std::sqrt( 2.0 );
+  const double& sqrtpih  = std::sqrt( M_PI / 2.0 );
+
+  if ( valpha > 0 )
+  {
+    if ( chi <= - valpha )
+    {
+      // Lower tail piece.
+      const double& term1 = vsigma / valpha * vn / ( vn - 1.0 ) * std::exp( - alphaSq / 2.0 );
+      const double& term2 = std::pow( vn / ( vn - alphaSq - valpha * chi ), vn - 1.0 );
+      return term1 * term2;
+    }
+    else
+    {
+      // Complete area of the tail.
+      const double& normTail = vsigma / valpha * vn / ( vn - 1.0 ) * std::exp( - alphaSq / 2.0 );
+
+      // Calculation of the area under the core (Gaussian) piece.
+      return normTail + vsigma * sqrtpih * ( Math::erf( chi / sqrt2 ) + Math::erf( valpha / sqrt2 ) );
+    }
+  }
+  else // If alpha < 0.
+  {
+    if ( chi > - valpha )
+    {
+      const double& normCore = vsigma * sqrtpih * ( 1.0 + Math::erf( - valpha / sqrt2 ) );
+
+      const double& term1 = vsigma / std::fabs( valpha ) * vn / ( vn - 1.0 ) * std::exp( - alphaSq / 2.0 );
+      const double& term2 = 1.0 - std::pow( vn / ( vn - alphaSq - valpha * chi ), vn - 1.0 );
+
+      return normCore + term1 * term2;
+    }
+    else
+    {
+      return vsigma * sqrtpih * ( 1.0 + Math::erf( chi / sqrt2 ) );
+    }
   }
 }
 
@@ -165,8 +187,10 @@ void CrystalBall::cache()
     areaUp = cumulativeNorm( _upper );
   else
   {
-    const double& normCore = sigma() * std::sqrt( 2.0 * M_PI ) * ( 1. + Math::erf( alpha() / std::sqrt( 2.0 ) ) ) / 2.0;
-    const double& normTail = sigma() / alpha() * n() / ( n() - 1.0 ) * std::exp( - std::pow( alpha(), 2 ) / 2.0 );
+    const double& absAlpha = std::fabs( alpha() );
+
+    const double& normCore = sigma() * std::sqrt( 2.0 * M_PI ) * ( 1.0 + Math::erf( absAlpha / std::sqrt( 2.0 ) ) ) / 2.0;
+    const double& normTail = sigma() / absAlpha * n() / ( n() - 1.0 ) * std::exp( - std::pow( alpha(), 2 ) / 2.0 );
     areaUp = normCore + normTail;
   }
 
@@ -176,26 +200,24 @@ void CrystalBall::cache()
 
 
 // Function to compute the value of the pdf at its core (Gaussian) part.
-const double CrystalBall::core( const double& x ) const
+const double CrystalBall::core( const double& chi ) const
 {
-  return std::exp( - std::pow( x - mu(), 2 ) / ( 2.0 * std::pow( sigma(), 2 ) ) ) / _norm;
+  return std::exp( - std::pow( chi, 2 ) / 2.0 ) / _norm;
 }
 
 
 // Function to compute the value of the pdf at its tail.
-const double CrystalBall::tail( const double& x ) const
+const double CrystalBall::tail( const double& chi ) const
 {
-  const double& vmu    = mu   ();
-  const double& vsigma = sigma();
   const double& valpha = alpha();
   const double& vn     = n    ();
 
   const double& alphaSq = std::pow( valpha, 2 );
 
-  const double& num = std::pow( vn, vn ) * std::exp( - alphaSq / 2.0 );
-  const double& den = std::pow( vn - alphaSq - valpha * ( x - vmu ) / vsigma, vn );
+  const double& term1 = std::exp( - alphaSq / 2.0 );
+  const double& term2 = std::pow( vn / ( vn - alphaSq - std::fabs( valpha ) * chi ), vn );
 
-  return num / den / _norm;
+  return term1 * term2 / _norm;
 }
 
 
@@ -208,10 +230,13 @@ const double CrystalBall::evaluate( const double& x ) const throw( PdfException 
   if ( _hasUpper && ( x > _upper ) )
     return 0.0;
 
-  if ( x < mu() - alpha() * sigma() )
-    return tail( x );
+  const double& sign = ( alpha() > 0 ) - ( alpha() < 0 );
+  const double& chi  = sign * ( x - mu() ) / sigma();
 
-  return core( x );
+  if ( chi < - std::fabs( alpha() ) )
+    return tail( chi );
+
+  return core( chi );
 }
 
 
@@ -232,12 +257,16 @@ void CrystalBall::setParExpr()
 
 const double CrystalBall::area( const double& min, const double& max ) const throw( PdfException )
 {
-  return ( cumulativeNorm( std::min( max, _upper ) ) - cumulativeNorm( std::max( min, _lower ) ) ) / _norm;
+  const double& xmin = _hasLower ? std::max( min, _lower ) : min;
+  const double& xmax = _hasUpper ? std::min( max, _upper ) : max;
+
+  return ( cumulativeNorm( xmax ) - cumulativeNorm( xmin ) ) / _norm;
 }
 
 
 const std::map< std::string, double > CrystalBall::generate() const throw( PdfException )
 {
+  const double& vmu    = mu();
   const double& vn     = n();
   const double& vnm1   = vn - 1.0;
   const double& vsigma = sigma();
@@ -246,11 +275,19 @@ const std::map< std::string, double > CrystalBall::generate() const throw( PdfEx
 
   // Evaluate the area up to the lower limit (0 if it's -infinity).
   double areaLo = 0.0;
-  if ( _hasLower )
-    areaLo = cumulativeNorm( _lower ) / _norm;
+  if ( valpha > 0 && _hasLower ) areaLo = cumulativeNorm(   _lower ) / _norm;
+  if ( valpha < 0 && _hasUpper )
+  {
+    const double& absAlpha = std::fabs( alpha() );
 
-  // Cumulative pdf evaluated at the tail-core threshold.
-  const double& areaTh = vsigma / ( valpha * _norm ) * vn / vnm1 * std::exp( - std::pow( valpha, 2 ) / 2.0 );
+    const double& normCore  = sigma() * std::sqrt( 2.0 * M_PI ) * ( 1.0 + Math::erf( absAlpha / std::sqrt( 2.0 ) ) ) / 2.0;
+    const double& normTail  = sigma() / absAlpha * n() / ( n() - 1.0 ) * std::exp( - std::pow( valpha, 2 ) / 2.0 );
+    const double& normTotal = normCore + normTail;
+    areaLo = ( normTotal - cumulativeNorm( _upper ) ) / _norm;
+  }
+
+  // Cumulative pdf evaluated at the tail-core threshold for alpha > 0.
+  const double& areaTh = vsigma / ( std::fabs( valpha ) * _norm ) * vn / vnm1 * std::exp( - std::pow( valpha, 2 ) / 2.0 );
 
   // Generate a flat random number.
   std::uniform_real_distribution< double > dist( 0.0, 1.0 );
@@ -258,11 +295,15 @@ const std::map< std::string, double > CrystalBall::generate() const throw( PdfEx
 
   // If random number is below the tail-core threshold, generate the tail.
   //    Otherwise, generate the (Gaussian) core.
-  double genVal = 0.0;
+  double genChi;
   if ( unif < areaTh )
-    genVal = mu() - valpha * vsigma - vn * vsigma / valpha * ( std::pow( areaTh / unif, 1.0 / vnm1 ) - 1.0 );
+    genChi = - std::fabs( valpha ) - vn / std::fabs( valpha ) * ( std::pow( areaTh / unif, 1.0 / vnm1 ) - 1.0 );
   else
-    genVal = mu() + vsigma * sqrt2 * Math::inverf( _norm / vsigma * sqrt( 2.0 / M_PI ) * ( unif - areaTh ) - std::erf( valpha / sqrt2 ) );
+    genChi = sqrt2 * Math::inverf( _norm / vsigma * sqrt( 2.0 / M_PI ) * ( unif - areaTh ) - std::erf( std::fabs( valpha ) / sqrt2 ) );
+
+  genChi *= ( valpha > 0 ) - ( valpha < 0 );
+
+  double genVal = vmu + vsigma * genChi;
 
   std::map< std::string, double > gen;
   gen[ getVar( 0 ).name() ] = genVal;
