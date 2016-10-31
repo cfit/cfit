@@ -320,7 +320,10 @@ void DoubleCrystalBall::setParExpr()
 
 const double DoubleCrystalBall::area( const double& min, const double& max ) const throw( PdfException )
 {
-  return ( cumulativeNorm( max ) - cumulativeNorm( min ) ) / _norm;
+  const double& xmin = _hasLower ? std::max( min, _lower ) : min;
+  const double& xmax = _hasUpper ? std::min( max, _upper ) : max;
+
+  return ( cumulativeNorm( xmax ) - cumulativeNorm( xmin ) ) / _norm;
 }
 
 
