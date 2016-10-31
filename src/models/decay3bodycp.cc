@@ -155,6 +155,13 @@ void Decay3BodyCP::cache()
 
   const double mSqSum = _ps.mSqSum();
 
+  // Determine whether the amplitudes in the 400x400 bins should be cached.
+  //    Cache them if the amplitude is fixed, but it has not yet been cached.
+  bool cachedAmp   = ! _ampCache.empty();
+  bool needToCache = ! cachedAmp && _amp.isFixed();
+  if ( needToCache )
+    _ampCache.resize( std::pow( nBins, 2 ) );
+
   // Define the variables at each bin.
   double mSq12;
   double mSq13;
@@ -164,6 +171,9 @@ void Decay3BodyCP::cache()
   std::complex< double > ampDir;
   std::complex< double > ampCnj;
 
+  unsigned binDir;
+  unsigned binCnj;
+
   // Compute the integral on the grid.
   for ( int binX = 0; binX < nBins; ++binX )
     for ( int binY = 0; binY < nBins; ++binY )
@@ -172,13 +182,29 @@ void Decay3BodyCP::cache()
       mSq13 = min + step * ( binY + 0.5 );
       mSq23 = mSqSum - mSq12 - mSq13;
 
-      // Proceed only if the point lies inside the kinematically allowed Dalitz region.
+      // Proceed only if the point lies inside the kinematically allowed phase space region.
       // std::norm returns the squared modulus of the complex number, not its norm.
       if ( _ps.contains( mSq12, mSq13, mSq23 ) )
       {
         funcs = evaluateFuncs( mSq12, mSq13, mSq23 );
-        ampDir = _amp.evaluate( _ps, mSq12, mSq13, mSq23 );
-        ampCnj = _amp.evaluate( _ps, mSq13, mSq12, mSq23 );
+
+        // If the amplitude is fixed, but the efficiency is not, use cached amplitude values.
+        if ( cachedAmp )
+        {
+          binDir = nBins * binX + binY;
+          binCnj = nBins * binY + binX;
+
+          ampDir = _ampCache[ binDir ];
+          ampCnj = _ampCache[ binCnj ];
+        }
+        else
+        {
+          ampDir = _amp.evaluate( _ps, mSq12, mSq13, mSq23 );
+          ampCnj = _amp.evaluate( _ps, mSq13, mSq12, mSq23 );
+
+          if ( needToCache )
+            _ampCache[ nBins * binX + binY ] = ampDir;
+        }
 
         _nDir += std::norm( ampDir ) * funcs;
         _nCnj += std::norm( ampCnj ) * funcs;
