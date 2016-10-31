@@ -214,12 +214,16 @@ public:
   friend const CoefExpr sin      ( const Coef&     coef );
   friend const CoefExpr cos      ( const Coef&     coef );
   friend const CoefExpr tan      ( const Coef&     coef );
+  friend const CoefExpr tanh     ( const Coef&     coef );
+  friend const CoefExpr atanh    ( const Coef&     coef );
 
   friend const CoefExpr exp      ( const CoefExpr& coef );
   friend const CoefExpr log      ( const CoefExpr& coef );
   friend const CoefExpr sin      ( const CoefExpr& coef );
   friend const CoefExpr cos      ( const CoefExpr& coef );
   friend const CoefExpr tan      ( const CoefExpr& coef );
+  friend const CoefExpr tanh     ( const CoefExpr& coef );
+  friend const CoefExpr atanh    ( const CoefExpr& coef );
 
   // Binary arithmetic operations with pdfs.
   friend const Amplitude operator*( const CoefExpr&  left, const Resonance& right );

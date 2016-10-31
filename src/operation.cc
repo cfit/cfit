@@ -242,6 +242,16 @@ const ParameterExpr tan( const Parameter& par )
   return ParameterExpr( par, Operation::tan );
 }
 
+const ParameterExpr tanh( const Parameter& par )
+{
+  return ParameterExpr( par, Operation::tanh );
+}
+
+const ParameterExpr atanh( const Parameter& par )
+{
+  return ParameterExpr( par, Operation::atanh );
+}
+
 
 const ParameterExpr exp( const ParameterExpr& par )
 {
@@ -266,6 +276,16 @@ const ParameterExpr cos( const ParameterExpr& par )
 const ParameterExpr tan( const ParameterExpr& par )
 {
   return ParameterExpr( par, Operation::tan );
+}
+
+const ParameterExpr tanh( const ParameterExpr& par )
+{
+  return ParameterExpr( par, Operation::tanh );
+}
+
+const ParameterExpr atanh( const ParameterExpr& par )
+{
+  return ParameterExpr( par, Operation::atanh );
 }
 
 
@@ -861,6 +881,16 @@ const CoefExpr tan( const Coef& coef )
   return CoefExpr( coef, Operation::tan );
 }
 
+const CoefExpr tanh( const Coef& coef )
+{
+  return CoefExpr( coef, Operation::tanh );
+}
+
+const CoefExpr atanh( const Coef& coef )
+{
+  return CoefExpr( coef, Operation::atanh );
+}
+
 
 const CoefExpr exp( const CoefExpr& coef )
 {
@@ -885,6 +915,16 @@ const CoefExpr cos( const CoefExpr& coef )
 const CoefExpr tan( const CoefExpr& coef )
 {
   return CoefExpr( coef, Operation::tan );
+}
+
+const CoefExpr tanh( const CoefExpr& coef )
+{
+  return CoefExpr( coef, Operation::tanh );
+}
+
+const CoefExpr atanh( const CoefExpr& coef )
+{
+  return CoefExpr( coef, Operation::atanh );
 }
 
 

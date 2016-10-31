@@ -9,7 +9,7 @@
 class Operation
 {
 public:
-  enum Op { plus, minus, mult, div, pow, exp, log, sin, cos, tan };
+  enum Op { plus, minus, mult, div, pow, exp, log, sin, cos, tan, tanh, atanh };
   static std::string tostring( Op val )
   {
     if ( val == plus  ) return "plus";
@@ -22,6 +22,8 @@ public:
     if ( val == sin   ) return "sin";
     if ( val == cos   ) return "cos";
     if ( val == tan   ) return "tan";
+    if ( val == tanh  ) return "tanh";
+    if ( val == atanh ) return "atanh";
 
     std::ostringstream str;
     str << val;
@@ -74,6 +76,10 @@ inline T Operation::operate( const T& x, const Operation::Op& oper ) throw( PdfE
     return std::cos( x );
   if ( oper == Operation::tan )
     return std::tan( x );
+  if ( oper == Operation::tanh )
+    return std::tanh( x );
+  if ( oper == Operation::atanh )
+    return std::atanh( x );
 
   throw PdfException( std::string( "Parse error: unknown unary operation " ) + Operation::tostring( oper ) + "." );
 }

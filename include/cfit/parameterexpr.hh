@@ -148,12 +148,16 @@ public:
   friend const ParameterExpr sin      ( const Parameter&     par );
   friend const ParameterExpr cos      ( const Parameter&     par );
   friend const ParameterExpr tan      ( const Parameter&     par );
+  friend const ParameterExpr tanh     ( const Parameter&     par );
+  friend const ParameterExpr atanh    ( const Parameter&     par );
 
   friend const ParameterExpr exp      ( const ParameterExpr& par );
   friend const ParameterExpr log      ( const ParameterExpr& par );
   friend const ParameterExpr sin      ( const ParameterExpr& par );
   friend const ParameterExpr cos      ( const ParameterExpr& par );
   friend const ParameterExpr tan      ( const ParameterExpr& par );
+  friend const ParameterExpr tanh     ( const ParameterExpr& par );
+  friend const ParameterExpr atanh    ( const ParameterExpr& par );
 
   friend const CoefExpr operator+( const std::complex< double >& left, const ParameterExpr& right );
   friend const CoefExpr operator-( const std::complex< double >& left, const ParameterExpr& right );
