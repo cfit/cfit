@@ -3,9 +3,9 @@
 
 #include <cfit/pdfmodel.hh>
 #include <cfit/variable.hh>
+#include <cfit/parameter.hh>
 #include <cfit/amplitude.hh>
 #include <cfit/phasespace.hh>
-
 
 class FunctionMinimum;
 
@@ -14,6 +14,10 @@ class DecayModel : public PdfModel
 protected:
   Amplitude  _amp;
   PhaseSpace _ps;
+
+  // One or more functions to define the efficiency.
+  std::vector< Function > _funcs;
+
 public:
   DecayModel( const Variable&   mSq12,
               const Variable&   mSq13,
@@ -23,9 +27,9 @@ public:
 
   virtual DecayModel* copy() const = 0;
 
-  virtual void setPars( const std::vector< double >& pars              ) throw( PdfException );
-  virtual void setPars( const std::map< std::string, Parameter >& pars ) throw( PdfException );
-  virtual void setPars( const FunctionMinimum&                    pars ) throw( PdfException );
+  void setPars( const std::vector< double >&              pars ) throw( PdfException );
+  void setPars( const std::map< std::string, Parameter >& pars ) throw( PdfException );
+  void setPars( const FunctionMinimum&                    pars ) throw( PdfException );
 
   const std::string mSq12name() const { return getVar( 0 ).name(); }
   const std::string mSq13name() const { return getVar( 1 ).name(); }

@@ -23,60 +23,6 @@ Decay3Body* Decay3Body::copy() const
 
 
 
-// Set the parameters to those given as argument.
-// They must be sorted alphabetically, since it's how MnUserParameters are passed
-//    in the minimize function of the minimizers. It must be so, because pushing
-//    two parameters with the same name would create confusion otherwise.
-void Decay3Body::setPars( const std::vector< double >& pars ) throw( PdfException )
-{
-  if ( _parMap.size() != pars.size() )
-    throw PdfException( "Decay3Body::setPars: Number of arguments passed does not match number of required arguments." );
-
-  typedef std::map< std::string, Parameter >::iterator pIter;
-  int index = 0;
-  for ( pIter par = _parMap.begin(); par != _parMap.end(); ++par )
-    par->second.setValue( pars[ index++ ] );
-
-  _amp.setPars( _parMap );
-
-  typedef std::vector< Function >::iterator fIter;
-  for ( fIter func = _funcs.begin(); func != _funcs.end(); ++func )
-    func->setPars( _parMap );
-}
-
-
-// Need to overwrite setters defined in PdfModel, since function parameters may need to be set.
-void Decay3Body::setPars( const std::map< std::string, Parameter >& pars ) throw( PdfException )
-{
-  typedef std::map< const std::string, Parameter >::iterator pIter;
-  for ( pIter par = _parMap.begin(); par != _parMap.end(); ++par )
-    par->second.setValue( pars.find( par->first )->second.value() );
-
-  _amp.setPars( _parMap );
-
-  typedef std::vector< Function >::iterator fIter;
-  for ( fIter func = _funcs.begin(); func != _funcs.end(); ++func )
-    func->setPars( _parMap );
-}
-
-
-// Need to overwrite setters defined in PdfModel, since function parameters may need to be set.
-void Decay3Body::setPars( const FunctionMinimum& min ) throw( PdfException )
-{
-  const MnUserParameters& pars = min.userParameters();
-  typedef std::vector< MinuitParameter >::const_iterator pIter;
-  for( pIter par = pars.parameters().begin(); par != pars.parameters().end(); ++par )
-    _parMap[ par->name() ].set( par->value(), par->error() );
-
-  _amp.setPars( _parMap );
-
-  typedef std::vector< Function >::iterator fIter;
-  for ( fIter func = _funcs.begin(); func != _funcs.end(); ++func )
-    func->setPars( _parMap );
-}
-
-
-
 const double Decay3Body::evaluateFuncs( const double& mSq12, const double& mSq13, const double& mSq23 ) const
 {
   double value = 1.0;

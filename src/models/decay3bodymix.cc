@@ -17,26 +17,22 @@ Decay3BodyMix::Decay3BodyMix( const Variable&      mSq12  ,
                               const CoefExpr&      z      ,
                               const PhaseSpace&    ps     ,
                               bool                 docache  )
-  : _mSq12( mSq12.name() ), _mSq13( mSq13.name() ), _mSq23( mSq23.name() ), _t( t.name() ),
+  : DecayModel( mSq12, mSq13, mSq23, amp, ps ),
+    _mSq12( mSq12.name() ), _mSq13( mSq13.name() ), _mSq23( mSq23.name() ), _t( t.name() ),
     _width( width ),
-    _amp( amp ),
     _z( z ),
     _qoverp( 1.0 ),
     _hasMixing( true  ),
     _hasCPV   ( false ),
-    _ps( ps ),
     _nDir( 0.0 ), _nCnj( 0.0 ), _nXed( 0.0 ), _norm( 1.0 ), _fixedAmp( false ),
     _maxPdf( 54.0 ), _cacheAmps( false ), _ampDirCache( 0 ), _ampCnjCache( 0 )
 {
   // Make the variables available to cfit.
-  push( mSq12 );
-  push( mSq13 );
-  push( mSq23 );
+  // The squared invariant masses are already made available by the DecayModel constructor.
   push( t     );
 
-  // Make all the parameters in width, amp and z available to cfit.
+  // Make all the parameters in width and z available to cfit.
   push( width );
-  push( amp   );
   push( z     );
 
   // Do calculations common to all values of variables (compute norm).
@@ -56,26 +52,22 @@ Decay3BodyMix::Decay3BodyMix( const Variable&      mSq12  ,
                               const CoefExpr&      qoverp ,
                               const PhaseSpace&    ps     ,
                               bool                 docache  )
-  : _mSq12( mSq12.name() ), _mSq13( mSq13.name() ), _mSq23( mSq23.name() ), _t( t.name() ),
+  : DecayModel( mSq12, mSq13, mSq23, amp, ps ),
+    _mSq12( mSq12.name() ), _mSq13( mSq13.name() ), _mSq23( mSq23.name() ), _t( t.name() ),
     _width( width ),
-    _amp( amp ),
     _z( z ),
     _qoverp( qoverp ),
     _hasMixing( true ),
     _hasCPV   ( true ),
-    _ps( ps ),
     _nDir( 0.0 ), _nCnj( 0.0 ), _nXed( 0.0 ), _norm( 1.0 ), _fixedAmp( false ),
     _maxPdf( 54.0 ), _cacheAmps( false ), _ampDirCache( 0 ), _ampCnjCache( 0 )
 {
   // Make the variables available to cfit.
-  push( mSq12 );
-  push( mSq13 );
-  push( mSq23 );
+  // The squared invariant masses are already made available by the DecayModel constructor.
   push( t     );
 
-  // Make all the parameters in width, amp and z available to cfit.
+  // Make all the parameters in width, z and qoverp available to cfit.
   push( width  );
-  push( amp    );
   push( z      );
   push( qoverp );
 
@@ -135,74 +127,12 @@ void Decay3BodyMix::setCPV( const CoefExpr& qoverp )
 
 
 
-
-// Set the parameters to those given as argument.
-// They must be sorted alphabetically, since it's how MnUserParameters are passed
-//    in the minimize function of the minimizers. It must be so, because pushing
-//    two parameters with the same name would create confusion otherwise.
-void Decay3BodyMix::setPars( const std::vector< double >& pars ) throw( PdfException )
+void Decay3BodyMix::setParExpr()
 {
-  if ( _parMap.size() != pars.size() )
-    throw PdfException( "Decay3BodyMix::setPars: Number of arguments passed does not match number of required arguments." );
+  _width.setPars( _parMap );
 
-  typedef std::map< std::string, Parameter >::iterator pIter;
-  int index = 0;
-  for ( pIter par = _parMap.begin(); par != _parMap.end(); ++par )
-    par->second.setValue( pars[ index++ ] );
-
-  _width .setPars( _parMap );
-  _amp   .setPars( _parMap );
   if ( _hasMixing ) _z     .setPars( _parMap );
   if ( _hasCPV    ) _qoverp.setPars( _parMap );
-
-  typedef std::vector< Function >::iterator fIter;
-  for ( fIter func = _funcs.begin(); func != _funcs.end(); ++func )
-    func->setPars( _parMap );
-}
-
-
-// Need to overwrite setters defined in PdfModel, since function parameters may need to be set.
-void Decay3BodyMix::setPars( const std::map< std::string, Parameter >& pars ) throw( PdfException )
-{
-  typedef std::map< const std::string, Parameter >::iterator pIter;
-  for ( pIter par = _parMap.begin(); par != _parMap.end(); ++par )
-    par->second.setValue( pars.find( par->first )->second.value() );
-
-  _width .setPars( _parMap );
-  _amp   .setPars( _parMap );
-  if ( _hasMixing ) _z     .setPars( _parMap );
-  if ( _hasCPV    ) _qoverp.setPars( _parMap );
-
-  typedef std::vector< Function >::iterator fIter;
-  for ( fIter func = _funcs.begin(); func != _funcs.end(); ++func )
-    func->setPars( _parMap );
-}
-
-
-// Need to overwrite setters defined in PdfModel, since function parameters may need to be set.
-void Decay3BodyMix::setPars( const FunctionMinimum& min ) throw( PdfException )
-{
-  const std::vector< MinuitParameter >& pars = min.userParameters().parameters();
-  typedef std::map< const std::string, Parameter >::iterator pIter;
-  std::vector< MinuitParameter >::const_iterator mpar;
-  for ( pIter par = _parMap.begin(); par != _parMap.end(); ++par )
-  {
-    mpar = std::find_if( pars.begin(), pars.end(),
-                         [par]( const MinuitParameter& mpar )
-                         { return mpar.name() == par->first; } );
-
-    if ( mpar != pars.end() )
-      par->second.setValue( mpar->value() );
-  }
-
-  _width .setPars( _parMap );
-  _amp   .setPars( _parMap );
-  if ( _hasMixing ) _z     .setPars( _parMap );
-  if ( _hasCPV    ) _qoverp.setPars( _parMap );
-
-  typedef std::vector< Function >::iterator fIter;
-  for ( fIter func = _funcs.begin(); func != _funcs.end(); ++func )
-    func->setPars( _parMap );
 }
 
 

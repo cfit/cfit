@@ -1,5 +1,6 @@
 
 #include <cfit/decaymodel.hh>
+#include <cfit/function.hh>
 
 #include <Minuit/FunctionMinimum.h>
 #include <Minuit/MnUserParameters.h>
@@ -12,47 +13,59 @@ DecayModel::DecayModel( const Variable&   mSq12,
                         const PhaseSpace& ps    )
   : _amp( amp ), _ps( ps )
 {
-  const std::map< std::string, Parameter >& pars = _amp.getPars();
-  typedef std::map< const std::string, Parameter >::const_iterator pIter;
-  for ( pIter par = pars.begin(); par != pars.end(); ++par )
-    push( par->second );
-
   push( mSq12 );
   push( mSq13 );
   push( mSq23 );
+
+  push( amp );
 }
 
 
+// Need to overwrite setters defined in PdfModel, since function parameters may need to be set.
+// Set the parameters to those given as argument.
+// They must be sorted alphabetically, since it's how MnUserParameters are passed
+//    in the minimize function of the minimizers. It must be so, because pushing
+//    two parameters with the same name would create confusion otherwise.
 void DecayModel::setPars( const std::vector< double >& pars ) throw( PdfException )
 {
-  if ( _parMap.size() != pars.size() )
-    throw PdfException( "DecayModel::setPars: Number of arguments passed does not match number of required arguments." );
-
-  typedef std::map< std::string, Parameter >::iterator pIter;
-  int index = 0;
-  for ( pIter par = _parMap.begin(); par != _parMap.end(); ++par )
-    par->second.setValue( pars[ index++ ] );
+  setParMap( pars );
 
   _amp.setPars( _parMap );
+
+  typedef std::vector< Function >::iterator fIter;
+  for ( fIter func = _funcs.begin(); func != _funcs.end(); ++func )
+    func->setPars( _parMap );
+
+  setParExpr();
 }
 
 
-void DecayModel::setPars( const FunctionMinimum& min ) throw( PdfException )
-{
-  const MnUserParameters& pars = min.userParameters();
-  typedef std::vector< MinuitParameter >::const_iterator pIter;
-  for( pIter par = pars.parameters().begin(); par != pars.parameters().end(); ++par )
-    _parMap[ par->name() ].set( par->value(), par->error() );
-
-  _amp.setPars( _parMap );
-}
-
-
+// Need to overwrite setters defined in PdfModel, since function parameters may need to be set.
 void DecayModel::setPars( const std::map< std::string, Parameter >& pars ) throw( PdfException )
 {
-  typedef std::map< std::string, Parameter >::iterator pIter;
-  for ( pIter par = _parMap.begin(); par != _parMap.end(); ++par )
-    par->second.setValue( pars.find( par->first )->second.value() );
+  setParMap( pars );
 
   _amp.setPars( pars );
+
+  typedef std::vector< Function >::iterator fIter;
+  for ( fIter func = _funcs.begin(); func != _funcs.end(); ++func )
+    func->setPars( _parMap );
+
+  setParExpr();
 }
+
+
+// Need to overwrite setters defined in PdfModel, since function parameters may need to be set.
+void DecayModel::setPars( const FunctionMinimum& min ) throw( PdfException )
+{
+  setParMap( min );
+
+  _amp.setPars( _parMap );
+
+  typedef std::vector< Function >::iterator fIter;
+  for ( fIter func = _funcs.begin(); func != _funcs.end(); ++func )
+    func->setPars( _parMap );
+
+  setParExpr();
+}
+

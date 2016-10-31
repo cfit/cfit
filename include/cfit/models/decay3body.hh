@@ -17,8 +17,6 @@ class Decay3Body : public DecayModel
 private:
   double _norm;
 
-  std::vector< Function > _funcs;
-
   // Maximum value of the pdf.
   double _maxPdf;
 
@@ -30,6 +28,8 @@ private:
     return ( max - min ) / double( nbins ) * ( bin + 0.5 ) + min;
   }
 
+  void setParExpr() {}
+
 public:
   Decay3Body( const Variable&   mSq12,
 	      const Variable&   mSq13,
@@ -38,11 +38,6 @@ public:
 	      const PhaseSpace& ps     );
 
   Decay3Body* copy() const;
-
-  // Need to define own setters, since function variables and parameters may need to be set, too.
-  void setPars( const std::vector< double >&              pars ) throw( PdfException );
-  void setPars( const std::map< std::string, Parameter >& pars ) throw( PdfException );
-  void setPars( const FunctionMinimum&                    min  ) throw( PdfException );
 
   void cache();
   const double evaluate( const double& mSq12, const double& mSq13, const double& mSq23 ) const throw( PdfException );

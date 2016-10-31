@@ -5,6 +5,7 @@
 #include <map>
 
 #include <cfit/pdfmodel.hh>
+#include <cfit/decaymodel.hh>
 #include <cfit/variable.hh>
 #include <cfit/amplitude.hh>
 #include <cfit/phasespace.hh>
@@ -15,7 +16,7 @@
 
 class Dataset;
 
-class Decay3BodyMix : public PdfModel
+class Decay3BodyMix : public DecayModel
 {
 private:
   // Names of the squared invariant mass and life time variables.
@@ -26,16 +27,12 @@ private:
 
   ParameterExpr _width;
 
-  Amplitude _amp;
-
   CoefExpr  _z;
   CoefExpr  _qoverp;
 
   // Booleans to control whether mixing and CP violation parameters have already been set.
   bool _hasMixing;
   bool _hasCPV;
-
-  PhaseSpace _ps;
 
   // Constants to speed up norm calculation.
   double                 _nDir;
@@ -52,9 +49,6 @@ private:
   bool     _cacheAmps;
   unsigned _ampDirCache;
   unsigned _ampCnjCache;
-
-
-  std::vector< Function > _funcs;
 
   // const double evaluateFuncs() const;
   const double evaluateFuncs( const double& mSq12, const double& mSq13, const double& mSq23 ) const;
@@ -75,6 +69,8 @@ private:
   const double                 psip( const double& t ) const;
   const double                 psim( const double& t ) const;
   const std::complex< double > psii( const double& t ) const;
+
+  void setParExpr();
 
 public:
   Decay3BodyMix( const Variable&      mSq12         ,
@@ -117,11 +113,6 @@ public:
   void setMixing       ( const CoefExpr& z      );
   void setCPV          ( const CoefExpr& qoverp );
   inline void setqoverp( const CoefExpr& qoverp ) { setCPV( qoverp ); }
-
-  // Need to define own setters, since function variables and parameters may need to be set, too.
-  void setPars( const std::vector< double >&              pars ) throw( PdfException );
-  void setPars( const std::map< std::string, Parameter >& pars ) throw( PdfException );
-  void setPars( const FunctionMinimum&                    min  ) throw( PdfException );
 
   // Norm components setters.
   void setNormComponents( const double& nDir, const double& nCnj, const std::complex< double >& nXed )

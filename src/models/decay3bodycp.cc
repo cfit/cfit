@@ -15,22 +15,11 @@ Decay3BodyCP::Decay3BodyCP( const Variable&   mSq12  ,
                             const CoefExpr&   z      ,
                             const PhaseSpace& ps     ,
                             bool              docache  )
-  : _amp( amp ), _ps( ps ), _hasKappa( false ), _z( z ),
+  : DecayModel( mSq12, mSq13, mSq23, amp, ps ), _hasKappa( false ), _z( z ),
     _nDir( 0.0 ), _nCnj( 0.0 ), _nXed( 0.0 ), _norm( 1.0 ), _fixed( false ),
     _maxPdf( 14.0 ), _cacheAmps( false ), _ampDirCache( 0 ), _ampCnjCache( 0 )
 {
-  const std::map< std::string, Parameter >& pars = _amp.getPars();
-  typedef std::map< const std::string, Parameter >::const_iterator pIter;
-  for ( pIter par = pars.begin(); par != pars.end(); ++par )
-    push( par->second );
-
-  const std::map< std::string, Parameter >& zpars = _z.getPars();
-  for ( pIter par = zpars.begin(); par != zpars.end(); ++par )
-    push( par->second );
-
-  push( mSq12 );
-  push( mSq13 );
-  push( mSq23 );
+  push( z );
 
   // Do calculations common to all values of variables
   //    (usually compute norm).
@@ -49,24 +38,12 @@ Decay3BodyCP::Decay3BodyCP( const Variable&   mSq12  ,
                             const Parameter&  kappa  ,
                             const PhaseSpace& ps     ,
                             bool              docache  )
-  : _amp( amp ), _ps( ps ), _hasKappa( true ), _kappa( kappa ), _z( z ),
+  : DecayModel( mSq12, mSq13, mSq23, amp, ps ), _hasKappa( true ), _kappa( kappa ), _z( z ),
     _nDir( 0.0 ), _nCnj( 0.0 ), _nXed( 0.0 ), _norm( 1.0 ), _fixed( false ),
     _maxPdf( 14.0 ), _cacheAmps( false ), _ampDirCache( 0 ), _ampCnjCache( 0 )
 {
-  const std::map< std::string, Parameter >& pars = _amp.getPars();
-  typedef std::map< const std::string, Parameter >::const_iterator pIter;
-  for ( pIter par = pars.begin(); par != pars.end(); ++par )
-    push( par->second );
-
-  const std::map< std::string, Parameter >& zpars = _z.getPars();
-  for ( pIter par = zpars.begin(); par != zpars.end(); ++par )
-    push( par->second );
-
+  push( z     );
   push( kappa );
-
-  push( mSq12 );
-  push( mSq13 );
-  push( mSq23 );
 
   // Do calculations common to all values of variables
   //    (usually compute norm).
@@ -76,84 +53,45 @@ Decay3BodyCP::Decay3BodyCP( const Variable&   mSq12  ,
 
 
 
+
+
+Decay3BodyCP::Decay3BodyCP( const Variable&      mSq12  ,
+                            const Variable&      mSq13  ,
+                            const Variable&      mSq23  ,
+                            const Amplitude&     amp    ,
+                            const CoefExpr&      z      ,
+                            const ParameterExpr& kappa  ,
+                            const PhaseSpace&    ps     ,
+                            bool                 docache  )
+  : DecayModel( mSq12, mSq13, mSq23, amp, ps ), _hasKappa( true ), _kappa( kappa ), _z( z ),
+    _nDir( 0.0 ), _nCnj( 0.0 ), _nXed( 0.0 ), _norm( 1.0 ), _fixed( false ),
+    _maxPdf( 14.0 ), _cacheAmps( false ), _ampDirCache( 0 ), _ampCnjCache( 0 )
+{
+  push( z     );
+  push( kappa );
+
+  // Do calculations common to all values of variables
+  //    (usually compute norm).
+  if ( docache )
+    cache();
+}
+
+
+
+
 Decay3BodyCP* Decay3BodyCP::copy() const
 {
   return new Decay3BodyCP( *this );
 }
 
 
-// Set the parameters to those given as argument.
-// They must be sorted alphabetically, since it's how MnUserParameters are passed
-//    in the minimize function of the minimizers. It must be so, because pushing
-//    two parameters with the same name would create confusion otherwise.
-void Decay3BodyCP::setPars( const std::vector< double >& pars ) throw( PdfException )
+void Decay3BodyCP::setParExpr()
 {
-  if ( _parMap.size() != pars.size() )
-    throw PdfException( "Decay3BodyCP::setPars: Number of arguments passed does not match number of required arguments." );
-
-  typedef std::map< std::string, Parameter >::iterator pIter;
-  int index = 0;
-  for ( pIter par = _parMap.begin(); par != _parMap.end(); ++par )
-    par->second.setValue( pars[ index++ ] );
-
-  _amp.setPars( _parMap );
   _z  .setPars( _parMap );
 
   if ( _hasKappa )
-    _kappa.setValue( _parMap[ _kappa.name() ].value() );
-
-  typedef std::vector< Function >::iterator fIter;
-  for ( fIter func = _funcs.begin(); func != _funcs.end(); ++func )
-    func->setPars( _parMap );
+    _kappa.setPars( _parMap );
 }
-
-
-// Need to overwrite setters defined in PdfModel, since function parameters may need to be set.
-void Decay3BodyCP::setPars( const std::map< std::string, Parameter >& pars ) throw( PdfException )
-{
-  typedef std::map< const std::string, Parameter >::iterator pIter;
-  for ( pIter par = _parMap.begin(); par != _parMap.end(); ++par )
-    par->second.setValue( pars.find( par->first )->second.value() );
-
-  _amp.setPars( _parMap );
-  _z  .setPars( _parMap );
-
-  if ( _hasKappa )
-    _kappa.setValue( pars.find( _kappa.name() )->second.value() );
-
-  typedef std::vector< Function >::iterator fIter;
-  for ( fIter func = _funcs.begin(); func != _funcs.end(); ++func )
-    func->setPars( _parMap );
-}
-
-
-// Need to overwrite setters defined in PdfModel, since function parameters may need to be set.
-void Decay3BodyCP::setPars( const FunctionMinimum& min ) throw( PdfException )
-{
-  const std::vector< MinuitParameter >& pars = min.userParameters().parameters();
-  typedef std::map< const std::string, Parameter >::iterator pIter;
-  std::vector< MinuitParameter >::const_iterator mpar;
-  for ( pIter par = _parMap.begin(); par != _parMap.end(); ++par )
-  {
-    mpar = std::find_if( pars.begin(), pars.end(),
-                         [par]( const MinuitParameter& mpar )
-                         { return mpar.name() == par->first; } );
-
-    if ( mpar != pars.end() )
-      par->second.setValue( mpar->value() );
-  }
-
-  _amp.setPars( _parMap );
-  _z  .setPars( _parMap );
-
-  if ( _hasKappa )
-    _kappa.setValue( _parMap.find( _kappa.name() )->second.value() );
-
-  typedef std::vector< Function >::iterator fIter;
-  for ( fIter func = _funcs.begin(); func != _funcs.end(); ++func )
-    func->setPars( _parMap );
-}
-
 
 
 const double Decay3BodyCP::evaluateFuncs( const double& mSq12, const double& mSq13, const double& mSq23 ) const
@@ -192,8 +130,8 @@ const double Decay3BodyCP::evaluateFuncs( const double& mSq12, const double& mSq
 
 void Decay3BodyCP::cache()
 {
-  const std::complex< double >& vz     = _z.evaluate();
-  const double&                 vKappa = _hasKappa ? _kappa.value() : 1.0;
+  const std::complex< double >& vz     = z();
+  const double&                 vKappa = kappa();
 
   if ( _fixed )
   {
@@ -208,7 +146,9 @@ void Decay3BodyCP::cache()
   _norm = 0.0;
 
   // Define the properties of the integration method.
-  const int    nBins = 400;
+  const int&   nBins = 400;
+  if ( nBins < 400 )
+    std::cout << "\e[91mALERT: calculating normalisation with only " << nBins << " bins.\e[0m" << std::endl;
   const double min   = _ps.mSq12min();
   const double max   = _ps.mSq12max();
   const double step  = ( max - min ) / double( nBins );

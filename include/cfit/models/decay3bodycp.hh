@@ -15,7 +15,7 @@
 
 class Dataset;
 
-class Decay3BodyCP : public PdfModel
+class Decay3BodyCP : public DecayModel
 {
 private:
   Amplitude _amp;
@@ -45,8 +45,6 @@ private:
   unsigned _ampCnjCache;
 
 
-  std::vector< Function > _funcs;
-
   const double evaluateFuncs( const double& mSq12, const double& mSq13, const double& mSq23 ) const;
   const double evaluateFuncs( const double& mSq12, const double& mSq13                      ) const;
 
@@ -60,6 +58,8 @@ private:
 
   const std::map< unsigned, std::vector< std::complex< double > > > cacheComplex( const Dataset& data );
 
+  void setParExpr();
+
 public:
   Decay3BodyCP( const Variable&   mSq12         ,
                 const Variable&   mSq13         ,
@@ -67,7 +67,7 @@ public:
                 const Amplitude&  amp           ,
                 const CoefExpr&   z             ,
                 const PhaseSpace& ps            ,
-                bool              docache = true  );
+                bool              docache = true );
 
   Decay3BodyCP( const Variable&   mSq12         ,
                 const Variable&   mSq13         ,
@@ -76,7 +76,16 @@ public:
                 const CoefExpr&   z             ,
                 const Parameter&  kappa         ,
                 const PhaseSpace& ps            ,
-                bool              docache = true  );
+                bool              docache = true );
+
+  Decay3BodyCP( const Variable&      mSq12         ,
+                const Variable&      mSq13         ,
+                const Variable&      mSq23         ,
+                const Amplitude&     amp           ,
+                const CoefExpr&      z             ,
+                const ParameterExpr& kappa         ,
+                const PhaseSpace&    ps            ,
+                bool                 docache = true );
 
   Decay3BodyCP* copy() const;
 
@@ -84,15 +93,14 @@ public:
   const std::string mSq13name() const { return getVar( 1 ).name(); }
   const std::string mSq23name() const { return getVar( 2 ).name(); }
 
+  // Getters.
+  const std::complex< double > z()     const { return             _z    .evaluate();       }
+  const double                 kappa() const { return _hasKappa ? _kappa.evaluate() : 1.0; }
+
   // Norm components getters.
   const double&                 nDir() const { return _nDir; }
   const double&                 nCnj() const { return _nCnj; }
   const std::complex< double >& nXed() const { return _nXed; }
-
-  // Need to define own setters, since function variables and parameters may need to be set, too.
-  void setPars( const std::vector< double >&              pars ) throw( PdfException );
-  void setPars( const std::map< std::string, Parameter >& pars ) throw( PdfException );
-  void setPars( const FunctionMinimum&                    min  ) throw( PdfException );
 
   // Norm components setters.
   void setNormComponents( const double& nDir, const double& nCnj, const std::complex< double >& nXed )
