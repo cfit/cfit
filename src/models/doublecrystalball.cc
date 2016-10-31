@@ -2,7 +2,10 @@
 #include <cfit/math.hh>
 #include <cfit/models/doublecrystalball.hh>
 
+#include <cfit/dataset.hh>
+
 #include <cfit/random.hh>
+
 
 DoubleCrystalBall::DoubleCrystalBall( const Variable& x,
                                       const Parameter& mu   , const Parameter& sigma,
@@ -200,6 +203,32 @@ void DoubleCrystalBall::cache()
 }
 
 
+// Cache the values of the pdf at every point in the dataset, if the parameters are fixed.
+const std::map< unsigned, std::vector< double > > DoubleCrystalBall::cacheReal( const Dataset& data )
+{
+  // Determine whether the amplitudes should be cached, i.e. only if all their parameters are fixed.
+  _doCache = true;
+  for ( unsigned par = 0; par < 6; ++par )
+    _doCache &= getPar( par ).isFixed();
+
+  std::map< unsigned, std::vector< double > > cached;
+
+  if ( ! _doCache )
+    return cached;
+
+  // Get an index for the cached complex amplitudes.
+  _cacheIdx = _cacheIdxReal++;
+
+  const std::string& varname = getVar( 0 ).name();
+  const std::size_t& size = data.size();
+  for ( std::size_t entry = 0; entry < size; ++entry )
+    cached[ _cacheIdx ].push_back( evaluate( data.value( varname, entry ) ) );
+
+  return cached;
+}
+
+
+
 // Function to compute the value of the pdf at its core (Gaussian) part.
 const double DoubleCrystalBall::core( const double& x ) const
 {
@@ -264,6 +293,18 @@ const double DoubleCrystalBall::evaluate( const std::vector< double >& vars ) co
 {
   return evaluate( vars[ 0 ] );
 }
+
+
+const double DoubleCrystalBall::evaluate( const std::vector< double >&                 vars  ,
+                                          const std::vector< double >&                 cacheR,
+                                          const std::vector< std::complex< double > >& cacheC ) const throw( PdfException )
+{
+  if ( ! _doCache )
+    return evaluate( vars );
+
+  return cacheR[ _cacheIdx ];
+}
+
 
 
 void DoubleCrystalBall::setParExpr()

@@ -4,6 +4,8 @@
 
 #include <cfit/random.hh>
 
+#include <cfit/dataset.hh>
+
 /*
   Definitions of several functions based on the definition of the norm.
                           1       (   ( x - mu )^2  )
@@ -51,6 +53,7 @@ Gauss::Gauss( const Variable& x, const ParameterExpr& mu, const ParameterExpr& s
 
   cache();
 }
+
 
 
 Gauss* Gauss::copy() const
@@ -144,6 +147,29 @@ void Gauss::cache()
 }
 
 
+// Cache the values of the pdf at every point in the dataset, if the parameters are fixed.
+const std::map< unsigned, std::vector< double > > Gauss::cacheReal( const Dataset& data )
+{
+  // Determine whether the amplitudes should be cached, i.e. only if all their parameters are fixed.
+  _doCache = getPar( 0 ).isFixed() && getPar( 1 ).isFixed();
+
+  std::map< unsigned, std::vector< double > > cached;
+
+  if ( ! _doCache )
+    return cached;
+
+  // Get an index for the cached complex amplitudes.
+  _cacheIdx = _cacheIdxReal++;
+
+  const std::string& varname = getVar( 0 ).name();
+  const std::size_t& size = data.size();
+  for ( std::size_t entry = 0; entry < size; ++entry )
+    cached[ _cacheIdx ].push_back( evaluate( data.value( varname, entry ) ) );
+
+  return cached;
+}
+
+
 const double Gauss::evaluate( const double& x ) const throw( PdfException )
 {
   return std::exp( - 0.5 * pow( x - mu(), 2 ) / pow( sigma(), 2 ) ) / _norm;
@@ -153,6 +179,17 @@ const double Gauss::evaluate( const double& x ) const throw( PdfException )
 const double Gauss::evaluate( const std::vector< double >& vars ) const throw( PdfException )
 {
   return evaluate( vars[ 0 ] );
+}
+
+
+const double Gauss::evaluate( const std::vector< double >&                 vars  ,
+                              const std::vector< double >&                 cacheR,
+                              const std::vector< std::complex< double > >& cacheC ) const throw( PdfException )
+{
+  if ( ! _doCache )
+    return evaluate( vars );
+
+  return cacheR[ _cacheIdx ];
 }
 
 

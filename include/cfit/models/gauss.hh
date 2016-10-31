@@ -22,6 +22,10 @@ private:
 
   double _norm;
 
+  // Index of the cached pdf.
+  bool     _doCache;
+  unsigned _cacheIdx;
+
   void setParExpr();
 
 public:
@@ -43,8 +47,13 @@ public:
 
   void cache();
 
+  const std::map< unsigned, std::vector< double > > cacheReal( const Dataset& data );
+
   const double evaluate( const double& x                   ) const throw( PdfException );
   const double evaluate( const std::vector< double >& vars ) const throw( PdfException );
+  const double evaluate( const std::vector< double >&                 vars  ,
+                         const std::vector< double >&                 cacheR,
+                         const std::vector< std::complex< double > >& cacheC ) const throw( PdfException );
 
   const std::map< std::string, double > generate() const throw( PdfException );
 

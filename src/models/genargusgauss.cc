@@ -2,6 +2,8 @@
 #include <cfit/models/genargusgauss.hh>
 #include <cfit/math.hh>
 
+#include <cfit/dataset.hh>
+
 #include <cfit/random.hh>
 
 GenArgusGauss::GenArgusGauss( const Variable&  x ,
@@ -169,6 +171,32 @@ void GenArgusGauss::cache()
 }
 
 
+// Cache the values of the pdf at every point in the dataset, if the parameters are fixed.
+const std::map< unsigned, std::vector< double > > GenArgusGauss::cacheReal( const Dataset& data )
+{
+  // Determine whether the amplitudes should be cached, i.e. only if all their parameters are fixed.
+  _doCache = true;
+  for ( unsigned par = 0; par < 5; ++par )
+    _doCache &= getPar( par ).isFixed();
+
+  std::map< unsigned, std::vector< double > > cached;
+
+  if ( ! _doCache )
+    return cached;
+
+  // Get an index for the cached complex amplitudes.
+  _cacheIdx = _cacheIdxReal++;
+
+  const std::string& varname = getVar( 0 ).name();
+  const std::size_t& size = data.size();
+  for ( std::size_t entry = 0; entry < size; ++entry )
+    cached[ _cacheIdx ].push_back( evaluate( data.value( varname, entry ) ) );
+
+  return cached;
+}
+
+
+
 const double GenArgusGauss::genargus( const double& x ) const
 {
   const double& vc   = c();
@@ -263,6 +291,16 @@ const double GenArgusGauss::evaluate( const std::vector< double >& vars ) const 
   return evaluate( vars[ 0 ] );
 }
 
+
+const double GenArgusGauss::evaluate( const std::vector< double >&                 vars  ,
+                                      const std::vector< double >&                 cacheR,
+                                      const std::vector< std::complex< double > >& cacheC ) const throw( PdfException )
+{
+  if ( ! _doCache )
+    return evaluate( vars );
+
+  return cacheR[ _cacheIdx ];
+}
 
 void GenArgusGauss::setParExpr()
 {
