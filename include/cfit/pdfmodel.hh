@@ -40,8 +40,16 @@ protected:
 
   const double yield() const { return 1.0; }
 
+  void setParMap( const std::vector< double >&              pars );
+  void setParMap( const std::map< std::string, Parameter >& pars );
+  void setParMap( const FunctionMinimum&                    min  );
+
 public:
   virtual PdfModel* copy() const = 0;
+
+  virtual ~PdfModel() {}
+
+  virtual void setParExpr() = 0;
 
   void setPar ( const std::string& name, const double& val, const double& err = -1. ) throw( PdfException );
 

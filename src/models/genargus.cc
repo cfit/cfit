@@ -5,7 +5,20 @@
 #include <cfit/random.hh>
 
 GenArgus::GenArgus( const Variable& x, const Parameter& c, const Parameter& chi, const Parameter& p )
-  : _hasLower( false ), _hasUpper( false ), _lower( 0.0 ), _upper( 0.0 )
+  : _c( c ), _chi( chi ), _p( p ), _hasLower( false ), _hasUpper( false ), _lower( 0.0 ), _upper( 0.0 )
+{
+  push( x );
+
+  push( c   );
+  push( chi );
+  push( p   );
+
+  cache();
+}
+
+
+GenArgus::GenArgus( const Variable& x, const ParameterExpr& c, const ParameterExpr& chi, const ParameterExpr& p )
+  : _c( c ), _chi( chi ), _p( p ), _hasLower( false ), _hasUpper( false ), _lower( 0.0 ), _upper( 0.0 )
 {
   push( x );
 
@@ -23,22 +36,9 @@ GenArgus* GenArgus::copy() const
 }
 
 
-double GenArgus::c()  const
-{
-  return getPar( 0 ).value();
-}
-
-
-double GenArgus::chi() const
-{
-  return getPar( 1 ).value();
-}
-
-
-double GenArgus::p() const
-{
-  return getPar( 2 ).value();
-}
+double GenArgus::c()   const { return _c  .evaluate(); }
+double GenArgus::chi() const { return _chi.evaluate(); }
+double GenArgus::p()   const { return _p  .evaluate(); }
 
 
 void GenArgus::setLowerLimit( const double& lower )
@@ -165,6 +165,15 @@ const double GenArgus::evaluate( const double& x ) const throw( PdfException )
 const double GenArgus::evaluate( const std::vector< double >& vars ) const throw( PdfException )
 {
   return evaluate( vars[ 0 ] );
+}
+
+
+
+void GenArgus::setParExpr()
+{
+  _c  .setPars( _parMap );
+  _chi.setPars( _parMap );
+  _p  .setPars( _parMap );
 }
 
 

@@ -12,6 +12,9 @@
 class Gauss : public PdfModel
 {
 private:
+  ParameterExpr _mu;
+  ParameterExpr _sigma;
+
   bool   _hasLower;
   bool   _hasUpper;
   double _lower;
@@ -19,8 +22,11 @@ private:
 
   double _norm;
 
+  void setParExpr();
+
 public:
-  Gauss( const Variable& x, const Parameter& mu, const Parameter& sigma );
+  Gauss( const Variable& x, const Parameter&     mu, const Parameter&     sigma );
+  Gauss( const Variable& x, const ParameterExpr& mu, const ParameterExpr& sigma );
 
   Gauss* copy() const;
 

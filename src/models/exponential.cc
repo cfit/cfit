@@ -26,7 +26,18 @@
 
 
 Exponential::Exponential( const Variable& x, const Parameter& gamma )
-  : _hasLower( false ), _hasUpper( false ), _lower( 0.0 ), _upper( 0.0 )
+  : _gamma( gamma ), _hasLower( false ), _hasUpper( false ), _lower( 0.0 ), _upper( 0.0 )
+{
+  push( x );
+
+  push( gamma );
+
+  cache();
+}
+
+
+Exponential::Exponential( const Variable& x, const ParameterExpr& gamma )
+  : _gamma( gamma ), _hasLower( false ), _hasUpper( false ), _lower( 0.0 ), _upper( 0.0 )
 {
   push( x );
 
@@ -42,10 +53,7 @@ Exponential* Exponential::copy() const
 }
 
 
-double Exponential::gamma()  const
-{
-  return getPar( 0 ).value();
-}
+double Exponential::gamma() const { return _gamma.evaluate(); }
 
 
 void Exponential::setLowerLimit( const double& lower )
@@ -142,6 +150,12 @@ const double Exponential::evaluate( const double& x ) const throw( PdfException 
 const double Exponential::evaluate( const std::vector< double >& vars ) const throw( PdfException )
 {
   return evaluate( vars[ 0 ] );
+}
+
+
+void Exponential::setParExpr()
+{
+  _gamma.setPars( _parMap );
 }
 
 

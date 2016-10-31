@@ -12,6 +12,8 @@
 class Exponential : public PdfModel
 {
 private:
+  ParameterExpr _gamma;
+
   bool   _hasLower;
   bool   _hasUpper;
   double _lower;
@@ -19,8 +21,11 @@ private:
 
   double _norm;
 
+  void setParExpr();
+
 public:
-  Exponential( const Variable& x, const Parameter& gamma );
+  Exponential( const Variable& x, const Parameter&     gamma );
+  Exponential( const Variable& x, const ParameterExpr& gamma );
 
   Exponential* copy() const;
 

@@ -12,6 +12,10 @@
 class GenArgus : public PdfModel
 {
 private:
+  ParameterExpr _c;
+  ParameterExpr _chi;
+  ParameterExpr _p;
+
   bool   _hasLower;
   bool   _hasUpper;
   double _lower;
@@ -19,8 +23,11 @@ private:
 
   double _norm;
 
+  void setParExpr();
+
 public:
-  GenArgus( const Variable& x, const Parameter& c, const Parameter& chi, const Parameter& p );
+  GenArgus( const Variable& x, const Parameter&     c, const Parameter&     chi, const Parameter&     p );
+  GenArgus( const Variable& x, const ParameterExpr& c, const ParameterExpr& chi, const ParameterExpr& p );
 
   GenArgus* copy() const;
 

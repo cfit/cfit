@@ -12,6 +12,8 @@ Polynomial::Polynomial( const Variable& x, const Parameter& c1 )
   push( x );
 
   push( c1 );
+
+  _coefs.push_back( c1 );
 }
 
 
@@ -22,6 +24,9 @@ Polynomial::Polynomial( const Variable& x, const Parameter& c1, const Parameter&
 
   push( c1 );
   push( c2 );
+
+  _coefs.push_back( c1 );
+  _coefs.push_back( c2 );
 }
 
 
@@ -33,6 +38,46 @@ Polynomial::Polynomial( const Variable& x, const std::vector< Parameter >& coefs
   typedef std::vector< Parameter >::const_iterator pIter;
   for ( pIter par = coefs.begin(); par != coefs.end(); ++par )
     push( *par );
+
+  std::copy( coefs.begin(), coefs.end(), std::back_inserter( _coefs ) );
+}
+
+
+
+Polynomial::Polynomial( const Variable& x, const ParameterExpr& c1 )
+  : _hasLower( false ), _hasUpper( false ), _lower( 0.0 ), _upper( 0.0 )
+{
+  push( x );
+
+  push( c1 );
+
+  _coefs.push_back( c1 );
+}
+
+
+Polynomial::Polynomial( const Variable& x, const ParameterExpr& c1, const ParameterExpr& c2 )
+  : _hasLower( false ), _hasUpper( false ), _lower( 0.0 ), _upper( 0.0 )
+{
+  push( x );
+
+  push( c1 );
+  push( c2 );
+
+  _coefs.push_back( c1 );
+  _coefs.push_back( c2 );
+}
+
+
+Polynomial::Polynomial( const Variable& x, const std::vector< ParameterExpr >& coefs )
+  : _hasLower( false ), _hasUpper( false ), _lower( 0.0 ), _upper( 0.0 )
+{
+  push( x );
+
+  typedef std::vector< ParameterExpr >::const_iterator pIter;
+  for ( pIter par = coefs.begin(); par != coefs.end(); ++par )
+    push( *par );
+
+  _coefs = coefs;
 }
 
 
@@ -43,9 +88,9 @@ Polynomial* Polynomial::copy() const
 }
 
 
-double Polynomial::coef( const unsigned& index )  const
+double Polynomial::coef( const unsigned& index ) const
 {
-  return getPar( index ).value();
+  return _coefs.at( index ).evaluate();
 }
 
 
@@ -114,6 +159,17 @@ const double Polynomial::evaluate( const double& x ) const throw( PdfException )
 const double Polynomial::evaluate( const std::vector< double >& vars ) const throw( PdfException )
 {
   return evaluate( vars[ 0 ] );
+}
+
+
+
+void Polynomial::setParExpr()
+{
+  std::for_each( _coefs.begin(), _coefs.end(),
+                 std::bind2nd(
+                   std::mem_fun_ref( (void (ParameterExpr::*)( const std::map< std::string, Parameter >& )) &ParameterExpr::setPars ),
+                   _parMap )
+    );
 }
 
 

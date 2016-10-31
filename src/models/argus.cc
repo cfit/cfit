@@ -3,7 +3,20 @@
 #include <cfit/math.hh>
 
 Argus::Argus( const Variable& x, const Parameter& c, const Parameter& chi )
-  : _hasLower( false ), _hasUpper( false ), _lower( 0.0 ), _upper( 0.0 )
+  : _c( c ), _chi( chi ), _hasLower( false ), _hasUpper( false ), _lower( 0.0 ), _upper( 0.0 )
+{
+  push( x );
+
+  push( c   );
+  push( chi );
+
+  cache();
+}
+
+
+
+Argus::Argus( const Variable& x, const ParameterExpr& c, const ParameterExpr& chi )
+  : _c( c ), _chi( chi ), _hasLower( false ), _hasUpper( false ), _lower( 0.0 ), _upper( 0.0 )
 {
   push( x );
 
@@ -20,16 +33,8 @@ Argus* Argus::copy() const
 }
 
 
-double Argus::c()  const
-{
-  return getPar( 0 ).value();
-}
-
-
-double Argus::chi() const
-{
-  return getPar( 1 ).value();
-}
+double Argus::c()   const { return _c  .evaluate(); }
+double Argus::chi() const { return _chi.evaluate(); }
 
 
 void Argus::setLowerLimit( const double& lower )
@@ -156,6 +161,13 @@ const double Argus::evaluate( const double& x ) const throw( PdfException )
 const double Argus::evaluate( const std::vector< double >& vars ) const throw( PdfException )
 {
   return evaluate( vars[ 0 ] );
+}
+
+
+void Argus::setParExpr()
+{
+  _c  .setPars( _parMap );
+  _chi.setPars( _parMap );
 }
 
 

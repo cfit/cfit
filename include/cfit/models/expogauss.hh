@@ -12,6 +12,10 @@
 class ExpoGauss : public PdfModel
 {
 private:
+  ParameterExpr _gamma;
+  ParameterExpr _mu;
+  ParameterExpr _sigma;
+
   bool   _hasLower;
   bool   _hasUpper;
   double _lower;
@@ -24,9 +28,14 @@ private:
 
   const double expogauss( const double& x ) const;
 
+  void setParExpr();
+
 public:
   ExpoGauss( const Variable& x,
-             const Parameter& gamma, const Parameter& mu, const Parameter& sigma );
+             const Parameter&     gamma, const Parameter&     mu, const Parameter&     sigma );
+
+  ExpoGauss( const Variable& x,
+             const ParameterExpr& gamma, const ParameterExpr& mu, const ParameterExpr& sigma );
 
   ExpoGauss* copy() const;
 

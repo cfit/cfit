@@ -12,6 +12,8 @@
 class Polynomial : public PdfModel
 {
 private:
+  std::vector< ParameterExpr > _coefs;
+
   bool   _hasLower;
   bool   _hasUpper;
   double _lower;
@@ -19,10 +21,16 @@ private:
 
   double _norm;
 
+  void setParExpr();
+
 public:
   Polynomial( const Variable& x, const Parameter& c1 );
   Polynomial( const Variable& x, const Parameter& c1, const Parameter& c2 );
   Polynomial( const Variable& x, const std::vector< Parameter >& coefs );
+
+  Polynomial( const Variable& x, const ParameterExpr& c1 );
+  Polynomial( const Variable& x, const ParameterExpr& c1, const ParameterExpr& c2 );
+  Polynomial( const Variable& x, const std::vector< ParameterExpr >& coefs );
 
   Polynomial* copy() const;
 

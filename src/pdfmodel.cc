@@ -109,6 +109,51 @@ const Parameter& PdfModel::getPar( const int& idx ) const
 }
 
 
+
+// Set the values of the parameter map from a vector of values, sorted alphabetically by parameter name.
+// It is necessary that they have the same size.
+void PdfModel::setParMap( const std::vector< double >& pars )
+{
+  if ( _parMap.size() != pars.size() )
+    throw PdfException( "PdfModel::setParMap: Number of arguments passed does not match number of required arguments." );
+
+  typedef std::map< std::string, Parameter >::iterator pIter;
+  int index = 0;
+  for ( pIter par = _parMap.begin(); par != _parMap.end(); ++par )
+    par->second.setValue( pars[ index++ ] );
+}
+
+
+// Set the values of the parameter map from another parameter map. Their sizes may differ.
+void PdfModel::setParMap( const std::map< std::string, Parameter >& pars )
+{
+  typedef std::map< const std::string, Parameter >::iterator pIter;
+  for ( pIter par = _parMap.begin(); par != _parMap.end(); ++par )
+    if ( pars.count( par->first ) )
+      par->second.setValue( pars.at( par->first ).value() );
+}
+
+
+
+// Set the values of the parameter map from a minuit FunctionMinimum object. Their sizes may differ.
+void PdfModel::setParMap( const FunctionMinimum& min )
+{
+  const std::vector< MinuitParameter >& pars = min.userParameters().parameters();
+
+  // Do not require that the number of parameters in _parMap and min be the same.
+  //    The user may want to run fit 1, then set fit result as initial values for
+  //    fit 2, with some other parameters.
+
+  // if ( _parMap.size() != pars.size() )
+  //   throw PdfException( "PdfModel::setPars( minimum ): Number of arguments passed does not match number of required arguments." );
+
+  typedef std::vector< MinuitParameter >::const_iterator pIter;
+  for ( pIter par = pars.begin(); par != pars.end(); ++par )
+    if ( _parMap.count( par->name() ) )
+      _parMap[ par->name() ].set( par->value(), par->error() );
+}
+
+
 // Setter for individual parameter.
 void PdfModel::setPar( const std::string& name, const double& val, const double& err ) throw( PdfException )
 {
@@ -125,37 +170,25 @@ void PdfModel::setPar( const std::string& name, const double& val, const double&
 //    two parameters with the same name would create confusion otherwise.
 void PdfModel::setPars( const std::vector< double >& pars ) throw( PdfException )
 {
-  if ( _parMap.size() != pars.size() )
-    throw PdfException( "PdfModel::setPars( vector ): Number of arguments passed does not match number of required arguments." );
+  setParMap( pars );
 
-  typedef std::map< std::string, Parameter >::iterator pIter;
-  int index = 0;
-  for ( pIter par = _parMap.begin(); par != _parMap.end(); par++ )
-    par->second.setValue( pars[ index++ ] );
+  setParExpr();
 }
-
-
-void PdfModel::setPars( const FunctionMinimum& min ) throw( PdfException )
-{
-  const MnUserParameters& pars = min.userParameters();
-  const std::vector< MinuitParameter >& parVec = pars.parameters();
-
-  if ( _parMap.size() != parVec.size() )
-    throw PdfException( "PdfModel::setPars( minimum ): Number of arguments passed does not match number of required arguments." );
-
-  typedef std::vector< MinuitParameter >::const_iterator pIter;
-  for ( pIter par = parVec.begin(); par != parVec.end(); ++par )
-    _parMap[ par->name() ].set( par->value(), par->error() );
-}
-
 
 // The function must be virtual to allow the derived decay model classes to use their
 //    own setPars function.
 void PdfModel::setPars( const std::map< std::string, Parameter >& pars ) throw( PdfException )
 {
-  typedef std::map< const std::string, Parameter >::iterator pIter;
-  for ( pIter par = _parMap.begin(); par != _parMap.end(); ++par )
-    par->second.setValue( pars.find( par->first )->second.value() );
+  setParMap( pars );
+
+  setParExpr();
+}
+
+void PdfModel::setPars( const FunctionMinimum& min ) throw( PdfException )
+{
+  setParMap( min );
+
+  setParExpr();
 }
 
 

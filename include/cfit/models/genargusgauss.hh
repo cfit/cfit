@@ -12,6 +12,12 @@
 class GenArgusGauss : public PdfModel
 {
 private:
+  ParameterExpr _c;
+  ParameterExpr _chi;
+  ParameterExpr _p;
+  ParameterExpr _mu;
+  ParameterExpr _sigma;
+
   bool   _hasLower;
   bool   _hasUpper;
   double _lower;
@@ -30,10 +36,16 @@ private:
 
   const double generateArgus() const;
 
+  void setParExpr();
+
 public:
   GenArgusGauss( const Variable& x,
-                 const Parameter& c , const Parameter& chi, const Parameter& p,
-                 const Parameter& mu, const Parameter& sigma );
+                 const Parameter&     c , const Parameter&     chi, const Parameter&     p,
+                 const Parameter&     mu, const Parameter&     sigma );
+
+  GenArgusGauss( const Variable& x,
+                 const ParameterExpr& c , const ParameterExpr& chi, const ParameterExpr& p,
+                 const ParameterExpr& mu, const ParameterExpr& sigma );
 
   GenArgusGauss* copy() const;
 

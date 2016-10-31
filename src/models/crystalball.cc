@@ -6,7 +6,25 @@
 
 CrystalBall::CrystalBall( const Variable& x,
 			  const Parameter& mu, const Parameter& sigma, const Parameter& alpha, const Parameter& n )
-  : _hasLower( false ), _hasUpper( false ), _lower( 0.0 ), _upper( 0.0 )
+  : _mu( mu ), _sigma( sigma ), _alpha( alpha ), _n( n ), _hasLower( false ), _hasUpper( false ), _lower( 0.0 ), _upper( 0.0 )
+{
+  push( x );
+
+  push( mu    );
+  push( sigma );
+  push( alpha );
+  push( n     );
+
+  cache();
+}
+
+
+CrystalBall::CrystalBall( const Variable&      x    ,
+                          const ParameterExpr& mu   ,
+                          const ParameterExpr& sigma,
+                          const ParameterExpr& alpha,
+                          const ParameterExpr& n     )
+  : _mu( mu ), _sigma( sigma ), _alpha( alpha ), _n( n ), _hasLower( false ), _hasUpper( false ), _lower( 0.0 ), _upper( 0.0 )
 {
   push( x );
 
@@ -81,25 +99,25 @@ void CrystalBall::unsetLimits()
 
 double CrystalBall::mu()  const
 {
-  return getPar( 0 ).value();
+  return _mu.evaluate();
 }
 
 
 double CrystalBall::sigma() const
 {
-  return getPar( 1 ).value();
+  return _sigma.evaluate();
 }
 
 
 double CrystalBall::alpha() const
 {
-  return getPar( 2 ).value();
+  return _alpha.evaluate();
 }
 
 
 double CrystalBall::n() const
 {
-  return getPar( 3 ).value();
+  return _n.evaluate();
 }
 
 
@@ -200,6 +218,15 @@ const double CrystalBall::evaluate( const double& x ) const throw( PdfException 
 const double CrystalBall::evaluate( const std::vector< double >& vars ) const throw( PdfException )
 {
   return evaluate( vars[ 0 ] );
+}
+
+
+void CrystalBall::setParExpr()
+{
+  _mu   .setPars( _parMap );
+  _sigma.setPars( _parMap );
+  _alpha.setPars( _parMap );
+  _n    .setPars( _parMap );
 }
 
 

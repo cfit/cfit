@@ -78,6 +78,8 @@ public:
 
   PdfExpr( const PdfExpr& right );
 
+  PdfExpr* copy() const { return new PdfExpr( *this ); }
+
   ~PdfExpr();
 
   void setPar( const std::string& name, const double& val, const double& err = -1. ) throw( PdfException );

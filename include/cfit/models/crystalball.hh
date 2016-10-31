@@ -12,6 +12,11 @@
 class CrystalBall : public PdfModel
 {
 private:
+  ParameterExpr _mu;
+  ParameterExpr _sigma;
+  ParameterExpr _alpha;
+  ParameterExpr _n;
+
   bool   _hasLower;
   bool   _hasUpper;
   double _lower;
@@ -24,8 +29,15 @@ private:
   const double core( const double& x ) const;
   const double tail( const double& x ) const;
 
+  void setParExpr();
+
 public:
   CrystalBall( const Variable& x, const Parameter& mu, const Parameter& sigma, const Parameter& alpha, const Parameter& n );
+  CrystalBall( const Variable&      x    ,
+               const ParameterExpr& mu   ,
+               const ParameterExpr& sigma,
+               const ParameterExpr& alpha,
+               const ParameterExpr& n );
 
   CrystalBall* copy() const;
 

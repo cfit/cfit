@@ -29,7 +29,20 @@
 
 
 Gauss::Gauss( const Variable& x, const Parameter& mu, const Parameter& sigma )
-  : _hasLower( false ), _hasUpper( false ), _lower( 0.0 ), _upper( 0.0 )
+  : _mu( mu ), _sigma( sigma ), _hasLower( false ), _hasUpper( false ), _lower( 0.0 ), _upper( 0.0 ), _doCache( false ), _cacheIdx( 0 )
+{
+  push( x );
+
+  push( mu    );
+  push( sigma );
+
+  cache();
+}
+
+
+
+Gauss::Gauss( const Variable& x, const ParameterExpr& mu, const ParameterExpr& sigma )
+  : _mu( mu ), _sigma( sigma ), _hasLower( false ), _hasUpper( false ), _lower( 0.0 ), _upper( 0.0 ), _doCache( false ), _cacheIdx( 0 )
 {
   push( x );
 
@@ -48,13 +61,13 @@ Gauss* Gauss::copy() const
 
 double Gauss::mu()  const
 {
-  return getPar( 0 ).value();
+  return _mu.evaluate();
 }
 
 
 double Gauss::sigma() const
 {
-  return getPar( 1 ).value();
+  return _sigma.evaluate();
 }
 
 
@@ -141,6 +154,14 @@ const double Gauss::evaluate( const std::vector< double >& vars ) const throw( P
 {
   return evaluate( vars[ 0 ] );
 }
+
+
+void Gauss::setParExpr()
+{
+  _mu   .setPars( _parMap );
+  _sigma.setPars( _parMap );
+}
+
 
 
 const double Gauss::area( const double& min, const double& max ) const throw( PdfException )

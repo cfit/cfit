@@ -6,7 +6,24 @@
 
 ExpoGauss::ExpoGauss( const Variable&  x ,
                       const Parameter& gamma, const Parameter& mu, const Parameter& sigma )
-  : _hasLower( false ), _hasUpper( false ), _lower( 0.0 ), _upper( 0.0 ),
+  : _gamma( gamma ), _mu( mu ), _sigma( sigma ),
+    _hasLower( false ), _hasUpper( false ), _lower( 0.0 ), _upper( 0.0 ),
+    _normExpo( 0.0 ), _normGauss( 0.0 ), _norm( 0.0 )
+{
+  push( x );
+
+  push( gamma );
+  push( mu    );
+  push( sigma );
+
+  cache();
+}
+
+
+ExpoGauss::ExpoGauss( const Variable&  x ,
+                      const ParameterExpr& gamma, const ParameterExpr& mu, const ParameterExpr& sigma )
+  : _gamma( gamma ), _mu( mu ), _sigma( sigma ),
+    _hasLower( false ), _hasUpper( false ), _lower( 0.0 ), _upper( 0.0 ),
     _normExpo( 0.0 ), _normGauss( 0.0 ), _norm( 0.0 )
 {
   push( x );
@@ -25,23 +42,9 @@ ExpoGauss* ExpoGauss::copy() const
 }
 
 
-double ExpoGauss::gamma()  const
-{
-  return getPar( 0 ).value();
-}
-
-
-double ExpoGauss::mu() const
-{
-  return getPar( 1 ).value();
-}
-
-
-double ExpoGauss::sigma() const
-{
-  return getPar( 2 ).value();
-}
-
+double ExpoGauss::gamma() const { return _gamma.evaluate(); }
+double ExpoGauss::mu()    const { return _mu   .evaluate(); }
+double ExpoGauss::sigma() const { return _sigma.evaluate(); }
 
 
 void ExpoGauss::setLowerLimit( const double& lower )
@@ -192,6 +195,14 @@ const double ExpoGauss::evaluate( const double& x ) const throw( PdfException )
 const double ExpoGauss::evaluate( const std::vector< double >& vars ) const throw( PdfException )
 {
   return evaluate( vars[ 0 ] );
+}
+
+
+void ExpoGauss::setParExpr()
+{
+  _gamma.setPars( _parMap );
+  _mu   .setPars( _parMap );
+  _sigma.setPars( _parMap );
 }
 
 

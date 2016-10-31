@@ -7,8 +7,28 @@
 GenArgusGauss::GenArgusGauss( const Variable&  x ,
                               const Parameter& c , const Parameter& chi, const Parameter& p,
                               const Parameter& mu, const Parameter& sigma )
-  : _hasLower( false ), _hasUpper( false ), _lower( 0.0 ), _upper( 0.0 ),
-    _normGenArgus( 0.0 ), _normGauss( 0.0 ), _norm( 0.0 )
+  : _c( c ), _chi( chi ), _p( p ), _mu( mu ), _sigma( sigma ),
+    _hasLower( false ), _hasUpper( false ), _lower( 0.0 ), _upper( 0.0 ),
+    _normGenArgus( 0.0 ), _normGauss( 0.0 ), _norm( 0.0 ), _doCache( false ), _cacheIdx( 0 )
+{
+  push( x );
+
+  push( c     );
+  push( chi   );
+  push( p     );
+  push( mu    );
+  push( sigma );
+
+  cache();
+}
+
+
+GenArgusGauss::GenArgusGauss( const Variable&  x ,
+                              const ParameterExpr& c , const ParameterExpr& chi, const ParameterExpr& p,
+                              const ParameterExpr& mu, const ParameterExpr& sigma )
+  : _c( c ), _chi( chi ), _p( p ), _mu( mu ), _sigma( sigma ),
+    _hasLower( false ), _hasUpper( false ), _lower( 0.0 ), _upper( 0.0 ),
+    _normGenArgus( 0.0 ), _normGauss( 0.0 ), _norm( 0.0 ), _doCache( false ), _cacheIdx( 0 )
 {
   push( x );
 
@@ -28,34 +48,11 @@ GenArgusGauss* GenArgusGauss::copy() const
 }
 
 
-double GenArgusGauss::c()  const
-{
-  return getPar( 0 ).value();
-}
-
-
-double GenArgusGauss::chi() const
-{
-  return getPar( 1 ).value();
-}
-
-
-double GenArgusGauss::p() const
-{
-  return getPar( 2 ).value();
-}
-
-
-double GenArgusGauss::mu() const
-{
-  return getPar( 3 ).value();
-}
-
-
-double GenArgusGauss::sigma() const
-{
-  return getPar( 4 ).value();
-}
+double GenArgusGauss::c()     const { return _c    .evaluate(); }
+double GenArgusGauss::chi()   const { return _chi  .evaluate(); }
+double GenArgusGauss::p()     const { return _p    .evaluate(); }
+double GenArgusGauss::mu()    const { return _mu   .evaluate(); }
+double GenArgusGauss::sigma() const { return _sigma.evaluate(); }
 
 
 
@@ -264,6 +261,16 @@ const double GenArgusGauss::evaluate( const double& x ) const throw( PdfExceptio
 const double GenArgusGauss::evaluate( const std::vector< double >& vars ) const throw( PdfException )
 {
   return evaluate( vars[ 0 ] );
+}
+
+
+void GenArgusGauss::setParExpr()
+{
+  _c    .setPars( _parMap );
+  _chi  .setPars( _parMap );
+  _p    .setPars( _parMap );
+  _mu   .setPars( _parMap );
+  _sigma.setPars( _parMap );
 }
 
 

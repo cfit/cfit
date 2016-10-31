@@ -17,6 +17,8 @@ class Dataset;
 class Region;
 class Minimizer;
 
+class FunctionMinimum;
+
 class PdfBase
 {
   friend Minimizer;
@@ -40,10 +42,15 @@ public:
   static unsigned _cacheIdxReal;
   static unsigned _cacheIdxComplex;
 
+  virtual PdfBase* copy() const = 0;
+
   virtual ~PdfBase() {}
 
   // Setters.
-  virtual void setPars( const std::vector< double >& pars ) throw( PdfException ) = 0;
+  virtual void setPars( const std::vector< double >&              pars ) throw( PdfException ) = 0;
+  virtual void setPars( const std::map< std::string, Parameter >& pars ) throw( PdfException ) = 0;
+  virtual void setPars( const FunctionMinimum&                    pars ) throw( PdfException ) = 0;
+
   virtual void setPar ( const std::string& name, const double& val, const double& err = -1. ) throw( PdfException ) = 0;
 
   void fix    ( const std::string& name ) throw( PdfException );

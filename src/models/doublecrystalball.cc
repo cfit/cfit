@@ -8,7 +8,29 @@ DoubleCrystalBall::DoubleCrystalBall( const Variable& x,
                                       const Parameter& mu   , const Parameter& sigma,
                                       const Parameter& alpha, const Parameter& n,
                                       const Parameter& beta , const Parameter& m )
-  : _hasLower( false ), _hasUpper( false ), _lower( 0.0 ), _upper( 0.0 )
+  : _mu( mu ), _sigma( sigma ), _alpha( alpha ), _n( n ), _beta( beta ), _m( m ),
+    _hasLower( false ), _hasUpper( false ), _lower( 0.0 ), _upper( 0.0 ), _doCache( false ), _cacheIdx( 0 )
+{
+  push( x );
+
+  push( mu    );
+  push( sigma );
+  push( alpha );
+  push( n     );
+  push( beta  );
+  push( m     );
+
+  cache();
+}
+
+
+
+DoubleCrystalBall::DoubleCrystalBall( const Variable& x,
+                                      const ParameterExpr& mu   , const ParameterExpr& sigma,
+                                      const ParameterExpr& alpha, const ParameterExpr& n,
+                                      const ParameterExpr& beta , const ParameterExpr& m )
+  : _mu( mu ), _sigma( sigma ), _alpha( alpha ), _n( n ), _beta( beta ), _m( m ),
+    _hasLower( false ), _hasUpper( false ), _lower( 0.0 ), _upper( 0.0 ), _doCache( false ), _cacheIdx( 0 )
 {
   push( x );
 
@@ -84,40 +106,12 @@ void DoubleCrystalBall::unsetLimits()
 }
 
 
-double DoubleCrystalBall::mu()  const
-{
-  return getPar( 0 ).value();
-}
-
-
-double DoubleCrystalBall::sigma() const
-{
-  return getPar( 1 ).value();
-}
-
-
-double DoubleCrystalBall::alpha() const
-{
-  return getPar( 2 ).value();
-}
-
-
-double DoubleCrystalBall::n() const
-{
-  return getPar( 3 ).value();
-}
-
-
-double DoubleCrystalBall::beta() const
-{
-  return getPar( 4 ).value();
-}
-
-
-double DoubleCrystalBall::m() const
-{
-  return getPar( 5 ).value();
-}
+double DoubleCrystalBall::mu()    const { return _mu   .evaluate(); }
+double DoubleCrystalBall::sigma() const { return _sigma.evaluate(); }
+double DoubleCrystalBall::alpha() const { return _alpha.evaluate(); }
+double DoubleCrystalBall::n()     const { return _n    .evaluate(); }
+double DoubleCrystalBall::beta()  const { return _beta .evaluate(); }
+double DoubleCrystalBall::m()     const { return _m    .evaluate(); }
 
 
 // Compute the area of the unnormalized pdf up to given value x.
@@ -269,6 +263,17 @@ const double DoubleCrystalBall::evaluate( const double& x ) const throw( PdfExce
 const double DoubleCrystalBall::evaluate( const std::vector< double >& vars ) const throw( PdfException )
 {
   return evaluate( vars[ 0 ] );
+}
+
+
+void DoubleCrystalBall::setParExpr()
+{
+  _mu   .setPars( _parMap );
+  _sigma.setPars( _parMap );
+  _alpha.setPars( _parMap );
+  _n    .setPars( _parMap );
+  _beta .setPars( _parMap );
+  _m    .setPars( _parMap );
 }
 
 

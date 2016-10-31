@@ -12,6 +12,9 @@
 class Argus : public PdfModel
 {
 private:
+  ParameterExpr _c;
+  ParameterExpr _chi;
+
   bool   _hasLower;
   bool   _hasUpper;
   double _lower;
@@ -19,8 +22,11 @@ private:
 
   double _norm;
 
+  void setParExpr();
+
 public:
-  Argus( const Variable& x, const Parameter& c, const Parameter& chi );
+  Argus( const Variable& x, const Parameter&     c, const Parameter&     chi );
+  Argus( const Variable& x, const ParameterExpr& c, const ParameterExpr& chi );
 
   Argus* copy() const;
 

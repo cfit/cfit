@@ -12,6 +12,13 @@
 class DoubleCrystalBall : public PdfModel
 {
 private:
+  ParameterExpr _mu;
+  ParameterExpr _sigma;
+  ParameterExpr _alpha;
+  ParameterExpr _n;
+  ParameterExpr _beta;
+  ParameterExpr _m;
+
   bool   _hasLower;
   bool   _hasUpper;
   double _lower;
@@ -25,10 +32,16 @@ private:
   const double tailLo( const double& x ) const;
   const double tailUp( const double& x ) const;
 
+  void setParExpr();
+
 public:
   DoubleCrystalBall( const Variable& x, const Parameter& mu, const Parameter& sigma,
                      const Parameter& alpha, const Parameter& n,
                      const Parameter& beta , const Parameter& m );
+
+  DoubleCrystalBall( const Variable& x, const ParameterExpr& mu, const ParameterExpr& sigma,
+                     const ParameterExpr& alpha, const ParameterExpr& n,
+                     const ParameterExpr& beta , const ParameterExpr& m );
 
   DoubleCrystalBall* copy() const;
 
