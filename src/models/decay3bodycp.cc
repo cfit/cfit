@@ -12,14 +12,14 @@ Decay3BodyCP::Decay3BodyCP( const Variable&   mSq12  ,
                             const Variable&   mSq13  ,
                             const Variable&   mSq23  ,
                             const Amplitude&  amp    ,
-                            const CoefExpr&   z      ,
+                            const CoefExpr&   phi    ,
                             const PhaseSpace& ps     ,
                             bool              docache  )
-  : DecayModel( mSq12, mSq13, mSq23, amp, ps ), _hasKappa( false ), _z( z ),
+  : DecayModel( mSq12, mSq13, mSq23, amp, ps ), _hasKappa( false ), _phi( phi ),
     _nDir( 0.0 ), _nCnj( 0.0 ), _nXed( 0.0 ), _norm( 1.0 ), _fixed( false ),
     _maxPdf( 14.0 ), _cacheAmps( false ), _ampDirCache( 0 ), _ampCnjCache( 0 )
 {
-  push( z );
+  push( phi );
 
   // Do calculations common to all values of variables
   //    (usually compute norm).
@@ -34,15 +34,15 @@ Decay3BodyCP::Decay3BodyCP( const Variable&   mSq12  ,
                             const Variable&   mSq13  ,
                             const Variable&   mSq23  ,
                             const Amplitude&  amp    ,
-                            const CoefExpr&   z      ,
+                            const CoefExpr&   phi    ,
                             const Parameter&  kappa  ,
                             const PhaseSpace& ps     ,
                             bool              docache  )
-  : DecayModel( mSq12, mSq13, mSq23, amp, ps ), _hasKappa( true ), _kappa( kappa ), _z( z ),
+  : DecayModel( mSq12, mSq13, mSq23, amp, ps ), _hasKappa( true ), _kappa( kappa ), _phi( phi ),
     _nDir( 0.0 ), _nCnj( 0.0 ), _nXed( 0.0 ), _norm( 1.0 ), _fixed( false ),
     _maxPdf( 14.0 ), _cacheAmps( false ), _ampDirCache( 0 ), _ampCnjCache( 0 )
 {
-  push( z     );
+  push( phi   );
   push( kappa );
 
   // Do calculations common to all values of variables
@@ -59,15 +59,15 @@ Decay3BodyCP::Decay3BodyCP( const Variable&      mSq12  ,
                             const Variable&      mSq13  ,
                             const Variable&      mSq23  ,
                             const Amplitude&     amp    ,
-                            const CoefExpr&      z      ,
+                            const CoefExpr&      phi    ,
                             const ParameterExpr& kappa  ,
                             const PhaseSpace&    ps     ,
                             bool                 docache  )
-  : DecayModel( mSq12, mSq13, mSq23, amp, ps ), _hasKappa( true ), _kappa( kappa ), _z( z ),
+  : DecayModel( mSq12, mSq13, mSq23, amp, ps ), _hasKappa( true ), _kappa( kappa ), _phi( phi ),
     _nDir( 0.0 ), _nCnj( 0.0 ), _nXed( 0.0 ), _norm( 1.0 ), _fixed( false ),
     _maxPdf( 14.0 ), _cacheAmps( false ), _ampDirCache( 0 ), _ampCnjCache( 0 )
 {
-  push( z     );
+  push( phi   );
   push( kappa );
 
   // Do calculations common to all values of variables
@@ -87,7 +87,7 @@ Decay3BodyCP* Decay3BodyCP::copy() const
 
 void Decay3BodyCP::setParExpr()
 {
-  _z  .setPars( _parMap );
+  _phi.setPars( _parMap );
 
   if ( _hasKappa )
     _kappa.setPars( _parMap );
@@ -241,22 +241,25 @@ const std::map< unsigned, std::vector< std::complex< double > > > Decay3BodyCP::
 // Unnormalized evaluation.
 const double Decay3BodyCP::evaluateUnnorm( const double& mSq12, const double& mSq13, const double& mSq23 ) const throw( PdfException )
 {
+  if ( ! _ps.contains( mSq12, mSq13, mSq23 ) )
+    return 0;
+
   // Phase space amplitude of the decay of the particle.
   std::complex< double > ampDir = _amp.evaluate( _ps, mSq12, mSq13, mSq23 );
   std::complex< double > ampCnj = _amp.evaluate( _ps, mSq13, mSq12, mSq23 );
 
-  const std::complex< double >& vz = _z.evaluate();
+  const std::complex< double >& vz = z();
 
   if ( ! _hasKappa )
     // std::norm returns the squared modulus of the complex number, not its norm.
-    return std::norm( ampDir + vz * ampCnj ); // * evaluateFuncs( mSq12, mSq13, mSq23 );
+    return std::norm( ampDir + vz * ampCnj ) * evaluateFuncs( mSq12, mSq13, mSq23 );
 
   const std::complex< double >& interf = conj( ampDir ) * ampCnj;
 
   double ampSq = std::norm( ampDir ) + std::norm( vz ) * std::norm( ampCnj );
-  ampSq += 2.0 * _kappa.value() * std::real( vz * interf );
+  ampSq += 2.0 * kappa() * std::real( vz * interf );
 
-  return ampSq; // * evaluateFuncs( mSq12, mSq13, mSq23 );
+  return ampSq * evaluateFuncs( mSq12, mSq13, mSq23 );
 }
 
 
@@ -334,18 +337,20 @@ const double Decay3BodyCP::evaluate( const std::vector< double >&               
 
   const std::size_t& size = vars.size();
 
+  if ( ( size != 2 ) && ( size != 3 ) )
+    throw PdfException( "Decay3BodyCP can only take either 2 or 3 arguments." );
+
   std::complex< double > ampDir = cacheC[ _ampDirCache ];
   std::complex< double > ampCnj = cacheC[ _ampCnjCache ];
 
-  const std::complex< double >& vz = _z.evaluate();
+  const std::complex< double >& vz = z();
 
-  double funcs;
+  // Evaluate the functions that describe the efficiency.
+  double funcs = 0.0;
   if ( size == 2 )
     funcs = evaluateFuncs( vars[ 0 ], vars[ 1 ] );
   else if ( size == 3 )
     funcs = evaluateFuncs( vars[ 0 ], vars[ 1 ], vars[ 2 ] );
-  else
-    throw PdfException( "Decay3BodyCP can only take either 2 or 3 arguments." );
 
   if ( ! _hasKappa )
     return std::norm( ampDir + vz * ampCnj ) * funcs / _norm;
@@ -353,7 +358,7 @@ const double Decay3BodyCP::evaluate( const std::vector< double >&               
   const std::complex< double >& interf = std::conj( ampDir ) * ampCnj;
 
   double ampSq = std::norm( ampDir ) + std::norm( vz ) * std::norm( ampCnj );
-  ampSq += 2.0 * _kappa.value() * std::real( vz * interf );
+  ampSq += 2.0 * kappa() * std::real( vz * interf );
 
   return ampSq * funcs / _norm;
 }

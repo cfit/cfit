@@ -18,14 +18,9 @@ class Dataset;
 class Decay3BodyCP : public DecayModel
 {
 private:
-  Amplitude _amp;
-
-  PhaseSpace _ps;
-
-  bool      _hasKappa;
-  Parameter _kappa;
-
-  CoefExpr  _z;
+  bool          _hasKappa;
+  ParameterExpr _kappa;
+  CoefExpr      _phi;
 
   // Constants to speed up norm calculation.
   double                 _nDir;
@@ -94,7 +89,8 @@ public:
   const std::string mSq23name() const { return getVar( 2 ).name(); }
 
   // Getters.
-  const std::complex< double > z()     const { return             _z    .evaluate();       }
+  const std::complex< double > phi()   const { return             _phi  .evaluate();       }
+  const std::complex< double > z()     const { return             std::tanh( phi() );      }
   const double                 kappa() const { return _hasKappa ? _kappa.evaluate() : 1.0; }
 
   // Norm components getters.
