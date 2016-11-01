@@ -497,20 +497,25 @@ const std::map< std::string, double > Decay3BodyCP::generate() const throw( PdfE
     mSq13 = Random::flat( min13, max13 );
     mSq23 = mSqSum - mSq12 - mSq13;
 
-    values[ mSq12name ] = mSq12;
-    values[ mSq13name ] = mSq13;
-    values[ mSq23name ] = mSq23;
+    if ( _ps.contains( mSq12, mSq13, mSq23 ) )
+    {
+      values[ mSq12name ] = mSq12;
+      values[ mSq13name ] = mSq13;
+      values[ mSq23name ] = mSq23;
 
-    pdfVal = this->evaluate( mSq12, mSq13, mSq23 );
+      pdfVal = this->evaluate( mSq12, mSq13, mSq23 );
 
-    if ( pdfVal > _maxPdf )
-      std::cout << "Problem: " << pdfVal << " > " << _maxPdf
-                << " for variables " << mSq12 << " " << mSq13 << " " << mSq23 << std::endl;
+      if ( pdfVal > _maxPdf )
+        std::cout << "Problem: " << pdfVal << " > " << _maxPdf
+                  << " for variables " << mSq12 << " " << mSq13 << " " << mSq23 << " " << _norm << std::endl;
 
-    // Apply the accept-reject decision.
-    if ( Random::flat( 0.0, _maxPdf ) < pdfVal )
-      return values;
+      // Apply the accept-reject decision.
+      if ( Random::flat( 0.0, _maxPdf ) < pdfVal )
+        return values;
+    }
   }
+
+  std::cout << "ALERT: too many attempts trying to generate an event" << std::endl;
 
   values[ mSq12name ] = 0.0;
   values[ mSq13name ] = 0.0;
