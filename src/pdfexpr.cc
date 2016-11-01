@@ -322,7 +322,8 @@ void PdfExpr::setPars( const std::map< std::string, Parameter >& pars ) throw( P
   // Set the local values of the parameters.
   typedef std::map< std::string, Parameter >::const_iterator pIter;
   for ( pIter par = pars.begin(); par != pars.end(); ++par )
-    _parMap[ par->first ].set( par->second.value(), par->second.error() );
+    if ( _parMap.count( par->first ) )
+      _parMap[ par->first ].set( par->second.value(), par->second.error() );
 
   // Propagate the values to the list of pdfs.
   typedef std::vector< PdfModel* >::const_iterator pdfIter;
@@ -336,13 +337,12 @@ void PdfExpr::setPars( const FunctionMinimum& min ) throw( PdfException )
   const MnUserParameters& pars = min.userParameters();
   const std::vector< MinuitParameter >& parVec = pars.parameters();
 
-  if ( _parMap.size() != parVec.size() )
-    throw PdfException( "PdfExpr::setPars( minimum ): Number of arguments passed does not match number of required arguments." );
 
   // Set the local values of the parameters.
   typedef std::vector< MinuitParameter >::const_iterator pIter;
   for ( pIter par = parVec.begin(); par != parVec.end(); ++par )
-    _parMap[ par->name() ].set( par->value(), par->error() );
+    if ( _parMap.count( par->name() ) )
+      _parMap[ par->name() ].set( par->value(), par->error() );
 
   // Propagate the values to the list of pdfs.
   typedef std::vector< PdfModel* >::const_iterator pdfIter;
