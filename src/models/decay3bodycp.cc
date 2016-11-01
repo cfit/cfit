@@ -486,7 +486,7 @@ const std::map< std::string, double > Decay3BodyCP::generate() const throw( PdfE
   double pdfVal  = 0.0;
 
   // Attempts to generate an event.
-  int count = 10000;
+  int count = 50000;
 
   std::map< std::string, double > values;
 
