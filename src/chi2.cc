@@ -14,26 +14,38 @@
 #include <cfit/chi2.hh>
 
 
-Chi2::Chi2( PdfBase& pdf, const Variable& y, const Dataset& data )
+Chi2::Chi2( const PdfModel& pdf, const Variable& y, const Dataset& data )
   : Minimizer( pdf, data ), _y( y )
 {
   _up = 1.0;
 }
 
 
+Chi2::Chi2( const PdfExpr& pdf, const Variable& y, const Dataset& data )
+  : Minimizer( pdf, data ), _y( y )
+{
+  _up = 1.0;
+}
+
+
+Chi2::Chi2( const Chi2& chi2 )
+  : Minimizer( chi2 ), _y( chi2._y )
+{}
+
+
 double Chi2::operator()( const std::vector<double>& pars ) const throw( PdfException )
 {
-  if ( pars.size() != _pdf.nPars() )
+  if ( pars.size() != _pdf->nPars() )
     throw PdfException( "Number of parameters passed does not match number of required arguments." );
 
-  _pdf.setPars( pars );
+  _pdf->setPars( pars );
 
   // Before evaluating the pdf at all data points, cache anything common to
   //    all points (usually compute the norm).
-  _pdf.cache();
+  _pdf->cache();
 
   // Get the vector of variable names that the pdf depends on.
-  std::vector< std::string > varNames = _pdf.varNames();
+  std::vector< std::string > varNames = _pdf->varNames();
   typedef std::vector< std::string >::const_iterator vIter;
 
   // Vector of values of the variables that the pdf must be evaluated at.
@@ -60,7 +72,7 @@ double Chi2::operator()( const std::vector<double>& pars ) const throw( PdfExcep
 	}
 
       // Compute the numerator of the chi^2 term and finish computing the variance.
-      double diff = _pdf.evaluate( vars ) - _data.value( _y.name(), n );
+      double diff = _pdf->evaluate( vars ) - _data.value( _y.name(), n );
       variance += pow( _data.error( _y.name(), n ), 2 );
 
       // Add the term to the chi^2.

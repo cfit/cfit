@@ -15,7 +15,12 @@ private:
   const Variable& _y;
 
 public:
-  Chi2( PdfBase& pdf, const Variable& y, const Dataset& data );
+  Chi2( const PdfModel& pdf, const Variable& y, const Dataset& data );
+  Chi2( const PdfExpr&  pdf, const Variable& y, const Dataset& data );
+
+  Chi2( const Chi2& chi2 );
+
+  Chi2* copy() const { return new Chi2( *this ); }
 
   double operator()( const std::vector<double>& par ) const throw( PdfException );
 };

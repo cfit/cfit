@@ -11,7 +11,12 @@
 class Nll : public Minimizer
 {
 public:
-  Nll( PdfBase& pdf, const Dataset& data );
+  Nll( const PdfModel& pdf, const Dataset& data );
+  Nll( const PdfExpr&  pdf, const Dataset& data );
+
+  Nll( const Nll& nll );
+
+  Nll* copy() const { return new Nll( *this ); }
 
   double operator()( const std::vector<double>& par ) const throw( PdfException );
 };

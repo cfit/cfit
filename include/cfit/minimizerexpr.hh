@@ -18,16 +18,29 @@ private:
   std::vector< const Minimizer* > _minimizers;
   std::map< std::string, Parameter > _parMap;
 
+  void clear()
+  {
+    for ( std::vector< const Minimizer* >::iterator mmzr = _minimizers.begin(); mmzr != _minimizers.end(); ++mmzr )
+      delete *mmzr;
+
+    _parMap.clear();
+  }
+
 public:
   MinimizerExpr()
     : _up( -1.0 ), _verbose( false )
     {}
 
+  ~MinimizerExpr()
+  {
+    clear();
+  }
+
   // Getters.
   double up() const throw( MinimizerException );
 
   // Setters.
-  void setUp  ( const double& up  ) { _up = up;       }
+  void setUp  ( const double& up  ) { _up      = up;  }
   void verbose( const bool&   val ) { _verbose = val; }
 
   double operator()( const std::vector< double >& par ) const throw( PdfException );

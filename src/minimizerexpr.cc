@@ -90,8 +90,8 @@ FunctionMinimum MinimizerExpr::minimize() const
 
 MinimizerExpr& MinimizerExpr::operator=( const Minimizer& right )
 {
-  // If this MinimizerExpr already contains some stuff, it should not be deallocated,
-  //    since MinimizerExpr does not own any of the minimizers it uses.
+  // Deallocate currently owned pointers to minimizers and current _parMap.
+  clear();
 
   // Just assign everything from the given minimizer information.
 
@@ -101,8 +101,7 @@ MinimizerExpr& MinimizerExpr::operator=( const Minimizer& right )
   _parMap = right.pdf().getPars();
 
   // Append the given minimizer.
-  _minimizers.clear();
-  _minimizers.push_back( &right );
+  _minimizers.push_back( right.copy() );
 
   return *this;
 }
@@ -124,7 +123,7 @@ MinimizerExpr& MinimizerExpr::operator+=( const Minimizer& right )
   _parMap.insert( rPars.begin(), rPars.end() );
 
   // Append the given minimizer.
-  _minimizers.push_back( &right );
+  _minimizers.push_back( right.copy() );
 
   return *this;
 }
@@ -143,7 +142,8 @@ MinimizerExpr& MinimizerExpr::operator+=( const MinimizerExpr& right )
   _parMap.insert( right._parMap.begin(), right._parMap.end() );
 
   // Append all the given minimizers.
-  _minimizers.insert( _minimizers.end(), right._minimizers.begin(), right._minimizers.end() );
+  std::transform( right._minimizers.begin(), right._minimizers.end(), std::back_inserter( _minimizers ),
+                  std::mem_fn( &Minimizer::copy ) );
 
   return *this;
 }
@@ -171,8 +171,8 @@ MinimizerExpr operator+( const Minimizer& left, const Minimizer& right )
   total._parMap.insert( rPars.begin(), rPars.end() );
 
   // Append the two given minimizers.
-  total._minimizers.push_back( &left  );
-  total._minimizers.push_back( &right );
+  total._minimizers.push_back( left .copy() );
+  total._minimizers.push_back( right.copy() );
 
   return total;
 }

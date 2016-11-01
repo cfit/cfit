@@ -10,8 +10,8 @@
 
 void Minimizer::cache()
 {
-  const std::map< unsigned, std::vector< double >                 >& cachedR = _pdf.cacheReal   ( _data );
-  const std::map< unsigned, std::vector< std::complex< double > > >& cachedC = _pdf.cacheComplex( _data );
+  const std::map< unsigned, std::vector< double >                 >& cachedR = _pdf->cacheReal   ( _data );
+  const std::map< unsigned, std::vector< std::complex< double > > >& cachedC = _pdf->cacheComplex( _data );
 
   _cacheR.insert( cachedR.begin(), cachedR.end() );
   _cacheC.insert( cachedC.begin(), cachedC.end() );
@@ -27,7 +27,7 @@ FunctionMinimum Minimizer::minimize() const
   typedef std::map< std::string, Parameter >::const_iterator pIter;
 
   // Set the Minuit parameters' name, value and uncertainty.
-  const std::map< std::string, Parameter >& pars = _pdf.getPars();
+  const std::map< std::string, Parameter >& pars = _pdf->getPars();
 
   for ( pIter par = pars.begin(); par != pars.end(); ++par )
   {
