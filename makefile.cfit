@@ -7,6 +7,8 @@ DDIR = dep$(if $(CMTCONFIG),/$(CMTCONFIG))
 ODIR = obj$(if $(CMTCONFIG),/$(CMTCONFIG))
 LDIR = lib$(if $(CMTCONFIG),/$(CMTCONFIG))
 
+CLEANUP = dep obj
+
 #define MPI_ON
 #1
 #endef
@@ -24,8 +26,8 @@ OBJLIST = parameterexpr pdfbase pdfmodel pdfexpr function operation dataset mini
 # There should be no need to change much below this point.
 #-------------------------------------------------------------------
 
-CXX     = g++
-CXXL    = g++
+CXX     = g++ -std=c++0x
+CXXL    = g++ -std=c++0x
 
 ifdef MPI_ON
 # Directory of the MPI implementation.
@@ -39,9 +41,9 @@ endif
 HDRSTR = $(foreach dir,$(HDRDIRS),-I $(dir))
 LIBSTR = $(foreach dir,$(LIBDIRS),-L $(dir)) $(foreach lib,$(LIBLIST),-l$(lib))
 
-CFLAGS  = -g -O -Wall -fPIC -std=c++0x $(HDRSTR)
-DFLAGS  =                   -std=c++0x
-LFLAGS  = -g -O -Wall -fPIC -std=c++0x $(LIBSTR)
+CFLAGS  = -g -O -Wall -fPIC $(HDRSTR)
+DFLAGS  =
+LFLAGS  = -g -O -Wall -fPIC $(LIBSTR)
 
 ifdef MPI_ON
 CFLAGS  += -DMPI_ON
@@ -106,18 +108,23 @@ tidy:
 # This rule cleans up any backups or links to libraries only needed
 #    at compilation time.
 sweep:
-	@ $(RM) $(ELF).out *~ `find -name '*~'` `find -name '\#*'` `find -name '\#*'`
-	@ if [ $(ODIR) != "." ] && [ $(ODIR) != ".." ];	\
-	then						\
-		$(RM) $(ODIR);				\
-	else						\
-		$(RM) *.o;				\
-	fi
+	@ $(RM) $(ELF).out *~ `find -name '*~'` `find -name '\#*'`
 	@ if [ $(DDIR) != "." ] && [ $(DDIR) != ".." ];	\
 	then						\
 		$(RM) $(DDIR);				\
 	else						\
 		$(RM) *.d;				\
 	fi
+	@ if [ $(ODIR) != "." ] && [ $(ODIR) != ".." ];	\
+	then						\
+		$(RM) $(ODIR);				\
+	else						\
+		$(RM) *.o;				\
+	fi
+	@ if [ -n "$(wildcard $(CLEANUP))" ];						\
+	then										\
+		find $(wildcard $(CLEANUP)) -maxdepth 0 -empty -exec $(RM) {} \; ;	\
+	fi
 
 clean: tidy sweep
+
