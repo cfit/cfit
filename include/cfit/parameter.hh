@@ -46,7 +46,18 @@ public:
       _lower    ( 0.0   ),
       _upper    ( 0.0   ),
       _hasLimits( false )
-  {}
+    {}
+
+  Parameter( const Parameter& right )
+    : _name     ( right._name      ),
+      _value    ( right._value     ),
+      _error    ( right._error     ),
+      _isFixed  ( right._isFixed   ),
+      _isBlind  ( right._isBlind   ),
+      _lower    ( right._lower     ),
+      _upper    ( right._upper     ),
+      _hasLimits( right._hasLimits )
+    {}
 
   // Setters.
   void set ( double value, double error = -1. )
@@ -80,6 +91,20 @@ public:
   double      upperLimit() const { return   _upper;     }
   double      lower()      const { return   _lower;     }
   double      lowerLimit() const { return   _lower;     }
+
+  const Parameter& operator=( const Parameter& right )
+  {
+    _name      = right._name;
+    _value     = right._value;
+    _error     = right._error;
+    _isFixed   = right._isFixed;
+    _isBlind   = right._isBlind;
+    _lower     = right._lower;
+    _upper     = right._upper;
+    _hasLimits = right._hasLimits;
+
+    return *this;
+  }
 
   // Arithmetic operators.
   friend const ParameterExpr operator+( const Parameter&     left, const Parameter&     right );
