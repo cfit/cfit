@@ -11,8 +11,8 @@
 
 #include <Minuit/MnPrint.h>
 
-#define MIN   ( -40.0   )
-#define MAX   (  20.0   )
+#define MIN   ( -10.0   )
+#define MAX   (  10.0   )
 #define NBIN  ( 100     )
 #define NEVT  (   1.0e6 )
 
@@ -76,11 +76,13 @@ int main( int argc, char** argv )
   Parameter area ( "area" ,  2.0e5, 300.0   );
   Parameter mu   ( "mu"   ,  0.0  ,   0.003 );
   Parameter sigma( "sigma",  2.0  ,   0.003 );
-  Parameter alpha( "alpha",  1.0  ,   0.003 );
+  Parameter alpha( "alpha", -0.7  ,   0.003 );
   Parameter n    ( "n"    ,  1.7  ,   0.003 );
 
   // Definition of the pdf.
   CrystalBall cb( x, mu, sigma, alpha, n );
+
+  cb.setLimits( -8.0, 8.0 );
 
   if ( std::string( argv[ 1 ] ) == "gen" )
   {
