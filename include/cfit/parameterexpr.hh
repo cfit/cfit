@@ -67,6 +67,11 @@ public:
     append( par );
   }
 
+  ParameterExpr( const double& ctt )
+  {
+    append( ctt );
+  }
+
   // Return a map from parameter names to parameters for all parameters used in the expression.
   const std::map< std::string, Parameter > getPars() const;
 
