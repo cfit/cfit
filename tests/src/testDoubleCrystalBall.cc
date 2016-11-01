@@ -5,7 +5,7 @@
 #include <cfit/variable.hh>
 #include <cfit/dataset.hh>
 #include <cfit/chi2.hh>
-#include <cfit/pdf.hh>
+#include <cfit/pdfexpr.hh>
 
 #include <cfit/models/doublecrystalball.hh>
 
@@ -111,7 +111,7 @@ int main( int argc, char** argv )
     readData( "data/doublecrystalball.dat", data );
 
     // Define the pdf to be fitted.
-    Pdf sum = area * cb;
+    PdfExpr sum = area * cb;
 
     // Definition of the minimizer from the pdf.
     Chi2 chi2( sum, y, data );

@@ -5,7 +5,7 @@
 #include <cfit/variable.hh>
 #include <cfit/dataset.hh>
 #include <cfit/chi2.hh>
-#include <cfit/pdf.hh>
+#include <cfit/pdfexpr.hh>
 
 #include <cfit/models/gauss.hh>
 
@@ -84,7 +84,7 @@ int main( int argc, char** argv )
 
   if ( std::string( argv[ 1 ] ) == "gen" )
   {
-    Pdf sum = g1 + g2;
+    PdfExpr sum = g1 + g2;
 
     // Open the output file.
     std::ofstream output( "data/gauss.dat" );
@@ -111,7 +111,7 @@ int main( int argc, char** argv )
     readData( "data/gauss.dat", data );
 
     // Define the pdf to be fitted.
-    Pdf sum = area * ( pow( sin( phi ), 2 ) * g1 + pow( cos( phi ), 2 ) * g2 );
+    PdfExpr sum = area * ( pow( sin( phi ), 2 ) * g1 + pow( cos( phi ), 2 ) * g2 );
 
     // Definition of the minimizer from the pdf.
     Chi2 chi2( sum, y, data );
