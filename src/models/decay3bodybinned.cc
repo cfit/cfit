@@ -10,16 +10,16 @@
 
 Decay3BodyBinned::Decay3BodyBinned( const Variable&        bin    ,
                                     const BinnedAmplitude& amp    ,
-                                    const CoefExpr&        z      ,
+                                    const CoefExpr&        phi    ,
                                     bool                   docache  )
-  : _amp( amp ), _hasKappa( false ), _z( z ),
+  : _amp( amp ), _hasKappa( false ), _phi( phi ),
     _nDir( 0.0 ), _nXed( 0.0 ), _norm( 1.0 ), _fixedAmp( false ),
     _cacheAmps( false ), _ampDirCache( 0 ), _ampCnjCache( 0 )
 {
   push( bin );
 
   push( amp );
-  push( z   );
+  push( phi );
 
   // Do calculations common to all values of variables
   //    (usually compute norm).
@@ -31,17 +31,17 @@ Decay3BodyBinned::Decay3BodyBinned( const Variable&        bin    ,
 
 Decay3BodyBinned::Decay3BodyBinned( const Variable&         bin    ,
                                     const BinnedAmplitude&  amp    ,
-                                    const CoefExpr&         z      ,
+                                    const CoefExpr&         phi    ,
                                     const Parameter&        kappa  ,
                                     bool                    docache  )
-  : _amp( amp ), _hasKappa( true ), _kappa( kappa ), _z( z ),
+  : _amp( amp ), _hasKappa( true ), _kappa( kappa ), _phi( phi ),
     _nDir( 0.0 ), _nXed( 0.0 ), _norm( 1.0 ), _fixedAmp( false ),
     _cacheAmps( false ), _ampDirCache( 0 ), _ampCnjCache( 0 )
 {
   push( bin );
 
   push( amp   );
-  push( z     );
+  push( phi   );
   push( kappa );
 
   // Do calculations common to all values of variables
@@ -55,17 +55,17 @@ Decay3BodyBinned::Decay3BodyBinned( const Variable&         bin    ,
 
 Decay3BodyBinned::Decay3BodyBinned( const Variable&         bin    ,
                                     const BinnedAmplitude&  amp    ,
-                                    const CoefExpr&         z      ,
+                                    const CoefExpr&         phi    ,
                                     const ParameterExpr&    kappa  ,
                                     bool                    docache  )
-  : _amp( amp ), _hasKappa( true ), _kappa( kappa ), _z( z ),
+  : _amp( amp ), _hasKappa( true ), _kappa( kappa ), _phi( phi ),
     _nDir( 0.0 ), _nXed( 0.0 ), _norm( 1.0 ), _fixedAmp( false ),
     _cacheAmps( false ), _ampDirCache( 0 ), _ampCnjCache( 0 )
 {
   push( bin );
 
   push( amp   );
-  push( z     );
+  push( phi   );
   push( kappa );
 
   // Do calculations common to all values of variables
@@ -87,7 +87,7 @@ Decay3BodyBinned* Decay3BodyBinned::copy() const
 
 void Decay3BodyBinned::setParExpr()
 {
-  _z.setPars( _parMap );
+  _phi.setPars( _parMap );
 
   // Propagate the kappa parameter value if necessary.
   if ( _hasKappa )

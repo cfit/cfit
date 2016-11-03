@@ -23,7 +23,7 @@ private:
   bool          _hasKappa;
   ParameterExpr _kappa;
 
-  CoefExpr  _z;
+  CoefExpr      _phi;
 
   // Constants to speed up norm calculation.
   double _nDir;
@@ -73,7 +73,8 @@ public:
   Decay3BodyBinned* copy() const;
 
   // Getters.
-  const std::complex< double > z()     const { return             _z    .evaluate(); }
+  const std::complex< double > phi()   const { return             _phi  .evaluate();       }
+  const std::complex< double > z()     const { return             std::tanh( phi() );      }
   const double                 kappa() const { return _hasKappa ? _kappa.evaluate() : 1.0; }
 
   // Norm components getters.
