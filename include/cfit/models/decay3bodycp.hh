@@ -15,7 +15,7 @@
 
 class Dataset;
 
-class Decay3BodyCP : public DecayModel
+class Decay3BodyCP : public DecayModel< Amplitude >
 {
 private:
   bool          _hasKappa;

@@ -84,6 +84,17 @@ void PdfModel::push( const Amplitude& amp )
 
 
 
+// Push all the parameters in a binned amplitude.
+void PdfModel::push( const BinnedAmplitude& amp )
+{
+  const std::map< std::string, Parameter >& pars = amp.getPars();
+  typedef std::map< const std::string, Parameter >::const_iterator pIter;
+  for ( pIter par = pars.begin(); par != pars.end(); ++par )
+    push( par->second );
+}
+
+
+
 // Retrieve the mapped variable with same name as argument.
 const Variable& PdfModel::getVar( const Variable& var ) const
 {

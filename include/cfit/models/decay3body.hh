@@ -12,7 +12,7 @@
 #include <Minuit/FunctionMinimum.h>
 
 
-class Decay3Body : public DecayModel
+class Decay3Body : public DecayModel< Amplitude >
 {
 private:
   double _norm;

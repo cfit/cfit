@@ -16,7 +16,7 @@
 
 class Dataset;
 
-class Decay3BodyMix : public DecayModel
+class Decay3BodyMix : public DecayModel< Amplitude >
 {
 private:
   // Names of the squared invariant mass and life time variables.

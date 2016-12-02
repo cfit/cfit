@@ -10,6 +10,7 @@
 #include <cfit/parameterexpr.hh>
 #include <cfit/resonance.hh>
 #include <cfit/amplitude.hh>
+#include <cfit/binnedamplitude.hh>
 #include <cfit/pdfbase.hh>
 #include <cfit/pdfexpr.hh>
 #include <cfit/region.hh>
@@ -25,13 +26,14 @@ protected:
   std::vector< std::string > _varOrder;
   std::vector< std::string > _parOrder;
 
-  void push( const Variable&      var  );
-  void push( const Parameter&     par  );
-  void push( const Coef&          coef );
-  void push( const ParameterExpr& expr );
-  void push( const CoefExpr&      expr );
-  void push( const Resonance&     reso );
-  void push( const Amplitude&     amp  );
+  void push( const Variable&        var  );
+  void push( const Parameter&       par  );
+  void push( const Coef&            coef );
+  void push( const ParameterExpr&   expr );
+  void push( const CoefExpr&        expr );
+  void push( const Resonance&       reso );
+  void push( const Amplitude&       amp  );
+  void push( const BinnedAmplitude& amp  );
 
   const Variable&  getVar( const Variable&  var ) const;
   const Variable&  getVar( const int&       idx ) const;
