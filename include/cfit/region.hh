@@ -17,14 +17,19 @@ public:
   Region() {}
 
   // Setters.
-  void setLimit( const std::string& name, const double& lower, const double& upper )
+  void setLimits( const std::string& name, const std::pair< double, double >& limits )
+  {
+    _limits[ name ] = limits;
+  }
+
+  void setLimits( const std::string& name, const double& lower, const double& upper )
   {
     _limits[ name ] = std::make_pair( lower, upper );
   }
 
   // Getters.
   const spMap&                       limits     ()                          const { return _limits;               }
-  const bool                         hasLimit   ( const std::string& name ) const { return _limits.count( name ); }
+  const bool                         hasLimits  ( const std::string& name ) const { return _limits.count( name ); }
   const std::vector< std::string >   limitedPars()                          const
   {
     std::vector< std::string > names;
@@ -36,7 +41,7 @@ public:
     return names;
   }
 
-  const std::pair< double, double >& limit      ( const std::string& name ) const
+  const std::pair< double, double >& limits     ( const std::string& name ) const
   {
     return _limits.at( name );
   }
