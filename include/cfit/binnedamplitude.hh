@@ -41,6 +41,8 @@ public:
 
   // const bool isFixed() const;
 
+  const unsigned& nBins() const { return _nbins; }
+
   const std::map< std::string, Parameter >& getPars() const { return _parMap; };
   void setPars( const std::map< std::string, Parameter >& pars );
 
