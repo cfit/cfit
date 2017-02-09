@@ -12,7 +12,7 @@
 class Chi2 : public Minimizer
 {
 private:
-  const Variable& _y;
+  const Variable _y;
 
 public:
   Chi2( const PdfModel& pdf, const Variable& y, const Dataset& data );
