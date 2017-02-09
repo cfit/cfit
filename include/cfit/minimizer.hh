@@ -17,8 +17,8 @@ private:
   void cache();
 
 protected:
-  PdfBase*       _pdf;
-  const Dataset& _data;
+  PdfBase*      _pdf;
+  const Dataset _data;
 
   // Minimizer variation to produce uncertaities at a given number of sigmas.
   //    Notice that, if the user wants n-sigma uncertainties, up = n^2.
