@@ -52,7 +52,7 @@ public:
 
   const double                 getT( const int& bin ) const
   {
-    if ( std::abs( bin ) > _nbins )
+    if ( std::abs( bin ) > (int) _nbins )
       throw PdfException( "BinnedAmplitude: requesting invalid bin" );
 
     return ( ( bin > 0 ) ? _tpb[ bin - 1 ] : _tmb[ std::abs( bin ) - 1 ] ).value();
@@ -60,7 +60,7 @@ public:
 
   const std::complex< double > getX( const int& bin ) const
   {
-    if ( std::abs( bin ) > _nbins )
+    if ( std::abs( bin ) > (int) _nbins )
       throw PdfException( "BinnedAmplitude: requesting invalid bin" );
 
     return ( bin > 0 ) ? _xb[ bin - 1 ].evaluate() : std::conj( _xb[ std::abs( bin ) - 1 ].evaluate() );
