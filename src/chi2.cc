@@ -59,7 +59,7 @@ double Chi2::operator()( const std::vector<double>& pars ) const throw( PdfExcep
     {
       // Initialize the value of the variance for the current entry.
       //    It must be s_y^2 + Sum( s_x^2 ).
-      double variance = 0.;
+      double variance = 0.0;
 
       // Reset the vector of values of the variables.
       vars.clear();
