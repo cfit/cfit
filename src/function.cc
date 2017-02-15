@@ -115,7 +115,8 @@ void Function::setPars( const FunctionMinimum& min ) throw( PdfException )
 
   typedef std::vector< MinuitParameter >::const_iterator pIter;
   for ( pIter par = parVec.begin(); par != parVec.end(); ++par )
-    _parMap[ par->name() ].set( par->value(), par->error() );
+    if ( _parMap.count( par->name() ) )
+      _parMap[ par->name() ].set( par->value(), par->error() );
 }
 
 
