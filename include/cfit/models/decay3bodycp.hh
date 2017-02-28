@@ -42,9 +42,6 @@ private:
   // Vector to cache values of the amplitude for the norm evaluation.
   std::vector< std::complex< double > > _ampCache;
 
-  const double evaluateFuncs( const double& mSq12, const double& mSq13, const double& mSq23 ) const;
-  const double evaluateFuncs( const double& mSq12, const double& mSq13                      ) const;
-
   // Auxiliary function to compute the center of a bin.
   static const double binCenter( const unsigned& bin, const unsigned& nbins, const double& min, const double& max )
   {
