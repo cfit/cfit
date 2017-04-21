@@ -1,5 +1,6 @@
 
 #include <cmath>
+#include <algorithm>
 
 #include <cfit/phasespace.hh>
 
@@ -30,6 +31,26 @@ const double PhaseSpace::kallen( const double& x, const double& y, const double&
   result -= 2. * y * z;
 
   return result;
+}
+
+
+const double PhaseSpace::mSq12min( const double& mSq13 ) const
+{
+  double first  = std::pow( _mSqMother + _mSq1 - _mSq2 - _mSq3, 2 );
+  double second = std::sqrt( kallen( mSq13, _mSq1     , _mSq3 ) );
+  double third  = std::sqrt( kallen( mSq13, _mSqMother, _mSq2 ) );
+
+  return ( first - std::pow( second + third, 2 ) ) / ( 4. * mSq13 );
+}
+
+
+const double PhaseSpace::mSq12max( const double& mSq13 ) const
+{
+  double first  = std::pow( _mSqMother + _mSq1 - _mSq2 - _mSq3, 2 );
+  double second = std::sqrt( kallen( mSq13, _mSq1     , _mSq3 ) );
+  double third  = std::sqrt( kallen( mSq13, _mSqMother, _mSq2 ) );
+
+  return ( first - std::pow( second - third, 2 ) ) / ( 4. * mSq13 );
 }
 
 
@@ -73,6 +94,37 @@ const double PhaseSpace::mSq23max( const double& mSq12 ) const
 }
 
 
+
+const double PhaseSpace::mSq23min( const double& mSq12, const double& mSq13 ) const
+{
+  double first12  = std::pow( _mSqMother - _mSq1 + _mSq2 - _mSq3, 2 );
+  double second12 = std::sqrt( kallen( mSq12, _mSq1     , _mSq2 ) );
+  double third12  = std::sqrt( kallen( mSq12, _mSqMother, _mSq3 ) );
+
+  double first13  = std::pow( _mSqMother - _mSq1 - _mSq2 + _mSq3, 2 );
+  double second13 = std::sqrt( kallen( mSq13, _mSq1     , _mSq3 ) );
+  double third13  = std::sqrt( kallen( mSq13, _mSqMother, _mSq2 ) );
+
+  return std::max( ( first12 - std::pow( second12 + third12, 2 ) ) / ( 4. * mSq12 ),
+                   ( first13 - std::pow( second13 + third13, 2 ) ) / ( 4. * mSq13 ) );
+}
+
+
+const double PhaseSpace::mSq23max( const double& mSq12, const double& mSq13 ) const
+{
+  double first12  = std::pow( _mSqMother - _mSq1 + _mSq2 - _mSq3, 2 );
+  double second12 = std::sqrt( kallen( mSq12, _mSq1     , _mSq2 ) );
+  double third12  = std::sqrt( kallen( mSq12, _mSqMother, _mSq3 ) );
+
+  double first13  = std::pow( _mSqMother - _mSq1 - _mSq2 + _mSq3, 2 );
+  double second13 = std::sqrt( kallen( mSq13, _mSq1     , _mSq3 ) );
+  double third13  = std::sqrt( kallen( mSq13, _mSqMother, _mSq2 ) );
+
+  return std::min( ( first12 - std::pow( second12 - third12, 2 ) ) / ( 4. * mSq12 ),
+                   ( first13 - std::pow( second13 - third13, 2 ) ) / ( 4. * mSq13 ) );
+}
+
+
 const double PhaseSpace::mSq( unsigned index ) const
 {
   if ( index == 0 )
@@ -107,8 +159,9 @@ const double PhaseSpace::m( unsigned index ) const
 // Check if the kinematically allowed region contains a given point.
 bool PhaseSpace::contains( const double& mSq12, const double& mSq13, const double& mSq23 ) const
 {
-  return ( mSq13 > mSq13min( mSq12 ) ) && ( mSq13 < mSq13max( mSq12 ) ) &&
-         ( mSq23 > mSq23min( mSq12 ) ) && ( mSq23 < mSq23max( mSq12 ) );
+  return ( mSq12 > mSq12min( mSq13        ) ) && ( mSq12 < mSq12max( mSq13        ) ) &&
+         ( mSq13 > mSq13min( mSq12        ) ) && ( mSq13 < mSq13max( mSq12        ) ) &&
+         ( mSq23 > mSq23min( mSq12, mSq13 ) ) && ( mSq23 < mSq23max( mSq12, mSq13 ) );
 }
 
 

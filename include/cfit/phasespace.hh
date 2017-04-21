@@ -41,10 +41,14 @@ public:
   const double m  ( unsigned index ) const;
   const double mSq( unsigned index ) const;
 
+  const double mSq12min( const double& mSq13 ) const;
+  const double mSq12max( const double& mSq13 ) const;
   const double mSq13min( const double& mSq12 ) const;
   const double mSq13max( const double& mSq12 ) const;
   const double mSq23min( const double& mSq12 ) const;
   const double mSq23max( const double& mSq12 ) const;
+  const double mSq23min( const double& mSq12, const double& mSq13 ) const;
+  const double mSq23max( const double& mSq12, const double& mSq13 ) const;
 
   const double mSq12min() const { return std::pow( _m1      + _m2, 2 ); };
   const double mSq12max() const { return std::pow( _mMother - _m3, 2 ); };
