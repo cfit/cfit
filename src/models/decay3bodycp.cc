@@ -17,7 +17,8 @@ Decay3BodyCP::Decay3BodyCP( const Variable&   mSq12  ,
                             bool              docache  )
   : DecayModel( mSq12, mSq13, mSq23, amp, ps ), _hasKappa( false ), _phi( phi ),
     _nDir( 0.0 ), _nCnj( 0.0 ), _nXed( 0.0 ), _norm( 1.0 ), _fixed( false ),
-    _maxPdf( 14.0 ), _cacheAmps( false ), _ampDirCache( 0 ), _ampCnjCache( 0 )
+    _maxPdf( 14.0 ), _cacheAmps( false ), _ampDirCache( 0 ), _ampCnjCache( 0 ),
+    _nIntegSteps( 400 )
 {
   push( phi );
 
@@ -40,7 +41,8 @@ Decay3BodyCP::Decay3BodyCP( const Variable&   mSq12  ,
                             bool              docache  )
   : DecayModel( mSq12, mSq13, mSq23, amp, ps ), _hasKappa( true ), _kappa( kappa ), _phi( phi ),
     _nDir( 0.0 ), _nCnj( 0.0 ), _nXed( 0.0 ), _norm( 1.0 ), _fixed( false ),
-    _maxPdf( 14.0 ), _cacheAmps( false ), _ampDirCache( 0 ), _ampCnjCache( 0 )
+    _maxPdf( 14.0 ), _cacheAmps( false ), _ampDirCache( 0 ), _ampCnjCache( 0 ),
+    _nIntegSteps( 400 )
 {
   push( phi   );
   push( kappa );
@@ -65,7 +67,8 @@ Decay3BodyCP::Decay3BodyCP( const Variable&      mSq12  ,
                             bool                 docache  )
   : DecayModel( mSq12, mSq13, mSq23, amp, ps ), _hasKappa( true ), _kappa( kappa ), _phi( phi ),
     _nDir( 0.0 ), _nCnj( 0.0 ), _nXed( 0.0 ), _norm( 1.0 ), _fixed( false ),
-    _maxPdf( 14.0 ), _cacheAmps( false ), _ampDirCache( 0 ), _ampCnjCache( 0 )
+    _maxPdf( 14.0 ), _cacheAmps( false ), _ampDirCache( 0 ), _ampCnjCache( 0 ),
+    _nIntegSteps( 400 )
 {
   push( phi   );
   push( kappa );
@@ -113,12 +116,9 @@ void Decay3BodyCP::cache()
   _norm = 0.0;
 
   // Define the properties of the integration method.
-  const int&   nBins = 400;
-  if ( nBins < 400 )
-    std::cout << "\e[91mALERT: calculating normalisation with only " << nBins << " bins.\e[0m" << std::endl;
   const double min   = _ps.mSq12min();
   const double max   = _ps.mSq12max();
-  const double step  = ( max - min ) / double( nBins );
+  const double step  = ( max - min ) / double( _nIntegSteps );
 
   const double mSqSum = _ps.mSqSum();
 
@@ -127,7 +127,7 @@ void Decay3BodyCP::cache()
   bool cachedAmp   = ! _ampCache.empty();
   bool needToCache = ! cachedAmp && _amp.isFixed();
   if ( needToCache )
-    _ampCache.resize( std::pow( nBins, 2 ) );
+    _ampCache.resize( std::pow( _nIntegSteps, 2 ) );
 
   // Define the variables at each bin.
   double mSq12;
@@ -142,8 +142,8 @@ void Decay3BodyCP::cache()
   unsigned binCnj;
 
   // Compute the integral on the grid.
-  for ( int binX = 0; binX < nBins; ++binX )
-    for ( int binY = 0; binY < nBins; ++binY )
+  for ( unsigned binX = 0; binX < _nIntegSteps; ++binX )
+    for ( unsigned binY = 0; binY < _nIntegSteps; ++binY )
     {
       mSq12 = min + step * ( binX + 0.5 );
       mSq13 = min + step * ( binY + 0.5 );
@@ -158,8 +158,8 @@ void Decay3BodyCP::cache()
         // If the amplitude is fixed, but the efficiency is not, use cached amplitude values.
         if ( cachedAmp )
         {
-          binDir = nBins * binX + binY;
-          binCnj = nBins * binY + binX;
+          binDir = _nIntegSteps * binX + binY;
+          binCnj = _nIntegSteps * binY + binX;
 
           ampDir = _ampCache[ binDir ];
           ampCnj = _ampCache[ binCnj ];
@@ -170,7 +170,7 @@ void Decay3BodyCP::cache()
           ampCnj = _amp.evaluate( _ps, mSq13, mSq12, mSq23 );
 
           if ( needToCache )
-            _ampCache[ nBins * binX + binY ] = ampDir;
+            _ampCache[ _nIntegSteps * binX + binY ] = ampDir;
         }
 
         _nDir += std::norm( ampDir ) * funcs;
@@ -235,7 +235,7 @@ const std::map< unsigned, std::vector< std::complex< double > > > Decay3BodyCP::
 const double Decay3BodyCP::evaluateUnnorm( const double& mSq12, const double& mSq13, const double& mSq23 ) const throw( PdfException )
 {
   if ( ! _ps.contains( mSq12, mSq13, mSq23 ) )
-    return 0;
+    return 0.0;
 
   // Phase space amplitude of the decay of the particle.
   std::complex< double > ampDir = _amp.evaluate( _ps, mSq12, mSq13, mSq23 );
@@ -288,11 +288,10 @@ const double Decay3BodyCP::project( const std::string& varName, const double& x 
   const double& max = _ps.mSqMax( ( index + 1 ) % 3 );
 
   // Integrate the model.
-  const int& nbins = 400;
   double proj = 0.0;
-  for ( int yBin = 0; yBin < nbins; ++yBin )
+  for ( unsigned yBin = 0; yBin < _nIntegSteps; ++yBin )
   {
-    double y = binCenter( yBin, nbins, min, max );
+    double y = binCenter( yBin, _nIntegSteps, min, max );
     double z = _ps.mSqSum() - x - y;
 
     if ( index == 0 ) proj += evaluate( x, y, z );
@@ -300,7 +299,7 @@ const double Decay3BodyCP::project( const std::string& varName, const double& x 
     if ( index == 2 ) proj += evaluate( y, z, x );
   }
 
-  proj *= ( max - min ) / double( nbins );
+  proj *= ( max - min ) / double( _nIntegSteps );
 
   return proj;
 }

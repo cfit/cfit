@@ -42,6 +42,9 @@ private:
   // Vector to cache values of the amplitude for the norm evaluation.
   std::vector< std::complex< double > > _ampCache;
 
+  // Number of integration steps in each direction.
+  unsigned _nIntegSteps;
+
   // Auxiliary function to compute the center of a bin.
   static const double binCenter( const unsigned& bin, const unsigned& nbins, const double& min, const double& max )
   {
@@ -96,6 +99,12 @@ public:
   const double&                 nDir() const { return _nDir; }
   const double&                 nCnj() const { return _nCnj; }
   const std::complex< double >& nXed() const { return _nXed; }
+
+  // Getter of the number of integration steps.
+  const unsigned& integrationSteps() const { return _nIntegSteps; }
+
+  // Setters.
+  void setIntegrationSteps( const unsigned& steps ) { _nIntegSteps = steps; }
 
   // Norm components setters.
   void setNormComponents( const double& nDir, const double& nCnj, const std::complex< double >& nXed )
