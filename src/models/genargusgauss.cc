@@ -309,11 +309,20 @@ void GenArgusGauss::setParExpr()
   _p    .setPars( _parMap );
   _mu   .setPars( _parMap );
   _sigma.setPars( _parMap );
+
+  // When parameters are set, no cached values are valid anymore.
+  _areas.clear();
 }
 
 
 const double GenArgusGauss::area( const double& min, const double& max ) const throw( PdfException )
 {
+  std::pair< double, double > range = std::make_pair( min, max );
+
+  // If any cached value can be used, use it.
+  if ( _areas.count( range ) )
+    return _areas.at( range );
+
   // Set the limits of integration.
   const double& xmin = _hasLower ? std::max( min, _lower ) : min;
   const double& xmax = _hasUpper ? std::min( max, _upper ) : max;
@@ -326,6 +335,9 @@ const double GenArgusGauss::area( const double& min, const double& max ) const t
   double retval = 0.0;
   for ( double x = xmin; x < xmax; x += dx )
     retval += evaluate( x );
+
+  // Cache the calculation of the area for this range.
+  _areas[ range ] = retval * dx;
 
   return retval * dx;
 }

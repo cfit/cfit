@@ -32,6 +32,9 @@ private:
   bool     _doCache;
   unsigned _cacheIdx;
 
+  // Intented to cache areas within a range.
+  mutable std::map< std::pair< double, double >, double > _areas;
+
   const double genargus     ( const double& x ) const;
   const double gauss        ( const double& x ) const;
   const double genargusgauss( const double& x ) const;
