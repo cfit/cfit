@@ -145,7 +145,15 @@ public:
                          const std::vector< double >&                 cacheR,
                          const std::vector< std::complex< double > >& cacheC           ) const throw( PdfException );
 
-  const double project ( const std::string& varName, const double& value ) const throw( PdfException );
+  virtual const double project ( const std::string& varName, const double& value                ) const throw( PdfException );
+  virtual const double project ( const std::string& varName, const double& value, const Region& ) const throw( PdfException )
+  {
+    // Ignore region.
+    return project( varName, value );
+  }
+
+  // Do not override other project members defined in PdfModel.
+  using PdfModel::project;
 
   void setMaxPdf( const double& max ) { _maxPdf = max; }
   const std::map< std::string, double > generate() const throw( PdfException );
