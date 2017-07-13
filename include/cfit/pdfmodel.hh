@@ -105,11 +105,13 @@ public:
     if ( this->dependsOn( varName ) )
       return this->evaluate( value );
 
-    const   std::map< const std::string, std::pair< double, double > > limits = region.limits();
-    typedef std::map< const std::string, std::pair< double, double > > spMap;
-    typedef spMap::const_iterator                                      spmIter;
+    typedef const std::map< const std::string, std::pair< double, double > > cspMap;
 
-    for ( spmIter limit = limits.begin(); limit != limits.end(); ++limit )
+    // Check if there's any variable that should be integrated over some region.
+    cspMap& limits = region.limits();
+    cspMap::const_iterator begin = limits.begin();
+    cspMap::const_iterator end   = limits.end();
+    for ( cspMap::const_iterator limit = begin; limit != end; ++limit )
       if ( this->dependsOn( limit->first ) )
         return this->area( limit->second.first, limit->second.second );
 
