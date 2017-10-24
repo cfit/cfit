@@ -27,7 +27,20 @@ void Dataset::push( const std::map< std::string, double >& event )
 }
 
 
+// Add event from map of fields and pair of values and errors.
+void Dataset::push( const datum_type& event )
+{
+  for ( datum_type::const_iterator entry = event.begin(); entry != event.end(); ++entry )
+    _data[ entry->first ].push_back( entry->second );
+}
+
+
 // Getters.
+bool Dataset::empty() const
+{
+  return _data.empty();
+}
+
 std::size_t Dataset::size() const
 {
   if ( _data.empty() )
@@ -35,6 +48,19 @@ std::size_t Dataset::size() const
 
   return _data.begin()->second.size();
 }
+
+
+const Dataset::datum_type Dataset::entry( const std::size_t& index ) const
+{
+  Dataset::datum_type ret;
+
+  for ( std::map< std::string, std::vector< std::pair< double, double > > >::const_iterator b = _data.begin();
+        b != _data.end(); ++b )
+    ret.emplace( b->first, b->second.at( index ) );
+
+  return ret;
+}
+
 
 
 double Dataset::value( const std::string& field, int entry ) const throw( DataException )
@@ -92,6 +118,36 @@ std::vector< std::string > Dataset::fields() const
   std::transform( _data.begin(), _data.end(), std::back_inserter( fieldVect ), Select1st() );
 
   return fieldVect;
+}
+
+
+
+const Dataset Dataset::slice( const Region& region ) const
+{
+  std::map< const std::string, std::pair< double, double > > limits = region.limits();
+
+  Dataset ret;
+
+  bool accept; // To decide whether a given entry passes the region cuts.
+  std::size_t nentries = this->size();
+  for ( std::size_t e = 0; e < nentries; ++e )
+  {
+    // Check if this entry passes all the region cuts.
+    const datum_type& entry = this->entry( e );
+    accept = true;
+    for ( std::map< const std::string, std::pair< double, double > >::const_iterator limit = limits.begin();
+          accept && ( limit != limits.end() ); ++limit )
+    {
+      accept &= entry.at( limit->first ).first > limit->second.first;
+      accept &= entry.at( limit->first ).first < limit->second.second;
+    }
+
+    // If this entry passes all the region cuts, include it in the result dataset.
+    if ( accept )
+      ret.push( entry );
+  }
+
+  return ret;
 }
 
 
