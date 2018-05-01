@@ -27,7 +27,7 @@ void CoefExpr::append( const Parameter& par )
 void CoefExpr::append( const ParameterExpr& expr )
 {
   // Inserting real constants as complex should not be a problem.
-//   _ctnts.insert( _ctnts.end(), expr._ctnts.begin(), expr._ctnts.end() );
+  _ctnts.insert( _ctnts.end(), expr._ctnts.begin(), expr._ctnts.end() );
   _parms.insert( _parms.end(), expr._parms.begin(), expr._parms.end() );
   _opers.insert( _opers.end(), expr._opers.begin(), expr._opers.end() );
 
