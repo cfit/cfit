@@ -26,16 +26,20 @@ private:
   unsigned _nbins;
 
   // Vectors of the T_{+b}, T_{-b} parameters and X_b coefficients.
-  std::vector< Parameter > _tpb;
-  std::vector< Parameter > _tmb;
-  std::vector< CoefExpr  > _xb;
+  std::vector< ParameterExpr > _npb;
+  std::vector< ParameterExpr > _nmb;
+  std::vector< CoefExpr      > _xb;
 
 public:
   BinnedAmplitude() = default;
 
-  BinnedAmplitude( const std::vector< Parameter >& tpb,
-                   const std::vector< Parameter >& tmb,
+  BinnedAmplitude( const std::vector< Parameter >& npb,
+                   const std::vector< Parameter >& nmb,
                    const std::vector< CoefExpr  >& xb  );
+
+  BinnedAmplitude( const std::vector< ParameterExpr >& npb,
+                   const std::vector< ParameterExpr >& nmb,
+                   const std::vector< CoefExpr      >& xb  );
 
   ~BinnedAmplitude() {}
 
@@ -46,16 +50,16 @@ public:
   const std::map< std::string, Parameter >& getPars() const { return _parMap; };
   void setPars( const std::map< std::string, Parameter >& pars );
 
-  const std::vector< Parameter >& tpb() const { return _tpb; }
-  const std::vector< Parameter >& tmb() const { return _tmb; }
-  const std::vector< CoefExpr  >& xb()  const { return _xb;  }
+  const std::vector< ParameterExpr >& npb() const { return _npb; }
+  const std::vector< ParameterExpr >& nmb() const { return _nmb; }
+  const std::vector< CoefExpr      >& xb()  const { return _xb;  }
 
-  const double                 getT( const int& bin ) const
+  const double                 getN( const int& bin ) const
   {
     if ( std::abs( bin ) > (int) _nbins )
       throw PdfException( "BinnedAmplitude: requesting invalid bin" );
 
-    return ( ( bin > 0 ) ? _tpb[ bin - 1 ] : _tmb[ std::abs( bin ) - 1 ] ).value();
+    return ( ( bin > 0 ) ? _npb[ bin - 1 ] : _nmb[ std::abs( bin ) - 1 ] ).evaluate();
   }
 
   const std::complex< double > getX( const int& bin ) const
@@ -69,8 +73,8 @@ public:
 
   const std::tuple< double, double, std::complex< double > > evaluate( const int& bin ) const
   {
-    const double&&                 tpb = getT(   bin );
-    const double&&                 tmb = getT( - bin );
+    const double&&                 tpb = getN(   bin );
+    const double&&                 tmb = getN( - bin );
     const std::complex< double >&& txb = std::sqrt( tpb * tmb ) * getX( bin );
     return std::tuple< double, double, std::complex< double > >( tpb, tmb, txb );
   }

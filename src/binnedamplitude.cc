@@ -11,23 +11,29 @@
 
 
 
-BinnedAmplitude::BinnedAmplitude( const std::vector< Parameter >& tpb,
-                                  const std::vector< Parameter >& tmb,
+BinnedAmplitude::BinnedAmplitude( const std::vector< Parameter >& npb,
+                                  const std::vector< Parameter >& nmb,
                                   const std::vector< CoefExpr  >& xb  )
-  : _nbins( tpb.size() ),
-    _tpb( tpb ), _tmb( tmb ), _xb( xb )
+  : _nbins( npb.size() ),
+    _xb( xb )
 {
-  if ( _tmb.size() != _nbins )
+  for ( std::vector< Parameter >::const_iterator par = npb.begin(); par != npb.end(); ++par )
+    _npb.push_back( *par );
+
+  for ( std::vector< Parameter >::const_iterator par = nmb.begin(); par != nmb.end(); ++par )
+    _nmb.push_back( *par );
+
+  if ( _nmb.size() != _nbins )
     throw PdfException( "BinnedAmplitude: squared amplitude vectors must have the same size." );
 
   if ( _xb.size() != _nbins )
     throw PdfException( "BinnedAmplitude: squared amplitude and crossed amplitude vectors must have the same size." );
 
-  for ( std::vector< Parameter >::const_iterator tp = tpb.begin(); tp != tpb.end(); ++tp )
-    _parMap.emplace( tp->name(), *tp );
+  for ( std::vector< Parameter >::const_iterator np = npb.begin(); np != npb.end(); ++np )
+    _parMap.emplace( np->name(), *np );
 
-  for ( std::vector< Parameter >::const_iterator tm = tmb.begin(); tm != tmb.end(); ++tm )
-    _parMap.emplace( tm->name(), *tm );
+  for ( std::vector< Parameter >::const_iterator nm = nmb.begin(); nm != nmb.end(); ++nm )
+    _parMap.emplace( nm->name(), *nm );
 
   for ( std::vector< CoefExpr >::const_iterator x = xb.begin(); x != xb.end(); ++x )
   {
@@ -36,6 +42,40 @@ BinnedAmplitude::BinnedAmplitude( const std::vector< Parameter >& tpb,
 
     // _parMap.emplace( x->real().name(), x->real() );
     // _parMap.emplace( x->imag().name(), x->imag() );
+  }
+}
+
+
+
+
+BinnedAmplitude::BinnedAmplitude( const std::vector< ParameterExpr >& npb,
+                                  const std::vector< ParameterExpr >& nmb,
+                                  const std::vector< CoefExpr      >& xb  )
+  : _nbins( npb.size() ),
+    _npb( npb ), _nmb( nmb ), _xb( xb )
+{
+  if ( _nmb.size() != _nbins )
+    throw PdfException( "BinnedAmplitude: squared amplitude vectors must have the same size." );
+
+  if ( _xb.size() != _nbins )
+    throw PdfException( "BinnedAmplitude: squared amplitude and crossed amplitude vectors must have the same size." );
+
+  for ( std::vector< ParameterExpr >::const_iterator np = npb.begin(); np != npb.end(); ++np )
+  {
+    const std::map< std::string, Parameter >& pars = np->getPars();
+    _parMap.insert( pars.begin(), pars.end() );
+  }
+
+  for ( std::vector< ParameterExpr >::const_iterator nm = nmb.begin(); nm != nmb.end(); ++nm )
+  {
+    const std::map< std::string, Parameter >& pars = nm->getPars();
+    _parMap.insert( pars.begin(), pars.end() );
+  }
+
+  for ( std::vector< CoefExpr >::const_iterator x = xb.begin(); x != xb.end(); ++x )
+  {
+    const std::map< std::string, Parameter >& pars = x->getPars();
+    _parMap.insert( pars.begin(), pars.end() );
   }
 }
 
