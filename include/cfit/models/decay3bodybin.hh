@@ -8,7 +8,6 @@
 #include <cfit/variable.hh>
 #include <cfit/amplitude.hh>
 #include <cfit/phasespace.hh>
-#include <cfit/function.hh>
 #include <cfit/binnedamplitude.hh>
 
 #include <Minuit/FunctionMinimum.h>
@@ -46,9 +45,6 @@ private:
   const std::map< unsigned, std::vector< double > > cacheReal( const Dataset& data );
 
   void setParExpr();
-
-  // One or more functions to define the efficiency.
-  std::vector< Function > _funcs;
 
 public:
   Decay3BodyBin( const Variable&        mSq12         ,
@@ -114,10 +110,6 @@ public:
   const double evaluate( const std::vector< double >&                 vars  ,
                          const std::vector< double >&                 cacheR,
                          const std::vector< std::complex< double > >& cacheC ) const throw( PdfException );
-
-  friend const Decay3BodyBin  operator* (       Decay3BodyBin left, const Function&     right );
-  friend const Decay3BodyBin  operator* ( const Function&     left,       Decay3BodyBin right );
-  const        Decay3BodyBin& operator*=( const Function&     right                           ) throw( PdfException );
 };
 
 #endif

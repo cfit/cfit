@@ -127,12 +127,6 @@ void Decay3BodyBin::cacheNormComponents()
   double mSq12;
   double mSq13;
 
-  // Initialize the integrated efficiencies.
-  std::vector< double > effs;
-  effs.resize( _amp.nBins() );
-  for ( unsigned bin = 0; bin < _amp.nBins(); ++bin )
-    effs[ bin ] = 0.0;
-
   unsigned bin;
   // Integrate only over the region mSq13 < mSq12 (positive bins).
   for ( unsigned binX = 0; binX < nBins; ++binX )
@@ -154,42 +148,31 @@ void Decay3BodyBin::cacheNormComponents()
         {
           bin = _binCache[ nBins * binX + binY ];
         }
-
-        // std::cout << "DEBUG Decay3BodyBin: " << mSq12 << " " << mSq13 << " " << _binning.bin( mSq12, mSq13 ) << std::endl;
-        // bin = std::abs( _binning.bin( mSq12, mSq13 ) );
-        effs[ bin - 1 ] += evaluateFuncs( mSq12, mSq13 );
       }
     }
-
-  for ( unsigned bin = 0; bin < _amp.nBins(); ++bin )
-    effs[ bin ] *= std::pow( step, 2 );
 
   // Initialize the value of the norm components and the norm.
   _nDir = 0.0;
   _nXed = 0.0;
   _norm = 0.0;
 
-  std::vector< Parameter >::const_iterator tpb = _amp.tpb().begin();
-  std::vector< Parameter >::const_iterator tmb = _amp.tmb().begin();
-  std::vector< CoefExpr  >::const_iterator xb  = _amp.xb() .begin();
-  std::vector< double    >::const_iterator eff = effs      .begin();
+  std::vector< ParameterExpr >::const_iterator npb = _amp.npb().begin();
+  std::vector< ParameterExpr >::const_iterator nmb = _amp.nmb().begin();
+  std::vector< CoefExpr      >::const_iterator xb  = _amp.xb() .begin();
 
-  double                 ef;
-  double                 tp;
-  double                 tm;
-  std::complex< double > tx;
+  double                 np;
+  double                 nm;
+  std::complex< double > nx;
 
   // Calculate the norm components.
-  while ( tpb != _amp.tpb().end() )
+  while ( npb != _amp.npb().end() )
   {
-    ef = *eff++;
+    np = (npb++)->evaluate();
+    nm = (nmb++)->evaluate();
+    nx = std::sqrt( np * nm ) * (xb++)->evaluate();
 
-    tp = (tpb++)->value();
-    tm = (tmb++)->value();
-    tx = std::sqrt( tp * tm ) * (xb++)->evaluate();
-
-    _nDir += ef * ( tp + tm );
-    _nXed += ef * 2.0 * std::real( tx );
+    _nDir += np + nm;
+    _nXed += 2.0 * std::real( nx );
   }
 
   return;
@@ -257,11 +240,9 @@ const double Decay3BodyBin::evaluateUnnorm( const double& mSq12, const double& m
   const std::complex< double >&& vz     = z();
   const double&&                 vKappa = kappa();
 
-  const double&&                 funcs  = evaluateFuncs( mSq12, mSq13 );
-
-  return ( std::get< 0 >( tx )                   +
-           std::get< 1 >( tx ) * std::norm( vz ) +
-           2.0 * vKappa * std::real( vz * std::get< 2 >( tx ) ) ) * funcs;
+  return std::max( 0.0, ( std::get< 0 >( tx )                   +
+                          std::get< 1 >( tx ) * std::norm( vz ) +
+                          2.0 * vKappa * std::real( vz * std::get< 2 >( tx ) ) ) );
 }
 
 
@@ -308,79 +289,10 @@ const double Decay3BodyBin::evaluate( const std::vector< double >&              
   const std::complex< double >&& vz     = z();
   const double&&                 vKappa = kappa();
 
-  // Evaluate the functions that describe the efficiency.
-  double funcs = 0.0;
-  if ( size == 2 )
-    funcs = evaluateFuncs( vars[ 0 ], vars[ 1 ] );
-  else if ( size == 3 )
-    funcs = evaluateFuncs( vars[ 0 ], vars[ 1 ], vars[ 2 ] );
-
   const std::tuple< double, double, std::complex< double > >&& nx = _amp.evaluate( bin );
 
-  return ( std::get< 0 >( nx )                   +
-           std::get< 1 >( nx ) * std::norm( vz ) +
-           2.0 * vKappa * std::real( vz * std::get< 2 >( nx ) ) ) * funcs / _norm;
-}
-
-
-
-
-// No need to append an operator, since it can only be multiplication.
-const Decay3BodyBin& Decay3BodyBin::operator*=( const Function& right ) throw( PdfException )
-{
-  // For this case, do not check that the function does not depend on any variables that the model does not.
-  // The norm has to be calculated correctly, though.
-
-  // Consider the function parameters as own ones.
-  const std::map< std::string, Parameter >& parMap = right.getParMap();
-  _parMap.insert( parMap.begin(), parMap.end() );
-
-  // Append the function to the functions vector.
-  _funcs.push_back( right );
-
-  // Recompute the norm, since the pdf shape has changed under this operation.
-  cache();
-
-  return *this;
-}
-
-
-
-const Decay3BodyBin operator*( Decay3BodyBin left, const Function& right )
-{
-  // For this case, do not check that the function does not depend on any variables that the model does not.
-  // The norm has to be calculated correctly, though.
-
-  // Consider the function parameters as own ones.
-  const std::map< std::string, Parameter >& parMap = right.getParMap();
-  left._parMap.insert( parMap.begin(), parMap.end() );
-
-  // Append the function to the functions vector.
-  left._funcs.push_back( right );
-
-  // Recompute the norm, since the pdf shape has changed under this operation.
-  left.cache();
-
-  return left;
-}
-
-
-
-const Decay3BodyBin operator*( const Function& left, Decay3BodyBin right )
-{
-  // For this case, do not check that the function does not depend on any variables that the model does not.
-  // The norm has to be calculated correctly, though.
-
-  // Consider the function parameters as own ones.
-  const std::map< std::string, Parameter >& parMap = left.getParMap();
-  right._parMap.insert( parMap.begin(), parMap.end() );
-
-  // Append the function to the functions vector.
-  right._funcs.push_back( left );
-
-  // Recompute the norm, since the pdf shape has changed under this operation.
-  right.cache();
-
-  return right;
+  return std::max( 0.0, ( std::get< 0 >( nx )                   +
+                          std::get< 1 >( nx ) * std::norm( vz ) +
+                          2.0 * vKappa * std::real( vz * std::get< 2 >( nx ) ) ) ) / _norm;
 }
 
